@@ -52,7 +52,7 @@ export const actions = actionTree(
     addTarget({ state, commit }, target: Target) {
       commit('setTargets', [...state.targets, target])
     },
-    updateTarget({ state, commit }, params: { index: number, target: Target }) {
+    updateTarget({ state, commit }, params: { index: number; target: Target }) {
       commit(
         'setTargets',
         state.targets.map((t, i) => (i === params.index ? params.target : t))

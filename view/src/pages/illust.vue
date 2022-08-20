@@ -133,8 +133,8 @@ export default Vue.extend({
     async fetch() {
       this.loading = true
       const promises = []
-      for (const target of this.$accessor.settings.targets.filter(
-        (target) => target.targetType.includes('ILLUST')
+      for (const target of this.$accessor.settings.targets.filter((target) =>
+        target.targetType.includes('ILLUST')
       )) {
         promises.push(
           new Promise<void>((resolve) => {
