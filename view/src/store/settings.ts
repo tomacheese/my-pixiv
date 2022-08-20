@@ -29,12 +29,18 @@ export const state = (): Settings => ({
 export type RootState = ReturnType<typeof state>
 
 export const getters = getterTree(state, {
+  settings: (state) => state,
   darkMode: (state) => state.isDarkMode,
   targets: (state) => state.targets,
   filters: (state) => state.filters,
 })
 
 export const mutations = mutationTree(state, {
+  setAllSettings: (state, settings: Settings) => {
+    state.isDarkMode = settings.isDarkMode
+    state.targets = settings.targets
+    state.filters = settings.filters
+  },
   setDarkMode(state, isDarkMode: boolean) {
     state.isDarkMode = isDarkMode
   },
@@ -49,6 +55,9 @@ export const mutations = mutationTree(state, {
 export const actions = actionTree(
   { state, getters, mutations },
   {
+    setAllSettings: ({ commit }, settings: Settings) => {
+      commit('setAllSettings', settings)
+    },
     addTarget({ state, commit }, target: Target) {
       commit('setTargets', [...state.targets, target])
     },
