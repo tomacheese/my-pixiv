@@ -16,6 +16,7 @@
               <v-card-title class="text-h5" v-text="item.title"></v-card-title>
 
               <v-card-subtitle>
+                <div class="grey--text">{{ item.create_date }}</div>
                 <v-chip :color="item.is_bookmarked ? 'warning' : ''">
                   <v-icon>mdi-heart</v-icon>
                   {{ item.total_bookmarks }}

@@ -1,8 +1,8 @@
-from typing import Union
+import os.path
 
 import requests
-from fastapi import APIRouter, Header
-from starlette.responses import StreamingResponse
+from fastapi import APIRouter
+from starlette.responses import FileResponse, StreamingResponse
 
 from api import get_illusts, get_novels
 
@@ -31,4 +31,14 @@ def get_image(url: str):
                       "Chrome/80.0.3987.149 Safari/537.36",
         "Referer": "https://www.pixiv.net/"
     }, stream=True)
-    return StreamingResponse(response.raw, media_type="image/png")
+
+    if not os.path.exists("/cache"):
+        os.mkdir("/cache")
+
+    path = "/cache/" + url.split("/")[-1]
+    if not os.path.exists(path):
+        with open(path, "wb") as f:
+            for chunk in response.iter_content(chunk_size=1024):
+                f.write(chunk)
+
+    return FileResponse(path, media_type="image/png")
