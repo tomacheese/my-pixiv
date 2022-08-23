@@ -177,7 +177,7 @@ export default Vue.extend({
     },
     async fetchIllusts(str: string): Promise<PixivItem[]> {
       const res = await this.$axios.get(`/api/illusts/` + str).catch((err) => {
-        alert(`Error: ${err}`)
+        alert(`[fetchIllusts|${str}] Error: ${err}`)
         return null
       })
       if (res === null) {
@@ -221,6 +221,7 @@ export default Vue.extend({
       if (!window) {
         return
       }
+      this.overlay.isOpened = false
       window.open(`https://www.pixiv.net/artworks/${item.id}`, '_blank')
     },
     getImage(item: PixivItem): string {

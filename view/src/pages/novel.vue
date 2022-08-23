@@ -156,6 +156,7 @@ export default Vue.extend({
       if (!window) {
         return
       }
+      this.overlay.isOpened = false
       window.open(
         `https://www.pixiv.net/novel/show.php?id=${this.getItems()[i].id}`,
         '_blank'
