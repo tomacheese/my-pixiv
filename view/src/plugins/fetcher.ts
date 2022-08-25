@@ -49,7 +49,7 @@ export class Fetcher {
               .map((item) => {
                 return {
                   ...item,
-                  searchTags: target.tag,
+                  searchTags: target.tag
                 }
               })
           )
@@ -59,23 +59,15 @@ export class Fetcher {
   }
 
   private itemProcessor(item: PixivItem) {
-    item.image_urls.large =
-      this.$config.baseURL + 'api/images?url=' + item.image_urls.large
-    item.image_urls.medium =
-      this.$config.baseURL + 'api/images?url=' + item.image_urls.medium
-    item.image_urls.square_medium =
-      this.$config.baseURL + 'api/images?url=' + item.image_urls.square_medium
+    item.image_urls.large = `${this.$config.baseURL}api/images/${item.id}?url=${item.image_urls.large}`
+    item.image_urls.medium = `${this.$config.baseURL}api/images/${item.id}?url=${item.image_urls.medium}`
+    item.image_urls.square_medium = `${this.$config.baseURL}api/images/${item.id}?url=${item.image_urls.square_medium}`
 
     if (this.targetType === 'ILLUST') {
       for (const metaPage of item.meta_pages) {
-        metaPage.image_urls.large =
-          this.$config.baseURL + 'api/images?url=' + metaPage.image_urls.large
-        metaPage.image_urls.medium =
-          this.$config.baseURL + 'api/images?url=' + metaPage.image_urls.medium
-        metaPage.image_urls.square_medium =
-          this.$config.baseURL +
-          'api/images?url=' +
-          metaPage.image_urls.square_medium
+        metaPage.image_urls.large = `${this.$config.baseURL}api/images/${item.id}?url=${metaPage.image_urls.large}`
+        metaPage.image_urls.medium = `${this.$config.baseURL}api/images/${item.id}?url=${metaPage.image_urls.medium}`
+        metaPage.image_urls.square_medium = `${this.$config.baseURL}api/images/${item.id}?url=${metaPage.image_urls.square_medium}`
       }
     }
   }

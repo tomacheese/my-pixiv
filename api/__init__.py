@@ -73,7 +73,9 @@ def pixiv_download(url: str,
     return path
 
 
-def twi_img_download(url: str, tweet_id: str, num: int):
+def twi_img_download(url: str,
+                     tweet_id: str,
+                     num: int):
     response = requests.get(url, stream=True)
 
     os.makedirs(IMAGE_CACHE_DIR, exist_ok=True)
@@ -206,9 +208,9 @@ def get_match_tweets(screen_names: set[str],
     rets = []
 
     for screen_name in screen_names:
-        word = "from:{0} filter:images since:{1} until:{2} exclude:nativeretweets".format(screen_name, posted_at_before_1day,
-                                                                   posted_at_after_1day)
-        print(word)
+        word = "from:{0} filter:images since:{1} until:{2} exclude:nativeretweets".format(screen_name,
+                                                                                          posted_at_before_1day,
+                                                                                          posted_at_after_1day)
         tweets = search_tweet(word)
         if not tweets:
             raise HTTPException(status_code=404, detail="tweets not found")
@@ -227,6 +229,7 @@ def get_match_tweets(screen_names: set[str],
 
                 rets.append({"tweet": {
                     "id": tweet.id_str,
+                    "text": tweet.text,
                     "media_url": media_url,
                     "user": {
                         "id": tweet.user.id_str,

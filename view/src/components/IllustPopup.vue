@@ -7,6 +7,10 @@
         <v-icon>mdi-heart</v-icon>
       </v-btn>
 
+      <v-btn icon :color="getTweetFoundColor()" @click="openTwitter()">
+        <v-icon>mdi-twitter</v-icon>
+      </v-btn>
+
       <v-btn icon @click="openPage(item)">
         <v-icon>mdi-details</v-icon>
       </v-btn>
@@ -32,6 +36,10 @@
         <v-icon>mdi-heart</v-icon>
       </v-btn>
 
+      <v-btn icon :color="getTweetFoundColor()" @click="openTwitter()">
+        <v-icon>mdi-twitter</v-icon>
+      </v-btn>
+
       <v-btn icon @click="openPage(item)">
         <v-icon>mdi-details</v-icon>
       </v-btn>
@@ -40,6 +48,15 @@
         <v-icon>mdi-close</v-icon>
       </v-btn>
     </v-card-actions>
+
+    <v-dialog v-model="isTweetOpened">
+      <TweetPopup
+        :item="item"
+        @tweet-found="isTweetFound = true"
+        @tweet-not-found="isTweetFound = false"
+        @close-popup="close()"
+      ></TweetPopup>
+    </v-dialog>
   </v-card>
 </template>
 
@@ -51,15 +68,25 @@ export default Vue.extend({
     item: {
       type: Object as () => PixivItem,
       required: false,
-      default: () => null,
+      default: null,
     },
   },
   data(): {
     page: number
+    isTweetOpened: boolean
+    isTweetFound: boolean | null
   } {
     return {
       page: 1,
+      isTweetOpened: true,
+      isTweetFound: null,
     }
+  },
+  watch: {
+    item() {
+      this.isTweetOpened = false
+      this.isTweetFound = null
+    },
   },
   methods: {
     openPage(item: PixivItem) {
@@ -69,11 +96,20 @@ export default Vue.extend({
       this.$emit('close-popup')
       window.open(`https://www.pixiv.net/artworks/${item.id}`, '_blank')
     },
+    openTwitter() {
+      this.isTweetOpened = true
+    },
     getImage(item: PixivItem): string {
       if (item.meta_pages.length === 0) {
         return item.image_urls.large
       }
       return item.meta_pages[this.page - 1].image_urls.large
+    },
+    getTweetFoundColor(): string {
+      if (this.isTweetFound === null) {
+        return ''
+      }
+      return this.isTweetFound ? 'primary' : 'error'
     },
   },
 })

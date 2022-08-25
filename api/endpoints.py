@@ -1,14 +1,8 @@
-import os.path
-from pprint import pprint
+from fastapi import APIRouter
 
-import requests
-from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel
-from starlette.responses import FileResponse, StreamingResponse
+from fastapi import APIRouter
 
-from api import get_illust_screen_names, get_illusts, get_image, get_match_tweets, get_novels, get_search_tweets, \
-    init_pixiv_api, \
-    init_twitter_api
+from api import get_illusts, get_image, get_novels, get_search_tweets
 
 router = APIRouter(prefix="/api")
 
