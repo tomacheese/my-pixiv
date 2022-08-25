@@ -1,7 +1,7 @@
 import { NuxtConfig } from '@nuxt/types'
 
 const baseURL =
-  process.env.NODE_ENV === 'production' ? '/' : 'http://192.168.0.101:8080/'
+  process.env.NODE_ENV === 'production' ? '/' : 'http://192.168.0.101:8000/'
 
 const config: NuxtConfig = {
   srcDir: 'src/',
@@ -26,7 +26,10 @@ const config: NuxtConfig = {
 
   css: [],
 
-  plugins: [{ src: '@/plugins/settings', ssr: false }],
+  plugins: [
+    { src: '@/plugins/settings', ssr: false },
+    { src: '@/plugins/fetcher', ssr: false },
+  ],
 
   components: true,
 
