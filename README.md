@@ -6,8 +6,14 @@ Pixiv client for myself.
 
 ```powershell
 venv\Scripts\activate
-$env:PIXIVPY_TOKEN_FILE="token.json"
-python -m uvicorn api.__main__:app --host=0.0.0.0 --port=8000 --reload`
+$env:PIXIVPY_TOKEN_FILE="data/token.json"
+$env:CONFIG_FILE="data/config.json"
+$env:IMAGE_CACHE_DIR="cache/illusts/"
+$env:NOVEL_CACHE_DIR="cache/novels/"
+$env:IMAGE_CACHE_DIR="cache/images/"
+$env:TWEET_CACHE_DIR="cache/tweets/"
+
+python -m uvicorn api.__main__:app --host=0.0.0.0 --port=8000 --reload
 ```
 
 ```powershell

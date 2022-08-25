@@ -1,10 +1,14 @@
 import os.path
+from pprint import pprint
 
 import requests
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
+from pydantic import BaseModel
 from starlette.responses import FileResponse, StreamingResponse
 
-from api import get_illusts, get_novels
+from api import get_illust_screen_names, get_illusts, get_image, get_match_tweets, get_novels, get_search_tweets, \
+    init_pixiv_api, \
+    init_twitter_api
 
 router = APIRouter(prefix="/api")
 
@@ -24,21 +28,11 @@ def get_novels_req(word: str):
     return get_novels(word)
 
 
-@router.get("/images")
-def get_image(url: str):
-    response = requests.get(url, headers={
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) "
-                      "Chrome/80.0.3987.149 Safari/537.36",
-        "Referer": "https://www.pixiv.net/"
-    }, stream=True)
+@router.get("/images/{illust_id}")
+def get_image_req(illust_id: str, url: str):
+    return get_image(url, illust_id)
 
-    if not os.path.exists("/cache"):
-        os.mkdir("/cache")
 
-    path = "/cache/" + url.split("/")[-1]
-    if not os.path.exists(path):
-        with open(path, "wb") as f:
-            for chunk in response.iter_content(chunk_size=1024):
-                f.write(chunk)
-
-    return FileResponse(path, media_type="image/png")
+@router.get("/tweet/{illust_id}")
+def search_tweet(illust_id: str):
+    return get_search_tweets(illust_id)
