@@ -13,22 +13,22 @@ const config: NuxtConfig = {
     titleTemplate: '%s - my-pixiv',
     title: 'my-pixiv',
     htmlAttrs: {
-      lang: 'ja'
+      lang: 'ja',
     },
     meta: [
       { charset: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
       { hid: 'description', name: 'description', content: '' },
-      { name: 'format-detection', content: 'telephone=no' }
+      { name: 'format-detection', content: 'telephone=no' },
     ],
-    link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }]
+    link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }],
   },
 
   css: [],
 
   plugins: [
     { src: '@/plugins/settings', ssr: false },
-    { src: '@/plugins/fetcher', ssr: false }
+    { src: '@/plugins/fetcher', ssr: false },
   ],
 
   components: true,
@@ -37,30 +37,30 @@ const config: NuxtConfig = {
     '@nuxt/typescript-build',
     '@nuxtjs/stylelint-module',
     '@nuxtjs/vuetify',
-    'nuxt-typed-vuex'
+    'nuxt-typed-vuex',
   ],
 
   modules: ['@nuxtjs/axios'],
 
   axios: {
-    baseURL
+    baseURL,
   },
 
   publicRuntimeConfig: {
-    baseURL
+    baseURL,
   },
 
   vuetify: {
     customVariables: [],
     theme: {
-      dark: false
-    }
+      dark: false,
+    },
   },
 
   server: {
-    host: '0.0.0.0'
+    host: '0.0.0.0',
   },
 
-  build: {}
+  build: {},
 }
 export default config

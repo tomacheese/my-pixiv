@@ -23,7 +23,7 @@ interface Settings {
 export const state = (): Settings => ({
   isDarkMode: false,
   targets: [],
-  filters: []
+  filters: [],
 })
 
 export type RootState = ReturnType<typeof state>
@@ -37,7 +37,7 @@ export const getters = getterTree(state, {
       target.targetType.includes(targetType)
     )
   },
-  filters: (state) => state.filters
+  filters: (state) => state.filters,
 })
 
 export const mutations = mutationTree(state, {
@@ -54,7 +54,7 @@ export const mutations = mutationTree(state, {
   },
   setFilters(state, filters: Filter[]) {
     state.filters = filters
-  }
+  },
 })
 
 export const actions = actionTree(
@@ -98,6 +98,6 @@ export const actions = actionTree(
           (f) => f.type !== filter.type || f.value !== filter.value
         )
       )
-    }
+    },
   }
 )
