@@ -2,14 +2,14 @@ import { actionTree, getterTree, mutationTree } from 'typed-vuex'
 
 export type TargetType = 'ILLUST' | 'NOVEL'
 
-interface Target {
+export interface Target {
   targetType: TargetType[]
   tag: string[]
   ignores: string[]
   minLikeCount: number
 }
 
-interface Filter {
+export interface Filter {
   type: 'TITLE' | 'AUTHOR' | 'TAG' | 'ALL'
   value: string
 }
@@ -23,7 +23,7 @@ interface Settings {
 export const state = (): Settings => ({
   isDarkMode: false,
   targets: [],
-  filters: [],
+  filters: []
 })
 
 export type RootState = ReturnType<typeof state>
@@ -32,7 +32,12 @@ export const getters = getterTree(state, {
   settings: (state) => state,
   darkMode: (state) => state.isDarkMode,
   targets: (state) => state.targets,
-  filters: (state) => state.filters,
+  specificTargets: (state) => (targetType: TargetType) => {
+    return state.targets.filter((target) =>
+      target.targetType.includes(targetType)
+    )
+  },
+  filters: (state) => state.filters
 })
 
 export const mutations = mutationTree(state, {
@@ -49,7 +54,7 @@ export const mutations = mutationTree(state, {
   },
   setFilters(state, filters: Filter[]) {
     state.filters = filters
-  },
+  }
 })
 
 export const actions = actionTree(
@@ -93,6 +98,6 @@ export const actions = actionTree(
           (f) => f.type !== filter.type || f.value !== filter.value
         )
       )
-    },
+    }
   }
 )
