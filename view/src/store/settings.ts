@@ -2,14 +2,14 @@ import { actionTree, getterTree, mutationTree } from 'typed-vuex'
 
 export type TargetType = 'ILLUST' | 'NOVEL'
 
-interface Target {
+export interface Target {
   targetType: TargetType[]
   tag: string[]
   ignores: string[]
   minLikeCount: number
 }
 
-interface Filter {
+export interface Filter {
   type: 'TITLE' | 'AUTHOR' | 'TAG' | 'ALL'
   value: string
 }
@@ -32,6 +32,11 @@ export const getters = getterTree(state, {
   settings: (state) => state,
   darkMode: (state) => state.isDarkMode,
   targets: (state) => state.targets,
+  specificTargets: (state) => (targetType: TargetType) => {
+    return state.targets.filter((target) =>
+      target.targetType.includes(targetType)
+    )
+  },
   filters: (state) => state.filters,
 })
 
