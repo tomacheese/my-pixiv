@@ -18,7 +18,7 @@ export interface User {
 
 export interface Tag {
   name: string
-  translated_name: string
+  translated_name: string | null
 }
 
 export interface MetaSinglePage {
@@ -28,7 +28,6 @@ export interface MetaSinglePage {
 export interface PixivItem {
   id: number
   title: string
-  type: string
   image_urls: ImageUrls
   caption: string
   restrict: number
@@ -49,4 +48,8 @@ export interface PixivItem {
   is_bookmarked: boolean
   visible: boolean
   is_muted: boolean
+}
+
+export type PixivItemWithSearchTag = PixivItem & {
+  searchTags: string[]
 }
