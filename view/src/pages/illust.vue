@@ -2,10 +2,7 @@
   <v-container fluid>
     <ItemList :items="items" :loading="loading" @open="open"></ItemList>
     <v-dialog v-model="overlay.isIllustOpened">
-      <IllustPopup
-        :item="overlay.target"
-        @close-popup="close()"
-      ></IllustPopup>
+      <IllustPopup :item="overlay.target" @close-popup="close()"></IllustPopup>
     </v-dialog>
   </v-container>
 </template>
