@@ -7,5 +7,5 @@ services:
       - "8080:80"
     volumes:
       - type: bind
-        source: token.json
-        target: /data/token.json
+        source: data/
+        target: /data/

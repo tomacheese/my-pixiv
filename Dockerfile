@@ -5,7 +5,8 @@ WORKDIR /build
 COPY view/package.json package.json
 COPY view/yarn.lock yarn.lock
 
-RUN yarn install --frozen-lockfile
+RUN echo network-timeout 600000 > .yarnrc && \
+  yarn install --frozen-lockfile
 
 COPY view/src src
 COPY view/nuxt.config.ts nuxt.config.ts
@@ -14,11 +15,20 @@ COPY view/tsconfig.json tsconfig.json
 RUN yarn build && \
   yarn generate
 
-FROM python:3.10.6-alpine3.16
+FROM python:3.9.13-bullseye
 
-RUN apk update && \
-  apk add --no-cache nodejs yarn && \
-  rm -rf /var/cache/apk/*
+RUN export DEBIAN_FRONTEND=noninteractive && \
+  apt-get update && \
+  apt-get install -y --no-install-recommends \
+  libblas-dev \
+  liblapack-dev \
+  # cython \
+  gfortran \
+  # gfortran-4.9 \
+  # libgfortran-4.9-dev \
+  && \
+  apt-get clean && \
+  rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 WORKDIR /app
 COPY requirements.txt .

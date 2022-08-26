@@ -2,6 +2,9 @@ node_modules/
 .idea/
 venv/
 .nuxt/
+cache/
+data/
 
 token.json
+config.json
 *.pyc

@@ -1,11 +1,8 @@
 <template>
   <v-container fluid>
     <ItemList :items="items" :loading="loading" @open="open"></ItemList>
-    <v-dialog v-model="overlay.isOpened">
-      <IllustPopup
-        :item="overlay.target"
-        @close-popup="overlay.isOpened = false"
-      ></IllustPopup>
+    <v-dialog v-model="overlay.isIllustOpened">
+      <IllustPopup :item="overlay.target" @close-popup="close()"></IllustPopup>
     </v-dialog>
   </v-container>
 </template>
@@ -22,7 +19,7 @@ export default Vue.extend({
     items: PixivItemWithSearchTag[]
     page: number
     overlay: {
-      isOpened: boolean
+      isIllustOpened: boolean
       target: PixivItem | null
     }
     loading: boolean
@@ -31,7 +28,7 @@ export default Vue.extend({
       items: [],
       page: 1,
       overlay: {
-        isOpened: false,
+        isIllustOpened: false,
         target: null,
       },
       loading: false,
@@ -58,11 +55,12 @@ export default Vue.extend({
       this.loading = false
     },
     open(item: PixivItem): void {
-      if (!window) {
-        return
-      }
-      this.overlay.isOpened = true
+      this.overlay.isIllustOpened = true
       this.overlay.target = item
+    },
+    close() {
+      this.overlay.isIllustOpened = false
+      this.overlay.target = null
     },
   },
 })
