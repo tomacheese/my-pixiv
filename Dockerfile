@@ -5,7 +5,8 @@ WORKDIR /build
 COPY view/package.json package.json
 COPY view/yarn.lock yarn.lock
 
-RUN yarn install --frozen-lockfile
+RUN echo network-timeout 600000 > .yarnrc && \
+  yarn install --frozen-lockfile
 
 COPY view/src src
 COPY view/nuxt.config.ts nuxt.config.ts
