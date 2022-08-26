@@ -24,7 +24,7 @@ const config: NuxtConfig = {
     link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }],
   },
 
-  css: [],
+  css: ['@/assets/scroll.css'],
 
   plugins: [
     { src: '@/plugins/settings', ssr: false },
