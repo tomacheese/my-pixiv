@@ -5,13 +5,13 @@ import time
 from datetime import datetime, timedelta
 from pprint import pprint
 
-import cv2
+import imagehash
 import requests
 import tweepy
 from fastapi import HTTPException
-from imgsim import imgsim
 from pixivpy3 import AppPixivAPI
 from starlette.responses import FileResponse
+from PIL import Image
 
 TOKEN_FILE = os.environ.setdefault('PIXIVPY_TOKEN_FILE', '/data/token.json')
 CONFIG_FILE = os.environ.setdefault('CONFIG_FILE', '/data/config.json')
@@ -78,9 +78,9 @@ def twi_img_download(url: str,
                      num: int):
     response = requests.get(url, stream=True)
 
-    os.makedirs(IMAGE_CACHE_DIR, exist_ok=True)
+    os.makedirs(TWEET_CACHE_DIR, exist_ok=True)
 
-    path = os.path.join(IMAGE_CACHE_DIR, tweet_id + "-" + str(num) + ".png")
+    path = os.path.join(TWEET_CACHE_DIR, tweet_id + "-" + str(num) + ".png")
     if not os.path.exists(path):
         with open(path, "wb") as f:
             for chunk in response.iter_content(chunk_size=1024):
@@ -163,6 +163,8 @@ def get_search_tweets(illust_id: str):
     path = pixiv_download(illust_url, illust_id)
 
     screen_names = get_illust_screen_names(pixiv_api, result["illust"])
+    if len(screen_names) == 0:
+        raise HTTPException(status_code=404, detail="screen_names not found")
 
     # create_date: 2022-08-21T04:48:53+09:00
     posted_at = result["illust"]["create_date"]
@@ -170,6 +172,8 @@ def get_search_tweets(illust_id: str):
 
     # ツイートを検索
     tweets = get_match_tweets(screen_names, posted_at, path)
+    if len(tweets) == 0:
+        raise HTTPException(status_code=404, detail="tweets not found")
     return {"screen_names": screen_names, "tweets": tweets}
 
 
@@ -192,7 +196,7 @@ def get_illust_screen_names(pixiv_api: AppPixivAPI,
         if "twitter_account" in user["profile"]:
             screen_names.add(user["profile"]["twitter_account"])
 
-    return screen_names
+    return set(filter(lambda x: x != "", screen_names))
 
 
 def get_match_tweets(screen_names: set[str],
@@ -244,10 +248,9 @@ def get_match_tweets(screen_names: set[str],
 
 def calc_image_similarity(image_path: str,
                           tweet_image_path: str) -> float:
-    vtr = imgsim.Vectorizer()
-    img0 = cv2.imread(image_path)
-    img1 = cv2.imread(tweet_image_path)
-    vec0 = vtr.vectorize(img0)
-    vec1 = vtr.vectorize(img1)
+    print("image_path: " + image_path)
+    print("tweet_image_path: " + tweet_image_path)
+    hash_1a = imagehash.phash(Image.open(image_path))
+    hash_2a = imagehash.phash(Image.open(tweet_image_path))
 
-    return float(imgsim.distance(vec0, vec1))
+    return hash_2a-hash_1a

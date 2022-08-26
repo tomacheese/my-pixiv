@@ -52,8 +52,7 @@
     <v-dialog v-model="isTweetOpened">
       <TweetPopup
         :item="item"
-        @tweet-found="isTweetFound = true"
-        @tweet-not-found="isTweetFound = false"
+        :data="tweets"
         @close-popup="close()"
       ></TweetPopup>
     </v-dialog>
@@ -62,6 +61,7 @@
 
 <script lang="ts">
 import Vue from 'vue'
+import { TweetPopupProp } from './TweetPopup.vue'
 import { PixivItem } from '@/types/pixivItem'
 export default Vue.extend({
   props: {
@@ -75,18 +75,22 @@ export default Vue.extend({
     page: number
     isTweetOpened: boolean
     isTweetFound: boolean | null
+    tweets: TweetPopupProp | null
   } {
     return {
       page: 1,
-      isTweetOpened: true,
+      isTweetOpened: false,
       isTweetFound: null,
+      tweets: null,
     }
   },
   watch: {
     item() {
-      this.isTweetOpened = false
-      this.isTweetFound = null
+      this.getTweets()
     },
+  },
+  mounted() {
+    this.getTweets()
   },
   methods: {
     openPage(item: PixivItem) {
@@ -111,6 +115,48 @@ export default Vue.extend({
       }
       return this.isTweetFound ? 'primary' : 'error'
     },
+    getTweets() {
+      if (this.item == null) {
+        return
+      }
+      this.isTweetFound = null
+      this.$axios
+        .get<TweetPopupProp>(`/api/tweet/${this.item.id}`)
+        .then((response) => {
+          this.tweets = {
+            screen_names: response.data.screen_names,
+            tweets: response.data.tweets.sort((a, b) => {
+              return a.similarity - b.similarity
+            }),
+            error: null,
+          }
+          this.isTweetFound = true
+        })
+        .catch((error) => {
+          this.isTweetFound = false
+          if (error.response.status === 404) {
+            this.tweets = {
+              screen_names: [],
+              tweets: [],
+              error:
+                'ツイートが見つかりませんでした (' +
+                error.response.data.detail +
+                ')',
+            }
+          } else {
+            this.tweets = {
+              screen_names: [],
+              tweets: [],
+              error: String(error),
+            }
+          }
+        })
+    },
+    close() {
+      this.isTweetOpened = false
+      this.isTweetFound = null
+      this.$emit('close-popup')
+    }
   },
 })
 </script>
