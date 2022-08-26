@@ -252,8 +252,6 @@ def get_match_tweets(screen_names: set[str],
 
 def calc_image_similarity(image_path: str,
                           tweet_image_path: str) -> float:
-    print("image_path: " + image_path)
-    print("tweet_image_path: " + tweet_image_path)
     hash_1a = imagehash.phash(Image.open(image_path))
     hash_2a = imagehash.phash(Image.open(tweet_image_path))
 
