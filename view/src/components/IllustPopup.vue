@@ -30,7 +30,11 @@
         class="mt-3"
       ></v-pagination>
       <div class="text-center">
-        <img :src="getImage(item)" style="overflow: scroll" />
+        <img
+          :src="getImage(item)"
+          style="overflow: scroll"
+          @click="clickImage"
+        />
       </div>
     </v-card-text>
     <v-card-actions>
@@ -150,6 +154,22 @@ export default Vue.extend({
         .catch((error) => {
           alert('Likeに失敗: ' + error)
         })
+    },
+    clickImage(e: PointerEvent) {
+      if (this.item == null) {
+        return
+      }
+      if (this.item.meta_pages.length === 0) {
+        // 画像数が1個（meta_pagesは0）ならクリックしても何もおきない
+        return
+      }
+      const isRight =
+        e.offsetX > (e.target as HTMLImageElement).naturalWidth / 2
+      if (isRight && this.page < this.item.meta_pages.length) {
+        this.page++
+      } else if (!isRight && this.page > 1) {
+        this.page--
+      }
     },
     getTweets() {
       if (this.item == null) {

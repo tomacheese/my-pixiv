@@ -4,7 +4,8 @@
     <v-pagination
       v-model="page"
       :length="Math.ceil(items.length / 10)"
-      class="mt-3"
+      :total-visible="11"
+      class="my-3"
     ></v-pagination>
     <v-row>
       <v-col v-for="(item, i) in getItems()" :key="i" cols="12">
@@ -19,7 +20,8 @@
     <v-pagination
       v-model="page"
       :length="Math.ceil(items.length / 10)"
-      class="mt-3"
+      :total-visible="11"
+      class="my-3"
       @input="changePage"
     ></v-pagination>
   </v-container>
