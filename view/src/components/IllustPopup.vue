@@ -3,6 +3,10 @@
     <v-card-actions>
       <v-spacer></v-spacer>
 
+      <v-btn icon @click="changeFullScreen()">
+        <v-icon>mdi-{{ fullscreen ? 'fullscreen-exit' : 'fullscreen' }}</v-icon>
+      </v-btn>
+
       <v-btn icon :color="liked ? 'green' : ''" @click="addHeart()">
         <v-icon>mdi-heart</v-icon>
       </v-btn>
@@ -69,6 +73,11 @@ export default Vue.extend({
       type: Object as () => PixivItem,
       required: false,
       default: null,
+    },
+    fullscreen: {
+      type: Boolean,
+      required: false,
+      default: false,
     },
   },
   data(): {
@@ -181,6 +190,9 @@ export default Vue.extend({
       this.isTweetOpened = false
       this.isTweetFound = null
       this.$emit('close-popup')
+    },
+    changeFullScreen() {
+      this.$emit('change-fullscreen')
     },
   },
 })
