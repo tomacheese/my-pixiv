@@ -1,6 +1,7 @@
 <template>
-  <v-container ref="itemlist">
+  <v-container>
     <v-progress-linear v-if="loading" indeterminate></v-progress-linear>
+    <div ref="itemlist"></div>
     <v-pagination
       v-model="page"
       :length="Math.ceil(items.length / 10)"
