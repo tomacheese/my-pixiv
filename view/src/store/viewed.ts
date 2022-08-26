@@ -8,7 +8,7 @@ interface Viewed {
 
 export const state = (): Viewed => ({
   illusts: [],
-  novels: []
+  novels: [],
 })
 
 export type RootState = ReturnType<typeof state>
@@ -21,7 +21,7 @@ export const getters = getterTree(state, {
   novels: (state) => state.novels,
   isNovelViewed: (state) => (novelId: number) => {
     return state.novels.includes(novelId)
-  }
+  },
 })
 
 export const mutations = mutationTree(state, {
@@ -30,7 +30,7 @@ export const mutations = mutationTree(state, {
   },
   setNovels: (state, novels: number[]) => {
     state.novels = novels
-  }
+  },
 })
 
 export const actions = actionTree(
@@ -47,6 +47,6 @@ export const actions = actionTree(
         return
       }
       commit('setNovels', [...state.novels, item.id])
-    }
+    },
   }
 )

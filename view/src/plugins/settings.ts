@@ -4,6 +4,6 @@ export default ({ store }: any) => {
   createPersistedState({
     key: 'vuex',
     paths: ['settings', 'viewed'],
-    storage: window.localStorage
+    storage: window.localStorage,
   })(store)
 }

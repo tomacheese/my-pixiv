@@ -17,6 +17,6 @@ export const accessorType = getAccessorType({
   actions,
   modules: {
     settings,
-    viewed
-  }
+    viewed,
+  },
 })
