@@ -58,7 +58,7 @@ export class Fetcher {
               .map((item) => {
                 return {
                   ...item,
-                  searchTags: target.tag
+                  searchTags: target.tag,
                 }
               })
           )
