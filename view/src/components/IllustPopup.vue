@@ -107,6 +107,7 @@ export default Vue.extend({
       if (item.meta_pages.length === 0) {
         return item.image_urls.large
       }
+      console.log(item.meta_pages[this.page - 1].image_urls.large)
       return item.meta_pages[this.page - 1].image_urls.large
     },
     getTweetFoundColor(): string {

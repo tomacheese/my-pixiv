@@ -1,6 +1,6 @@
 <!-- eslint-disable vue/no-v-html -->
 <template>
-  <v-container>
+  <v-container ref="itemlist">
     <v-progress-linear v-if="loading" indeterminate></v-progress-linear>
     <v-pagination
       v-model="page"
@@ -46,6 +46,7 @@
       v-model="page"
       :length="Math.ceil(items.length / 10)"
       class="mt-3"
+      @input="changePage"
     ></v-pagination>
   </v-container>
 </template>
@@ -83,6 +84,9 @@ export default Vue.extend({
     },
     open(item: PixivItem): void {
       this.$emit('open', item)
+    },
+    changePage() {
+      ;(this.$refs.itemlist as HTMLElement).scrollIntoView()
     },
   },
 })
