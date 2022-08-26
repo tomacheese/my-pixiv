@@ -38,10 +38,10 @@ export class Fetcher {
 
   public getFetchItemPromise(target: Target) {
     return new Promise<PixivItemWithSearchTag[]>((resolve, reject) => {
-      // /api/illusts/XXXXX or /api/novels/XXXXX
+      // /api/illust/XXXXX or /api/novel/XXXXX
       this.$axios
         .get<PixivItem[]>(
-          `/api/${this.targetType.toLocaleLowerCase()}s/` + target.tag.join(' ')
+          `/api/${this.targetType.toLocaleLowerCase()}/` + target.tag.join(' ')
         )
         .then((result) => {
           const data = result.data
@@ -72,7 +72,7 @@ export class Fetcher {
     item.image_urls.medium = `${this.$config.baseURL}api/images/${item.id}?url=${item.image_urls.medium}`
     item.image_urls.square_medium = `${this.$config.baseURL}api/images/${item.id}?url=${item.image_urls.square_medium}`
 
-    if (this.targetType === 'ILLUST') {
+    if (this.targetType === 'ILLUST' || this.targetType === 'MANGA') {
       for (const metaPage of item.meta_pages) {
         metaPage.image_urls.large = `${this.$config.baseURL}api/images/${item.id}?url=${metaPage.image_urls.large}`
         metaPage.image_urls.medium = `${this.$config.baseURL}api/images/${item.id}?url=${metaPage.image_urls.medium}`

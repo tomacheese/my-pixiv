@@ -1,6 +1,6 @@
 import { actionTree, getterTree, mutationTree } from 'typed-vuex'
 
-export type TargetType = 'ILLUST' | 'NOVEL'
+export type TargetType = 'ILLUST' | 'MANGA' | 'NOVEL'
 
 export interface Target {
   targetType: TargetType[]

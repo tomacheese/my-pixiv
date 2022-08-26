@@ -17,6 +17,7 @@ TOKEN_FILE = os.environ.setdefault('PIXIVPY_TOKEN_FILE', '/data/token.json')
 CONFIG_FILE = os.environ.setdefault('CONFIG_FILE', '/data/config.json')
 ILLUST_CACHE_DIR = os.environ.setdefault('IMAGE_CACHE_DIR', '/cache/illusts/')
 NOVEL_CACHE_DIR = os.environ.setdefault('NOVEL_CACHE_DIR', '/cache/novels/')
+MANGA_CACHE_DIR = os.environ.setdefault('MANGA_CACHE_DIR', '/cache/manga/')
 IMAGE_CACHE_DIR = os.environ.setdefault('IMAGE_CACHE_DIR', '/cache/images/')
 TWEET_CACHE_DIR = os.environ.setdefault('TWEET_CACHE_DIR', '/cache/tweets/')
 
@@ -93,12 +94,27 @@ def twi_img_download(url: str,
     return path
 
 
-def get_illusts(word: str):
+def get_pixiv(item_type: str, word: str):
     api = init_pixiv_api()
-    # キャッシュ
-    os.makedirs(ILLUST_CACHE_DIR, exist_ok=True)
+    if item_type == "illust":
+        func = api.search_illust
+        cache_dir = ILLUST_CACHE_DIR
+        key = "illusts"
+    elif item_type == "novel":
+        func = api.search_novel
+        cache_dir = NOVEL_CACHE_DIR
+        key = "novels"
+    elif item_type == "manga":
+        func = api.search_illust
+        cache_dir = MANGA_CACHE_DIR
+        key = "illusts"
+    else:
+        raise Exception("item_type is invalid")
 
-    path = os.path.join(ILLUST_CACHE_DIR, word.replace(" ", "-") + ".json")
+    # キャッシュ
+    os.makedirs(cache_dir, exist_ok=True)
+
+    path = os.path.join(cache_dir, word.replace(" ", "-") + ".json")
     if os.path.exists(path):
         with open(path, "r", encoding="utf-8") as f:
             cache = json.load(f)
@@ -106,41 +122,20 @@ def get_illusts(word: str):
             if cache["updated_at"] > time.time() - 3600:
                 return cache["items"]
 
-    # とりあえず90件取得
+    # とりあえず150件取得
     items = []
-    for i in range(3):
-        results = api.search_illust(word, offset=i * 30)
-        if "illusts" not in results:
-            raise HTTPException(status_code=500, detail="illusts not found (" + results["message"] + ")")
-        items.extend(results["illusts"])
-
-    with open(path, "w", encoding="utf-8") as f:
-        f.write(json.dumps({"items": items, "updated_at": time.time()}))
-
-    return items
-
-
-def get_novels(word: str):
-    api = init_pixiv_api()
-    # キャッシュ
-    os.makedirs(NOVEL_CACHE_DIR, exist_ok=True)
-
-    path = os.path.join(NOVEL_CACHE_DIR, word.replace(" ", "-") + ".json")
-    if os.path.exists(path):
-        with open(path, "r", encoding="utf-8") as f:
-            cache = json.load(f)
-            # 1時間以内のキャッシュか
-            if cache["updated_at"] > time.time() - 3600:
-                return cache["items"]
-
-    # とりあえず90件取得
-    items = []
-    for i in range(3):
-        results = api.search_novel(word, offset=i * 30)
-        if "novels" not in results:
+    for i in range(5):
+        results = func(word, offset=i * 30)
+        if key not in results:
             print(results)
-            raise HTTPException(status_code=500, detail="novels not found (" + results["message"] + ")")
-        items.extend(results["novels"])
+            raise HTTPException(status_code=500, detail=item_type + " not found (" + results["message"] + ")")
+
+        if item_type == "novel":
+            # 小説の場合typeがない
+            items.extend(results[key])
+        else:
+            # イラスト・マンガはtypeで区別する必要がある
+            items.extend(list(filter(lambda x: x["type"] == item_type, results[key])))
 
     with open(path, "w", encoding="utf-8") as f:
         f.write(json.dumps({"items": items, "updated_at": time.time()}))

@@ -82,6 +82,7 @@ const targetTypeMap: {
   [key: string]: TargetType
 } = {
   イラスト: 'ILLUST',
+  マンガ: 'MANGA',
   小説: 'NOVEL',
 }
 
@@ -96,11 +97,11 @@ export default Vue.extend({
     editing: number | null
   } {
     return {
-      targetType: ['イラスト', '小説'],
+      targetType: ['イラスト', 'マンガ', '小説'],
       tag: '',
       ignores: '',
       minLikeCount: '0',
-      targetTypes: ['イラスト', '小説'],
+      targetTypes: ['イラスト', 'マンガ', '小説'],
       editing: null,
     }
   },

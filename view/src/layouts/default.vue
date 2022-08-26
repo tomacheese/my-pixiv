@@ -23,6 +23,10 @@ export default Vue.extend({
           value: 'illust',
         },
         {
+          name: 'マンガ',
+          value: 'manga',
+        },
+        {
           name: '小説',
           value: 'novel',
         },
