@@ -1,6 +1,12 @@
 <template>
   <v-container fluid>
-    <ItemList :items="items" :loading="loading" @open="open"></ItemList>
+    <ItemList
+      :items="items"
+      :loading="loading"
+      :vieweds="vieweds"
+      @open="open"
+      @intersect-item="onItemViewing"
+    ></ItemList>
     <v-dialog v-model="overlay.isIllustOpened">
       <IllustPopup :item="overlay.target" @close-popup="close()"></IllustPopup>
     </v-dialog>
@@ -17,6 +23,7 @@ export default Vue.extend({
   name: 'IllustPage',
   data(): {
     items: PixivItemWithSearchTag[]
+    vieweds: number[]
     page: number
     overlay: {
       isIllustOpened: boolean
@@ -26,6 +33,7 @@ export default Vue.extend({
   } {
     return {
       items: [],
+      vieweds: [],
       page: 1,
       overlay: {
         isIllustOpened: false,
@@ -36,6 +44,8 @@ export default Vue.extend({
   },
   async created() {
     await this.fetch()
+
+    this.vieweds = this.$accessor.viewed.illusts
   },
   methods: {
     async fetch() {
@@ -61,6 +71,9 @@ export default Vue.extend({
     close() {
       this.overlay.isIllustOpened = false
       this.overlay.target = null
+    },
+    onItemViewing(item: PixivItem) {
+      this.$accessor.viewed.addIllust(item)
     },
   },
 })
