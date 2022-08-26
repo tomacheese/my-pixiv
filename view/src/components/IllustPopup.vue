@@ -15,7 +15,7 @@
         <v-icon>mdi-details</v-icon>
       </v-btn>
 
-      <v-btn icon @click="isOpened = false">
+      <v-btn icon @click="close()">
         <v-icon>mdi-close</v-icon>
       </v-btn>
     </v-card-actions>
@@ -44,7 +44,7 @@
         <v-icon>mdi-details</v-icon>
       </v-btn>
 
-      <v-btn icon @click="isOpened = false">
+      <v-btn icon @click="close()">
         <v-icon>mdi-close</v-icon>
       </v-btn>
     </v-card-actions>

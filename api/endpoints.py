@@ -1,8 +1,6 @@
 from fastapi import APIRouter
 
-from fastapi import APIRouter
-
-from api import get_illusts, get_image, get_novels, get_search_tweets
+from api import get_image, get_pixiv, get_search_tweets
 
 router = APIRouter(prefix="/api")
 
@@ -12,14 +10,19 @@ def get_root():
     return {"message": "my-pixiv api"}
 
 
-@router.get("/illusts/{word}")
+@router.get("/illust/{word}")
 def get_illusts_req(word: str):
-    return get_illusts(word)
+    return get_pixiv("illust", word)
 
 
-@router.get("/novels/{word}")
+@router.get("/novel/{word}")
 def get_novels_req(word: str):
-    return get_novels(word)
+    return get_pixiv("novel", word)
+
+
+@router.get("/manga/{word}")
+def get_novels_req(word: str):
+    return get_pixiv("manga", word)
 
 
 @router.get("/images/{illust_id}")
