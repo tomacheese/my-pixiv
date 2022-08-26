@@ -62,7 +62,6 @@ export default Vue.extend({
     item() {
       const element = document.getElementById(this.observName)
       if (!element) {
-        console.log('element not found')
         return
       }
       if (this.isViewing(element)) {
@@ -84,7 +83,6 @@ export default Vue.extend({
     }
     const element = document.getElementById(this.observName)
     if (!element) {
-      console.log('element not found')
       return
     }
     if (this.isViewing(element)) {

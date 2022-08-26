@@ -73,7 +73,6 @@ export default Vue.extend({
       this.overlay.target = null
     },
     onItemViewing(item: PixivItem) {
-      console.log('onItemViewing', item.title)
       this.$accessor.viewed.addIllust(item)
     },
   },
