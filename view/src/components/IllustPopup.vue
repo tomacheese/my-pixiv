@@ -156,7 +156,7 @@ export default Vue.extend({
       this.isTweetOpened = false
       this.isTweetFound = null
       this.$emit('close-popup')
-    }
+    },
   },
 })
 </script>

@@ -110,7 +110,7 @@ export default Vue.extend({
     },
     close() {
       this.$emit('close-popup')
-    }
+    },
   },
 })
 </script>
