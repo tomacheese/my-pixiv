@@ -143,6 +143,18 @@ def get_pixiv(item_type: str, word: str):
     return items
 
 
+def like_pixiv(item_type: str, item_id: str):
+    api = init_pixiv_api()
+    if item_type == "illust" or item_type == "manga":
+        func = api.illust_bookmark_add
+    elif item_type == "novel":
+        raise Exception("novel not supported")
+    else:
+        raise Exception("item_type is invalid")
+
+    func(item_id, restrict="private")
+
+
 def get_image(url: str,
               illust_id: str):
     path = pixiv_download(url, illust_id)

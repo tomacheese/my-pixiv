@@ -3,7 +3,7 @@
     <v-card-actions>
       <v-spacer></v-spacer>
 
-      <v-btn icon @click="addHeart()">
+      <v-btn icon :color="liked ? 'green' : ''" @click="addHeart()">
         <v-icon>mdi-heart</v-icon>
       </v-btn>
 
@@ -32,7 +32,7 @@
     <v-card-actions>
       <v-spacer></v-spacer>
 
-      <v-btn icon @click="addHeart()">
+      <v-btn icon :color="liked ? 'green' : ''" @click="addHeart()">
         <v-icon>mdi-heart</v-icon>
       </v-btn>
 
@@ -72,12 +72,14 @@ export default Vue.extend({
     },
   },
   data(): {
+    liked: boolean
     page: number
     isTweetOpened: boolean
     isTweetFound: boolean | null
     tweets: TweetPopupProp | null
   } {
     return {
+      liked: false,
       page: 1,
       isTweetOpened: false,
       isTweetFound: null,
@@ -86,10 +88,20 @@ export default Vue.extend({
   },
   watch: {
     item() {
+      if (!this.item) {
+        return
+      }
+      this.liked = this.item.is_bookmarked
+
       this.getTweets()
     },
   },
   mounted() {
+    if (!this.item) {
+      return
+    }
+    this.liked = this.item.is_bookmarked
+
     this.getTweets()
   },
   methods: {
@@ -114,6 +126,19 @@ export default Vue.extend({
         return ''
       }
       return this.isTweetFound ? 'primary' : 'error'
+    },
+    addHeart() {
+      if (this.item == null) {
+        return
+      }
+      this.$axios
+        .get<TweetPopupProp>(`/api/like/illust/${this.item.id}`)
+        .then(() => {
+          this.liked = true
+        })
+        .catch((error) => {
+          alert('Likeに失敗: ' + error)
+        })
     },
     getTweets() {
       if (this.item == null) {
