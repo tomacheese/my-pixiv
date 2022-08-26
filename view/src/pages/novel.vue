@@ -1,6 +1,12 @@
 <template>
   <v-container fluid>
-    <ItemList :items="items" :loading="loading" @open="open"></ItemList>
+    <ItemList
+      :items="items"
+      :loading="loading"
+      :vieweds="vieweds"
+      @open="open"
+      @intersect-item="onItemViewing"
+    ></ItemList>
   </v-container>
 </template>
 
@@ -14,17 +20,21 @@ export default Vue.extend({
   name: 'NovelPage',
   data(): {
     items: PixivItemWithSearchTag[]
+    vieweds: number[]
     page: number
     loading: boolean
   } {
     return {
       items: [],
+      vieweds: [],
       page: 1,
       loading: false,
     }
   },
   async created() {
     await this.fetch()
+
+    this.vieweds = this.$accessor.viewed.illusts
   },
   methods: {
     async fetch() {
@@ -51,6 +61,12 @@ export default Vue.extend({
         `https://www.pixiv.net/novel/show.php?id=${item.id}`,
         '_blank'
       )
+    },
+    onItemViewing(item: PixivItem) {
+      this.$accessor.viewed.addNovel(item)
+    },
+    getVieweds(): number[] {
+      return this.$accessor.viewed.novels
     },
   },
 })
