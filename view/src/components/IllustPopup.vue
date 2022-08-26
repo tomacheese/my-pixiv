@@ -92,6 +92,7 @@ export default Vue.extend({
         return
       }
       this.liked = this.item.is_bookmarked
+      this.page = 1
 
       this.getTweets()
     },
@@ -101,6 +102,7 @@ export default Vue.extend({
       return
     }
     this.liked = this.item.is_bookmarked
+    this.page = 1
 
     this.getTweets()
   },
