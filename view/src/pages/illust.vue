@@ -7,8 +7,16 @@
       @open="open"
       @intersect-item="onItemViewing"
     ></ItemList>
-    <v-dialog v-model="overlay.isIllustOpened">
-      <IllustPopup :item="overlay.target" @close-popup="close()"></IllustPopup>
+    <v-dialog
+      v-model="overlay.isIllustOpened"
+      :fullscreen="overlay.isFullscreen"
+    >
+      <IllustPopup
+        :item="overlay.target"
+        :fullscreen="overlay.isFullscreen"
+        @change-fullscreen="overlay.isFullscreen = !overlay.isFullscreen"
+        @close-popup="close()"
+      ></IllustPopup>
     </v-dialog>
   </v-container>
 </template>
@@ -28,6 +36,7 @@ export default Vue.extend({
     overlay: {
       isIllustOpened: boolean
       target: PixivItem | null
+      isFullscreen: boolean
     }
     loading: boolean
   } {
@@ -38,6 +47,7 @@ export default Vue.extend({
       overlay: {
         isIllustOpened: false,
         target: null,
+        isFullscreen: false,
       },
       loading: false,
     }
