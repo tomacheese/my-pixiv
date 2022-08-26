@@ -10,7 +10,7 @@ const config: NuxtConfig = {
   target: 'static',
 
   head: {
-    titleTemplate: '%s - my-pixiv',
+    titleTemplate: 'my-pixiv',
     title: 'my-pixiv',
     htmlAttrs: {
       lang: 'ja',
