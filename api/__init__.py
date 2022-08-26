@@ -56,19 +56,21 @@ def init_pixiv_api():
 
 def pixiv_download(url: str,
                    illust_id: str):
+    path = os.path.join(IMAGE_CACHE_DIR, illust_id, url.split("/")[-1])
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+
+    if os.path.exists(path):
+        return path
+
     response = requests.get(url, headers={
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) "
                       "Chrome/80.0.3987.149 Safari/537.36",
         "Referer": "https://www.pixiv.net/"
     }, stream=True)
 
-    os.makedirs(IMAGE_CACHE_DIR, exist_ok=True)
-
-    path = os.path.join(IMAGE_CACHE_DIR, illust_id + ".png")
-    if not os.path.exists(path):
-        with open(path, "wb") as f:
-            for chunk in response.iter_content(chunk_size=1024):
-                f.write(chunk)
+    with open(path, "wb") as f:
+        for chunk in response.iter_content(chunk_size=1024):
+            f.write(chunk)
 
     return path
 
@@ -76,15 +78,17 @@ def pixiv_download(url: str,
 def twi_img_download(url: str,
                      tweet_id: str,
                      num: int):
-    response = requests.get(url, stream=True)
 
     os.makedirs(TWEET_CACHE_DIR, exist_ok=True)
-
     path = os.path.join(TWEET_CACHE_DIR, tweet_id + "-" + str(num) + ".png")
-    if not os.path.exists(path):
-        with open(path, "wb") as f:
-            for chunk in response.iter_content(chunk_size=1024):
-                f.write(chunk)
+
+    if os.path.exists(path):
+        return path
+
+    response = requests.get(url, stream=True)
+    with open(path, "wb") as f:
+        for chunk in response.iter_content(chunk_size=1024):
+            f.write(chunk)
 
     return path
 
