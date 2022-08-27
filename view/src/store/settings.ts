@@ -16,12 +16,14 @@ export interface Filter {
 
 interface Settings {
   isDarkMode: boolean
+  isOnlyNew: boolean
   targets: Target[]
   filters: Filter[]
 }
 
 export const state = (): Settings => ({
   isDarkMode: false,
+  isOnlyNew: false,
   targets: [],
   filters: [],
 })
@@ -31,6 +33,7 @@ export type RootState = ReturnType<typeof state>
 export const getters = getterTree(state, {
   settings: (state) => state,
   darkMode: (state) => state.isDarkMode,
+  onlyNew: (state) => state.isOnlyNew,
   targets: (state) => state.targets,
   specificTargets: (state) => (targetType: TargetType) => {
     return state.targets.filter((target) =>
@@ -42,12 +45,17 @@ export const getters = getterTree(state, {
 
 export const mutations = mutationTree(state, {
   setAllSettings: (state, settings: Settings) => {
-    state.isDarkMode = settings.isDarkMode
-    state.targets = settings.targets
-    state.filters = settings.filters
+    if (settings.isDarkMode !== undefined)
+      state.isDarkMode = settings.isDarkMode
+    if (settings.isOnlyNew !== undefined) state.isOnlyNew = settings.isOnlyNew
+    if (settings.targets !== undefined) state.targets = settings.targets
+    if (settings.filters !== undefined) state.filters = settings.filters
   },
   setDarkMode(state, isDarkMode: boolean) {
     state.isDarkMode = isDarkMode
+  },
+  setOnlyNew(state, isOnlyNew: boolean) {
+    state.isOnlyNew = isOnlyNew
   },
   setTargets: (state, targets: Target[]) => {
     state.targets = targets

@@ -14,6 +14,7 @@ export const state = (): Viewed => ({
 export type RootState = ReturnType<typeof state>
 
 export const getters = getterTree(state, {
+  allVieweds: (state) => state,
   illusts: (state) => state.illusts,
   isIllustViewed: (state) => (illustId: number) => {
     return state.illusts.includes(illustId)
@@ -25,6 +26,10 @@ export const getters = getterTree(state, {
 })
 
 export const mutations = mutationTree(state, {
+  setAllVieweds: (state, vieweds: Viewed) => {
+    if (vieweds.illusts !== undefined) state.illusts = vieweds.illusts
+    if (vieweds.novels !== undefined) state.novels = vieweds.novels
+  },
   setIllusts: (state, illusts: number[]) => {
     state.illusts = illusts
   },
