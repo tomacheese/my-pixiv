@@ -1,13 +1,13 @@
 <template>
-  <v-container>
+  <v-container ref="itemlist">
     <v-progress-linear v-if="loading" indeterminate></v-progress-linear>
-    <div ref="itemlist"></div>
     <v-pagination
       v-model="page"
       :length="Math.ceil(items.length / 10)"
       :total-visible="11"
       class="my-3"
     ></v-pagination>
+    <v-switch v-model="isOnlyNew" label="New のみ表示"></v-switch>
     <v-row>
       <v-col v-for="(item, i) in getItems()" :key="i" cols="12">
         <ItemCard
@@ -48,14 +48,18 @@ export default Vue.extend({
   },
   data(): {
     page: number
+    isOnlyNew: boolean
   } {
     return {
       page: 1,
+      isOnlyNew: false,
     }
   },
   methods: {
     getItems(): PixivItem[] {
-      return this.items.slice((this.page - 1) * 10, this.page * 10)
+      return this.items
+        .filter((item) => (this.isOnlyNew ? !this.isViewed(item) : true))
+        .slice((this.page - 1) * 10, this.page * 10)
     },
     changePage() {
       ;(this.$refs.itemlist as HTMLElement).scrollIntoView()
