@@ -1,6 +1,6 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 
-from api import get_image, get_pixiv, get_search_tweets, like_pixiv
+from api import get_image, get_pixiv, get_search_tweets, init_twitter_api, like_pixiv
 
 router = APIRouter(prefix="/api")
 
@@ -38,3 +38,36 @@ def get_image_req(illust_id: str, url: str):
 @router.get("/tweet/{illust_id}")
 def search_tweet(illust_id: str):
     return get_search_tweets(illust_id)
+
+
+@router.get("/like/{account}/{tweet_id}")
+def get_like(account: str, tweet_id: str):
+    api = init_twitter_api(account)
+    if api is None:
+        raise HTTPException(status_code=404, detail="account not found")
+
+    tweet = api.get_status(tweet_id)
+    if tweet is None:
+        raise HTTPException(status_code=404, detail="tweet not found")
+
+    return {
+        "liked": tweet.favorited,
+    }
+
+
+@router.post("/like/{account}/{tweet_id}")
+def post_like(account: str, tweet_id: str):
+    api = init_twitter_api(account)
+    if api is None:
+        raise HTTPException(status_code=404, detail="account not found")
+
+    api.create_favorite(tweet_id)
+
+
+@router.delete("/like/{account}/{tweet_id}")
+def delete_like(account: str, tweet_id: str):
+    api = init_twitter_api(account)
+    if api is None:
+        raise HTTPException(status_code=404, detail="account not found")
+
+    api.destroy_favorite(tweet_id)

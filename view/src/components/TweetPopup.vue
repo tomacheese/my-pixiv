@@ -27,7 +27,7 @@
                 </v-card-subtitle>
 
                 <v-card-text
-                  style="height: 5.5em; overflow: hidden"
+                  style="height: 1.5em; overflow: hidden"
                   v-text="tweet.tweet.text"
                 ></v-card-text>
               </div>
@@ -36,6 +36,26 @@
                 <v-img :src="tweet.tweet.media_url" />
               </v-avatar>
             </div>
+
+            <v-card-actions>
+              <v-spacer />
+              <v-btn
+                icon
+                elevation="5"
+                :color="getHeartColor(tweet, 'book000')"
+                @click.stop="toggleLike(tweet, 'book000')"
+              >
+                <v-icon>mdi-cards-heart</v-icon>
+              </v-btn>
+              <v-btn
+                icon
+                elevation="5"
+                :color="getHeartColor(tweet, 'ihc_amot')"
+                @click.stop="toggleLike(tweet, 'ihc_amot')"
+              >
+                <v-icon>mdi-tag-heart</v-icon>
+              </v-btn>
+            </v-card-actions>
           </v-card>
         </v-col>
       </v-row>
@@ -72,8 +92,11 @@ export interface TweetPopupProp {
   error: string | null
 }
 
+type Accounts = 'book000' | 'ihc_amot'
+
 export interface TweetPopupData {
   loading: boolean
+  liked: { [key in Accounts]: string[] }
 }
 
 export default Vue.extend({
@@ -92,8 +115,13 @@ export default Vue.extend({
   data(): TweetPopupData {
     return {
       loading: true,
+      liked: {
+        book000: [],
+        ihc_amot: [],
+      },
     }
   },
+
   methods: {
     getUserText(user: User): string {
       return `${user.name} (@${user.screen_name})`
@@ -110,6 +138,46 @@ export default Vue.extend({
     },
     close() {
       this.$emit('close-popup')
+    },
+    getHeartColor(tweet: Tweet, account: Accounts): string {
+      if (!this.item) {
+        return 'grey'
+      }
+      if (this.liked[account].includes(tweet.tweet.id)) {
+        return 'red'
+      }
+      return ''
+    },
+    toggleLike(tweet: Tweet, account: Accounts) {
+      if (!this.item) {
+        return
+      }
+      this.requestLike(
+        tweet,
+        account,
+        !this.liked[account].includes(tweet.tweet.id)
+      )
+    },
+    requestLike(tweet: Tweet, account: Accounts, isAdd: boolean) {
+      const func = isAdd ? this.$axios.post : this.$axios.delete
+      func(`/api/like/${account}/${tweet.tweet.id}`)
+        .then(() => {
+          if (isAdd) {
+            this.liked[account] = [...this.liked[account], tweet.tweet.id]
+          } else {
+            this.liked[account] = this.liked[account]?.filter(
+              (id) => id !== tweet.tweet.id
+            )
+          }
+        })
+        .catch((err) => {
+          alert(
+            'Likeに失敗: ' +
+              err.message +
+              '\n' +
+              (err.response?.data.detail || '')
+          )
+        })
     },
   },
 })
