@@ -14,6 +14,11 @@
     ></v-pagination>
     <v-switch v-model="isOnlyNew" label="New のみ表示"></v-switch>
     <v-row>
+      <v-col v-if="getItems().length === 0 && !loading">
+        <v-card>
+          <v-card-title>該当するアイテムはありません。</v-card-title>
+        </v-card>
+      </v-col>
       <v-col v-for="(item, i) in getItems()" :key="i" cols="12">
         <ItemCard
           :item="item"
@@ -64,6 +69,14 @@ export default Vue.extend({
       page: 1,
       isOnlyNew: false,
     }
+  },
+  watch: {
+    isOnlyNew() {
+      this.$accessor.settings.setOnlyNew(this.isOnlyNew)
+    },
+  },
+  mounted() {
+    this.isOnlyNew = this.$accessor.settings.onlyNew
   },
   methods: {
     getItems(): PixivItem[] {
