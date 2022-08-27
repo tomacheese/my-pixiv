@@ -22,7 +22,7 @@ IMAGE_CACHE_DIR = os.environ.setdefault('IMAGE_CACHE_DIR', '/cache/images/')
 TWEET_CACHE_DIR = os.environ.setdefault('TWEET_CACHE_DIR', '/cache/tweets/')
 
 
-def init_twitter_api():
+def init_twitter_api(account: str = None):
     if not os.path.exists(CONFIG_FILE):
         return None
 
@@ -30,6 +30,14 @@ def init_twitter_api():
         config = json.load(f)
 
     auth = tweepy.OAuthHandler(config["consumer_key"], config["consumer_secret"])
+    if account is not None:
+        if "accounts" not in config or account not in config["accounts"]:
+            return None
+        auth.set_access_token(
+            config["accounts"][account]["access_token"],
+            config["accounts"][account]["access_token_secret"]
+        )
+
     return tweepy.API(auth)
 
 
