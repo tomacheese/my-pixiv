@@ -1,9 +1,14 @@
 <template>
-  <v-container ref="itemlist">
+  <v-container>
     <v-progress-linear v-if="loading" indeterminate></v-progress-linear>
     <v-pagination
       v-model="page"
-      :length="Math.ceil(items.length / 10)"
+      :length="
+        Math.ceil(
+          items.filter((item) => (isOnlyNew ? !isViewed(item) : true)).length /
+            10
+        )
+      "
       :total-visible="11"
       class="my-3"
     ></v-pagination>
@@ -20,7 +25,12 @@
     </v-row>
     <v-pagination
       v-model="page"
-      :length="Math.ceil(items.length / 10)"
+      :length="
+        Math.ceil(
+          items.filter((item) => (isOnlyNew ? !isViewed(item) : true)).length /
+            10
+        )
+      "
       :total-visible="11"
       class="my-3"
       @input="changePage"
@@ -62,7 +72,7 @@ export default Vue.extend({
         .slice((this.page - 1) * 10, this.page * 10)
     },
     changePage() {
-      ;(this.$refs.itemlist as HTMLElement).scrollIntoView()
+      window.scroll({ top: 0, behavior: 'smooth' })
     },
     open(item: PixivItem): void {
       this.$emit('open', item)
