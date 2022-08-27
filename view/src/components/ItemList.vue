@@ -3,7 +3,12 @@
     <v-progress-linear v-if="loading" indeterminate></v-progress-linear>
     <v-pagination
       v-model="page"
-      :length="Math.ceil(items.length / 10)"
+      :length="
+        Math.ceil(
+          items.filter((item) => (isOnlyNew ? !isViewed(item) : true)).length /
+            10
+        )
+      "
       :total-visible="11"
       class="my-3"
     ></v-pagination>
@@ -20,7 +25,12 @@
     </v-row>
     <v-pagination
       v-model="page"
-      :length="Math.ceil(items.length / 10)"
+      :length="
+        Math.ceil(
+          items.filter((item) => (isOnlyNew ? !isViewed(item) : true)).length /
+            10
+        )
+      "
       :total-visible="11"
       class="my-3"
       @input="changePage"
