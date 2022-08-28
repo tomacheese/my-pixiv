@@ -34,7 +34,7 @@ export default Vue.extend({
   async created() {
     await this.fetch()
 
-    this.vieweds = this.$accessor.viewed.illusts
+    this.vieweds = this.$accessor.viewed.novels
   },
   methods: {
     async fetch() {
@@ -64,9 +64,6 @@ export default Vue.extend({
     },
     onItemViewing(item: PixivItem) {
       this.$accessor.viewed.addNovel(item)
-    },
-    getVieweds(): number[] {
-      return this.$accessor.viewed.novels
     },
   },
 })
