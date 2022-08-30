@@ -107,9 +107,11 @@ export function getClient() {
 }
 
 function createClient($config: NuxtRuntimeConfig) {
-  return new WebsocketBuilder(
-    `ws://${$config.baseURL.replace(/https?:\/\//, '')}api/viewed`
-  )
+  const domain =
+    $config.baseURL === '/'
+      ? `${location.host}/`
+      : $config.baseURL.replace(/https?:\/\//, '')
+  return new WebsocketBuilder(`ws://${domain}api/viewed`)
     .onOpen(onOpen)
     .onClose(onClose)
     .onMessage(onMessage)
