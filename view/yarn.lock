@@ -10592,6 +10592,11 @@ webpackbar@^4.0.0:
     text-table "^0.2.0"
     wrap-ansi "^6.0.0"
 
+websocket-ts@^1.1.1:
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/websocket-ts/-/websocket-ts-1.1.1.tgz#de482da5e0c714ebc58a43fe94157e5a855f2828"
+  integrity sha512-rm+S60J74Ckw5iizzgID12ju+OfaHAa6dhXhULIOrXkl0e05RzxfY42/vMStpz5jWL3iz9mkyjPcFUY1IgI0fw==
+
 whatwg-url@^5.0.0:
   version "5.0.0"
   resolved "https://registry.yarnpkg.com/whatwg-url/-/whatwg-url-5.0.0.tgz#966454e8765462e37644d3626f6742ce8b70965d"
