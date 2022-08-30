@@ -5,7 +5,13 @@
     <v-btn color="success" @click="copyToClipboard(dataText)"
       >クリップボードにコピー</v-btn
     >
+    <v-btn color="success" @click="downloadData(dataText, 'settings.json')"
+      >ダウンロード</v-btn
+    >
     <v-btn color="success" @click="importSettings()">インポート</v-btn>
+    <v-btn color="success" @click="importSettingsFile()"
+      >ファイルからインポート</v-btn
+    >
 
     <h2 class="mt-5">既読情報</h2>
     <ul>
@@ -17,7 +23,13 @@
     <v-btn color="success" @click="copyToClipboard(viewedsText)"
       >クリップボードにコピー</v-btn
     >
+    <v-btn color="success" @click="downloadData(viewedsText, 'vieweds.json')"
+      >ダウンロード</v-btn
+    >
     <v-btn color="success" @click="importVieweds()">インポート</v-btn>
+    <v-btn color="success" @click="importViewedsFile()"
+      >ファイルからインポート</v-btn
+    >
   </v-container>
 </template>
 
@@ -52,6 +64,15 @@ export default Vue.extend({
       textarea.remove()
       alert('コピーしました。')
     },
+    downloadData(text: string, filename: string) {
+      const blob = new Blob([text], { type: 'text/plain' })
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = filename
+      a.click()
+      URL.revokeObjectURL(url)
+    },
     importSettings() {
       if (!window) {
         return
@@ -63,6 +84,26 @@ export default Vue.extend({
       } catch (e) {
         alert('設定のインポートに失敗しました')
       }
+    },
+    importSettingsFile() {
+      if (!window) {
+        return
+      }
+      const input = document.createElement('input')
+      input.type = 'file'
+      input.onchange = () => {
+        if (!input.files || !input.files[0]) {
+          return
+        }
+        const file = input.files[0]
+        const reader = new FileReader()
+        reader.onload = () => {
+          this.dataText = reader.result as string
+          this.importSettings()
+        }
+        reader.readAsText(file)
+      }
+      input.click()
     },
     exportVieweds() {
       this.viewedsText = JSON.stringify(this.$accessor.viewed.allVieweds)
@@ -80,6 +121,26 @@ export default Vue.extend({
       } catch (e) {
         alert('既読情報のインポートに失敗しました')
       }
+    },
+    importViewedsFile() {
+      if (!window) {
+        return
+      }
+      const input = document.createElement('input')
+      input.type = 'file'
+      input.onchange = () => {
+        if (!input.files || !input.files[0]) {
+          return
+        }
+        const file = input.files[0]
+        const reader = new FileReader()
+        reader.onload = () => {
+          this.viewedsText = reader.result as string
+          this.importVieweds()
+        }
+        reader.readAsText(file)
+      }
+      input.click()
     },
   },
 })
