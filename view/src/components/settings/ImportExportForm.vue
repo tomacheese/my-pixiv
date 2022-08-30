@@ -30,6 +30,12 @@
     <v-btn color="success" @click="importViewedsFile()"
       >ファイルからインポート</v-btn
     >
+
+    <v-switch
+      v-model="isAutoSyncVieweds"
+      label="WebSocketを使用したリアルタイム閲覧済み更新"
+      @change="onAutoSyncViewedsChange"
+    />
   </v-container>
 </template>
 
@@ -45,13 +51,22 @@ export default Vue.extend({
         illusts: 0,
         novels: 0,
       },
+      isAutoSyncVieweds: false,
     }
   },
   mounted() {
     this.exportSettings()
     this.exportVieweds()
+
+    this.isAutoSyncVieweds = this.$accessor.settings.isAutoSyncVieweds
   },
   methods: {
+    onAutoSyncViewedsChange(val: boolean) {
+      this.$accessor.settings.setAutoSyncVieweds(val)
+      this.$nextTick(() => {
+        location.reload()
+      })
+    },
     exportSettings() {
       this.dataText = JSON.stringify(this.$accessor.settings.settings)
     },

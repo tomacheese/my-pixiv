@@ -1,4 +1,5 @@
 import { actionTree, getterTree, mutationTree } from 'typed-vuex'
+import { getClient } from '@/plugins/viewedSync'
 import { PixivItem } from '@/types/pixivItem'
 
 interface Viewed {
@@ -26,7 +27,7 @@ export const getters = getterTree(state, {
 })
 
 export const mutations = mutationTree(state, {
-  setAllVieweds: (state, vieweds: Viewed) => {
+  setAllVieweds: (state, vieweds: Partial<Viewed>) => {
     if (vieweds.illusts !== undefined) state.illusts = vieweds.illusts
     if (vieweds.novels !== undefined) state.novels = vieweds.novels
   },
@@ -45,13 +46,65 @@ export const actions = actionTree(
       if (state.illusts.includes(item.id)) {
         return
       }
+      const client = getClient()
+      if (client !== null) {
+        client.send(
+          JSON.stringify({
+            action: 'add-viewed',
+            type: 'illust',
+            itemId: item.id,
+          })
+        )
+      }
       commit('setIllusts', [...state.illusts, item.id])
+    },
+    addIllustId: ({ commit, state }, itemId: number) => {
+      if (state.illusts.includes(itemId)) {
+        return
+      }
+      const client = getClient()
+      if (client !== null) {
+        client.send(
+          JSON.stringify({
+            action: 'add-viewed',
+            type: 'illust',
+            itemId,
+          })
+        )
+      }
+      commit('setIllusts', [...state.illusts, itemId])
     },
     addNovel: ({ commit, state }, item: PixivItem) => {
       if (state.novels.includes(item.id)) {
         return
       }
+      const client = getClient()
+      if (client !== null) {
+        client.send(
+          JSON.stringify({
+            action: 'add-viewed',
+            type: 'novel',
+            itemId: item.id,
+          })
+        )
+      }
       commit('setNovels', [...state.novels, item.id])
+    },
+    addNovelId: ({ commit, state }, itemId: number) => {
+      if (state.novels.includes(itemId)) {
+        return
+      }
+      const client = getClient()
+      if (client !== null) {
+        client.send(
+          JSON.stringify({
+            action: 'add-viewed',
+            type: 'novel',
+            itemId,
+          })
+        )
+      }
+      commit('setNovels', [...state.novels, itemId])
     },
   }
 )

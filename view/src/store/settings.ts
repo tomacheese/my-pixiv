@@ -17,6 +17,7 @@ export interface Filter {
 interface Settings {
   isDarkMode: boolean
   isOnlyNew: boolean
+  isAutoSyncVieweds: boolean
   targets: Target[]
   filters: Filter[]
 }
@@ -24,6 +25,7 @@ interface Settings {
 export const state = (): Settings => ({
   isDarkMode: false,
   isOnlyNew: false,
+  isAutoSyncVieweds: false,
   targets: [],
   filters: [],
 })
@@ -34,6 +36,7 @@ export const getters = getterTree(state, {
   settings: (state) => state,
   darkMode: (state) => state.isDarkMode,
   onlyNew: (state) => state.isOnlyNew,
+  autoSyncVieweds: (state) => state.isAutoSyncVieweds,
   targets: (state) => state.targets,
   specificTargets: (state) => (targetType: TargetType) => {
     return state.targets.filter((target) =>
@@ -48,6 +51,8 @@ export const mutations = mutationTree(state, {
     if (settings.isDarkMode !== undefined)
       state.isDarkMode = settings.isDarkMode
     if (settings.isOnlyNew !== undefined) state.isOnlyNew = settings.isOnlyNew
+    if (settings.isAutoSyncVieweds !== undefined)
+      state.isAutoSyncVieweds = settings.isAutoSyncVieweds
     if (settings.targets !== undefined) state.targets = settings.targets
     if (settings.filters !== undefined) state.filters = settings.filters
   },
@@ -56,6 +61,9 @@ export const mutations = mutationTree(state, {
   },
   setOnlyNew(state, isOnlyNew: boolean) {
     state.isOnlyNew = isOnlyNew
+  },
+  setAutoSyncVieweds(state, isAutoSyncVieweds: boolean) {
+    state.isAutoSyncVieweds = isAutoSyncVieweds
   },
   setTargets: (state, targets: Target[]) => {
     state.targets = targets

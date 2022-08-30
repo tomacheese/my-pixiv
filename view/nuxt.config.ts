@@ -29,6 +29,7 @@ const config: NuxtConfig = {
   plugins: [
     { src: '@/plugins/settings', ssr: false },
     { src: '@/plugins/fetcher', ssr: false },
+    { src: '@/plugins/viewedSync', ssr: false },
   ],
 
   components: true,

@@ -15,6 +15,7 @@ from PIL import Image
 
 TOKEN_FILE = os.environ.setdefault('PIXIVPY_TOKEN_FILE', '/data/token.json')
 CONFIG_FILE = os.environ.setdefault('CONFIG_FILE', '/data/config.json')
+VIEWED_FILE = os.environ.setdefault('VIEWED_FILE', '/data/viewed.json')
 ILLUST_CACHE_DIR = os.environ.setdefault('IMAGE_CACHE_DIR', '/cache/illusts/')
 NOVEL_CACHE_DIR = os.environ.setdefault('NOVEL_CACHE_DIR', '/cache/novels/')
 MANGA_CACHE_DIR = os.environ.setdefault('MANGA_CACHE_DIR', '/cache/manga/')
