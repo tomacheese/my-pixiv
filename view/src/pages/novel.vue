@@ -57,10 +57,23 @@ export default Vue.extend({
       if (!window) {
         return
       }
-      window.open(
-        `https://www.pixiv.net/novel/show.php?id=${item.id}`,
-        '_blank'
-      )
+
+      let change = false
+      setTimeout(() => {
+        if (!change) {
+          window.open(
+            `https://www.pixiv.net/novel/show.php?id=${item.id}`,
+            '_blank'
+          )
+        }
+      }, 100)
+      window.location.href = `pixiv://illusts/${item.id}`
+      window.onblur = function () {
+        change = true
+      }
+      window.onfocus = function () {
+        change = false
+      }
     },
     onItemViewing(item: PixivItem) {
       this.$accessor.viewed.addNovel(item)

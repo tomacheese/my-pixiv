@@ -15,8 +15,12 @@
         <v-icon>mdi-twitter</v-icon>
       </v-btn>
 
+      <v-btn icon @click="openApp(item)">
+        <pixiv-icon />
+      </v-btn>
+
       <v-btn icon @click="openPage(item)">
-        <v-icon>mdi-details</v-icon>
+        <v-icon>mdi-open-in-new</v-icon>
       </v-btn>
 
       <v-btn icon @click="close()">
@@ -48,8 +52,12 @@
         <v-icon>mdi-twitter</v-icon>
       </v-btn>
 
+      <v-btn icon @click="openApp(item)">
+        <PixivIcon />
+      </v-btn>
+
       <v-btn icon @click="openPage(item)">
-        <v-icon>mdi-details</v-icon>
+        <v-icon>mdi-open-in-new</v-icon>
       </v-btn>
 
       <v-btn icon @click="close()">
@@ -126,6 +134,13 @@ export default Vue.extend({
       }
       this.$emit('close-popup')
       window.open(`https://www.pixiv.net/artworks/${item.id}`, '_blank')
+    },
+    openApp(item: PixivItem) {
+      if (!window) {
+        return
+      }
+      this.$emit('close-popup')
+      location.href = `pixiv://illusts/${item.id}`
     },
     openTwitter() {
       this.isTweetOpened = true
