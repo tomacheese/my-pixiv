@@ -19,7 +19,10 @@
       <li>小説既読数: {{ viewed.novels }}件</li>
     </ul>
 
-    <v-textarea v-model="viewedsText"></v-textarea>
+    <v-textarea
+      v-model="viewedsText"
+      :disabled="isAutoSyncVieweds"
+    ></v-textarea>
     <v-btn color="success" @click="copyToClipboard(viewedsText)"
       >クリップボードにコピー</v-btn
     >
@@ -27,7 +30,10 @@
       >ダウンロード</v-btn
     >
     <v-btn color="success" @click="importVieweds()">インポート</v-btn>
-    <v-btn color="success" @click="importViewedsFile()"
+    <v-btn
+      color="success"
+      :disabled="isAutoSyncVieweds"
+      @click="importViewedsFile()"
       >ファイルからインポート</v-btn
     >
 
@@ -59,6 +65,16 @@ export default Vue.extend({
     this.exportVieweds()
 
     this.isAutoSyncVieweds = this.$accessor.settings.isAutoSyncVieweds
+
+    setInterval(() => {
+      if (
+        !this.isAutoSyncVieweds ||
+        !this.$accessor.settings.isAutoSyncVieweds
+      ) {
+        return
+      }
+      this.exportVieweds()
+    }, 1000)
   },
   methods: {
     onAutoSyncViewedsChange(val: boolean) {
@@ -121,6 +137,11 @@ export default Vue.extend({
       input.click()
     },
     exportVieweds() {
+      if (
+        this.viewedsText === JSON.stringify(this.$accessor.viewed.allVieweds)
+      ) {
+        return
+      }
       this.viewedsText = JSON.stringify(this.$accessor.viewed.allVieweds)
       this.viewed.illusts = this.$accessor.viewed.illusts.length
       this.viewed.novels = this.$accessor.viewed.novels.length
