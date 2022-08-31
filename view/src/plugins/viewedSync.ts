@@ -1,6 +1,6 @@
 import { Context } from '@nuxt/types'
 import { NuxtRuntimeConfig } from '@nuxt/types/config/runtime'
-import { Websocket, WebsocketBuilder } from 'websocket-ts'
+import { ConstantBackoff, Websocket, WebsocketBuilder } from 'websocket-ts'
 
 interface GetAllViewedData {
   action: 'get-all-viewed'
@@ -18,6 +18,7 @@ type IWebSocket = GetAllViewedData | AddViewedData
 
 let client: Websocket | null = null
 let $accessor: Context['$accessor'] | null = null
+let $config: NuxtRuntimeConfig | null = null
 
 function actionGetAllViewed(data: GetAllViewedData) {
   console.log('actionGetAllViewed', data)
@@ -96,10 +97,18 @@ function onOpen(ws: Websocket) {
 
 function onClose(_: Websocket, event: CloseEvent) {
   console.log('WebSocket: closed', event)
+
+  if ($accessor && $config && $accessor.settings.autoSyncVieweds) {
+    client = createClient($config)
+  }
 }
 
 function onError(_: Websocket, event: Event) {
   console.error(event)
+}
+
+function onRetry() {
+  console.log('WebSocket: retry')
 }
 
 export function getClient() {
@@ -116,6 +125,8 @@ function createClient($config: NuxtRuntimeConfig) {
     .onClose(onClose)
     .onMessage(onMessage)
     .onError(onError)
+    .onRetry(onRetry)
+    .withBackoff(new ConstantBackoff(1000))
     .build()
 }
 
@@ -124,5 +135,6 @@ export default (context: Context) => {
     return
   }
   $accessor = context.$accessor
-  client = createClient(context.$config)
+  $config = context.$config
+  client = createClient($config)
 }
