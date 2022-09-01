@@ -1,51 +1,28 @@
 <template>
-  <v-container>
-    <v-progress-linear v-if="loading" indeterminate></v-progress-linear>
-    <v-pagination
-      v-model="page"
-      :length="
-        Math.ceil(
-          items.filter((item) => (isOnlyNew ? !isViewed(item) : true)).length /
-            10
-        )
-      "
-      :total-visible="11"
-      class="my-3"
-    ></v-pagination>
-    <v-switch v-model="isOnlyNew" label="New のみ表示"></v-switch>
-    <v-row>
-      <v-col v-if="getItems().length === 0 && !loading">
-        <v-card>
-          <v-card-title>該当するアイテムはありません。</v-card-title>
-        </v-card>
-      </v-col>
-      <v-col v-for="(item, i) in getItems()" :key="i" cols="12">
-        <ItemCard
-          :item="item"
-          :is-viewed="!isViewed(item)"
-          @open="open"
-          @intersect="onItemViewing"
-        />
-      </v-col>
-    </v-row>
-    <v-pagination
-      v-model="page"
-      :length="
-        Math.ceil(
-          items.filter((item) => (isOnlyNew ? !isViewed(item) : true)).length /
-            10
-        )
-      "
-      :total-visible="11"
-      class="my-3"
-      @input="changePage"
-    ></v-pagination>
-  </v-container>
+  <div>
+    <ItemPaginationList
+      v-if="selectType === 'PAGINATION'"
+      :items="items"
+      :loading="loading"
+      :vieweds="vieweds"
+      @open="open"
+      @intersect-item="onItemViewing"
+    />
+    <ItemVirtualList
+      v-if="selectType === 'VIRTUAL_SCROLL'"
+      :items="items"
+      :loading="loading"
+      :vieweds="vieweds"
+      @open="open"
+      @intersect-item="onItemViewing"
+    />
+  </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue'
 import { PixivItem } from '@/types/pixivItem'
+import { ViewType } from '@/store/settings'
 export default Vue.extend({
   props: {
     items: {
@@ -62,41 +39,21 @@ export default Vue.extend({
     },
   },
   data(): {
-    page: number
-    isOnlyNew: boolean
+    selectType: ViewType
   } {
     return {
-      page: 1,
-      isOnlyNew: false,
+      selectType: 'PAGINATION',
     }
   },
-  watch: {
-    isOnlyNew() {
-      this.$accessor.settings.setOnlyNew(this.isOnlyNew)
-    },
-  },
-  mounted() {
-    this.isOnlyNew = this.$accessor.settings.onlyNew
+  created() {
+    this.selectType = this.$accessor.settings.viewType
   },
   methods: {
-    getItems(): PixivItem[] {
-      return this.items
-        .filter((item) => (this.isOnlyNew ? !this.isViewed(item) : true))
-        .slice((this.page - 1) * 10, this.page * 10)
-    },
-    changePage() {
-      setTimeout(() => {
-        window.scroll({ top: 0, behavior: 'smooth' })
-      }, 100)
-    },
     open(item: PixivItem): void {
       this.$emit('open', item)
     },
     onItemViewing(item: PixivItem): void {
       this.$emit('intersect-item', item)
-    },
-    isViewed(item: PixivItem): boolean {
-      return this.vieweds.includes(item.id)
     },
   },
 })
