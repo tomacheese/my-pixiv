@@ -1,6 +1,7 @@
 <template>
   <v-container>
     <TargetSearch />
+    <ViewTypeSelector />
     <TitleFilter />
     <TagFilter />
     <ImportExportForm />
@@ -13,9 +14,16 @@ import TitleFilter from '@/components/settings/TitleFilter.vue'
 import TagFilter from '@/components/settings/TagFilter.vue'
 import TargetSearch from '@/components/settings/TargetSearch.vue'
 import ImportExportForm from '@/components/settings/ImportExportForm.vue'
+import ViewTypeSelector from '@/components/settings/ViewTypeSelector.vue'
 
 export default Vue.extend({
   name: 'SettingsPage',
-  components: { TitleFilter, TagFilter, TargetSearch, ImportExportForm },
+  components: {
+    ViewTypeSelector,
+    TitleFilter,
+    TagFilter,
+    TargetSearch,
+    ImportExportForm,
+  },
 })
 </script>

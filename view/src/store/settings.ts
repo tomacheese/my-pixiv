@@ -2,6 +2,8 @@ import { actionTree, getterTree, mutationTree } from 'typed-vuex'
 
 export type TargetType = 'ILLUST' | 'MANGA' | 'NOVEL'
 
+export type ViewType = 'PAGINATION' | 'VIRTUAL_SCROLL'
+
 export interface Target {
   targetType: TargetType[]
   tag: string[]
@@ -18,6 +20,7 @@ interface Settings {
   isDarkMode: boolean
   isOnlyNew: boolean
   isAutoSyncVieweds: boolean
+  viewType: ViewType
   targets: Target[]
   filters: Filter[]
 }
@@ -26,6 +29,7 @@ export const state = (): Settings => ({
   isDarkMode: false,
   isOnlyNew: false,
   isAutoSyncVieweds: false,
+  viewType: 'PAGINATION',
   targets: [],
   filters: [],
 })
@@ -37,6 +41,7 @@ export const getters = getterTree(state, {
   darkMode: (state) => state.isDarkMode,
   onlyNew: (state) => state.isOnlyNew,
   autoSyncVieweds: (state) => state.isAutoSyncVieweds,
+  viewType: (state) => state.viewType,
   targets: (state) => state.targets,
   specificTargets: (state) => (targetType: TargetType) => {
     return state.targets.filter((target) =>
@@ -53,6 +58,7 @@ export const mutations = mutationTree(state, {
     if (settings.isOnlyNew !== undefined) state.isOnlyNew = settings.isOnlyNew
     if (settings.isAutoSyncVieweds !== undefined)
       state.isAutoSyncVieweds = settings.isAutoSyncVieweds
+    if (settings.viewType !== undefined) state.viewType = settings.viewType
     if (settings.targets !== undefined) state.targets = settings.targets
     if (settings.filters !== undefined) state.filters = settings.filters
   },
@@ -64,6 +70,9 @@ export const mutations = mutationTree(state, {
   },
   setAutoSyncVieweds(state, isAutoSyncVieweds: boolean) {
     state.isAutoSyncVieweds = isAutoSyncVieweds
+  },
+  setViewType(state, viewType: ViewType) {
+    state.viewType = viewType
   },
   setTargets: (state, targets: Target[]) => {
     state.targets = targets

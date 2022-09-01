@@ -1,32 +1,38 @@
 <!-- eslint-disable vue/no-v-html -->
 <template>
   <v-card :id="observName" @click="open(item)">
-    <div class="d-flex flex-no-wrap justify-space-between">
+    <div
+      class="d-flex flex-no-wrap justify-space-between"
+      style="height: 200px"
+    >
       <div>
         <v-card-title class="text-h5" v-text="item.title"></v-card-title>
 
         <v-card-subtitle>
           <div class="grey--text">{{ item.create_date }}</div>
-          <v-chip :color="item.is_bookmarked ? 'warning' : ''">
-            <v-icon>mdi-heart</v-icon>
-            {{ item.total_bookmarks }}
-          </v-chip>
-          <v-chip
-            v-for="tag of item.tags"
-            :key="item.id + '-' + tag.name"
-            :color="getTagColor(item.searchTags, tag.name)"
-            class="ma-1"
-            v-text="tag.name"
-          ></v-chip>
+          <div class="item-card-tags hidden-scrollbar">
+            <v-chip :color="item.is_bookmarked ? 'warning' : ''">
+              <v-icon>mdi-heart</v-icon>
+              {{ item.total_bookmarks }}
+            </v-chip>
+            <v-chip
+              v-for="tag of item.tags"
+              :key="item.id + '-' + tag.name"
+              :color="getTagColor(item.searchTags, tag.name)"
+              class="ma-1"
+              v-text="tag.name"
+            ></v-chip>
+          </div>
         </v-card-subtitle>
 
         <v-card-text
-          style="height: 5.5em; overflow: hidden"
+          style="height: 5.2em; overflow-y: scroll"
+          class="hidden-scrollbar"
           v-html="item.caption"
         ></v-card-text>
       </div>
 
-      <v-badge overlap :content="'NEW'" :value="isViewed">
+      <v-badge overlap :content="'NEW'" offset-x="30" :value="isViewed">
         <v-avatar class="ma-3" size="125" tile>
           <v-img :src="item.image_urls.square_medium" />
         </v-avatar>
@@ -118,3 +124,19 @@ export default Vue.extend({
   },
 })
 </script>
+
+<style scoped>
+.item-card-tags {
+  height: 37px;
+  overflow-y: scroll;
+}
+
+.hidden-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.hidden-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+</style>
