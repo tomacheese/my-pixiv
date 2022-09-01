@@ -85,7 +85,9 @@ export default Vue.extend({
         .slice((this.page - 1) * 10, this.page * 10)
     },
     changePage() {
-      window.scroll({ top: 0, behavior: 'smooth' })
+      setTimeout(() => {
+        window.scroll({ top: 0, behavior: 'smooth' })
+      }, 100)
     },
     open(item: PixivItem): void {
       this.$emit('open', item)
