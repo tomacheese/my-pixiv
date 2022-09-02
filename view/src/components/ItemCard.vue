@@ -107,7 +107,7 @@ export default Vue.extend({
       if (tag === 'R-18') {
         return 'error'
       }
-      return searchTags.includes(tag) ? 'green' : ''
+      return searchTags && searchTags.includes(tag) ? 'green' : ''
     },
     open(item: PixivItem): void {
       this.$emit('open', item)

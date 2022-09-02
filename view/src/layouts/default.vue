@@ -19,6 +19,10 @@ export default Vue.extend({
       selected: -1,
       types: [
         {
+          name: 'おすすめ',
+          value: 'recommended',
+        },
+        {
           name: 'イラスト',
           value: 'illust',
         },

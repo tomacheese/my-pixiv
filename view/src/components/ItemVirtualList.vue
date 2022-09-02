@@ -1,7 +1,11 @@
 <template>
   <v-container>
     <v-progress-linear v-if="loading" indeterminate></v-progress-linear>
-    <v-switch v-model="isOnlyNew" label="New のみ表示"></v-switch>
+    <v-switch
+      v-if="vieweds !== undefined"
+      v-model="isOnlyNew"
+      label="New のみ表示"
+    ></v-switch>
     <v-row>
       <v-col v-if="getItems.length === 0 && !loading" cols="12">
         <v-card>
@@ -39,8 +43,9 @@ export default Vue.extend({
       required: true,
     },
     vieweds: {
-      type: Array as () => number[],
-      required: true,
+      type: Array as () => number[] | undefined,
+      required: false,
+      default: undefined,
     },
     loading: {
       type: Boolean,
@@ -84,6 +89,9 @@ export default Vue.extend({
       this.$emit('intersect-item', item)
     },
     isViewed(item: PixivItem): boolean {
+      if (!this.vieweds) {
+        return false
+      }
       return this.vieweds.includes(item.id)
     },
   },

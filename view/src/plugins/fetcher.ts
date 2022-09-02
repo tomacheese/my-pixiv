@@ -27,13 +27,26 @@ export class Fetcher {
       )
     )
       .flat()
+      .filter((item, index, self) => {
+        return self.map((item) => item.id).indexOf(item.id) === index
+      })
       .sort(
         (a, b) =>
           new Date(b.create_date).getTime() - new Date(a.create_date).getTime()
       )
-    return results.filter((item, index, self) => {
-      return self.map((item) => item.id).indexOf(item.id) === index
-    })
+    return results
+  }
+
+  public async getFetchRecommended() {
+    const response = await this.$axios.get<PixivItem[]>(
+      `/api/recommended/${this.targetType.toLocaleLowerCase()}`
+    )
+    const data = response.data
+    for (const item of data) {
+      this.itemProcessor(item)
+    }
+
+    return data
   }
 
   public getFetchItemPromise(target: Target) {
