@@ -5,6 +5,7 @@
     <TitleFilter />
     <TagFilter />
     <ImportExportForm />
+    <SyncSettings />
   </v-container>
 </template>
 
@@ -15,6 +16,7 @@ import TagFilter from '@/components/settings/TagFilter.vue'
 import TargetSearch from '@/components/settings/TargetSearch.vue'
 import ImportExportForm from '@/components/settings/ImportExportForm.vue'
 import ViewTypeSelector from '@/components/settings/ViewTypeSelector.vue'
+import SyncSettings from '@/components/settings/SyncSettings.vue'
 
 export default Vue.extend({
   name: 'SettingsPage',
@@ -24,6 +26,7 @@ export default Vue.extend({
     TagFilter,
     TargetSearch,
     ImportExportForm,
+    SyncSettings,
   },
 })
 </script>
