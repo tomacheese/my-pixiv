@@ -6,8 +6,8 @@ import { PixivItem, PixivItemWithSearchTag } from '@/types/pixivItem'
 export class Fetcher {
   private $config: NuxtRuntimeConfig
   private $axios: NuxtAxiosInstance
-  private targetType: TargetType
-  private globalFilter: Filter[]
+  private readonly targetType: TargetType
+  private readonly globalFilter: Filter[]
   public constructor(
     $config: NuxtRuntimeConfig,
     $axios: NuxtAxiosInstance,

@@ -1,5 +1,4 @@
 import json
-import os
 import traceback
 
 from fastapi import APIRouter
