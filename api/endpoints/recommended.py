@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from api import get_pixiv, get_pixiv_recommended, init_pixiv_api
+from api import get_pixiv_recommended, init_pixiv_api
 
 router = APIRouter(prefix="/recommended")
 
