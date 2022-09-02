@@ -8,8 +8,8 @@
     <v-btn color="success" @click="downloadData(dataText, 'settings.json')"
       >ダウンロード</v-btn
     >
-    <v-btn color="success" @click="importSettings()">インポート</v-btn>
-    <v-btn color="success" @click="importSettingsFile()"
+    <v-btn color="warning" @click="importSettings()">インポート</v-btn>
+    <v-btn color="warning" @click="importSettingsFile()"
       >ファイルからインポート</v-btn
     >
 
@@ -29,9 +29,9 @@
     <v-btn color="success" @click="downloadData(viewedsText, 'vieweds.json')"
       >ダウンロード</v-btn
     >
-    <v-btn color="success" @click="importVieweds()">インポート</v-btn>
+    <v-btn color="warning" @click="importVieweds()">インポート</v-btn>
     <v-btn
-      color="success"
+      color="warning"
       :disabled="isAutoSyncVieweds"
       @click="importViewedsFile()"
       >ファイルからインポート</v-btn
@@ -39,7 +39,7 @@
 
     <v-switch
       v-model="isAutoSyncVieweds"
-      label="WebSocketを使用したリアルタイム閲覧済み更新"
+      label="WebSocketを使用したリアルタイム既読更新"
       @change="onAutoSyncViewedsChange"
     />
   </v-container>
