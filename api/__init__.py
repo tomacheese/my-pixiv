@@ -88,7 +88,6 @@ def pixiv_download(url: str,
 def twi_img_download(url: str,
                      tweet_id: str,
                      num: int):
-
     os.makedirs(TWEET_CACHE_DIR, exist_ok=True)
     path = os.path.join(TWEET_CACHE_DIR, tweet_id + "-" + str(num) + ".png")
 
@@ -103,7 +102,8 @@ def twi_img_download(url: str,
     return path
 
 
-def get_pixiv(item_type: str, word: str):
+def get_pixiv(item_type: str,
+              word: str):
     api = init_pixiv_api()
     if item_type == "illust":
         func = api.search_illust
@@ -152,7 +152,34 @@ def get_pixiv(item_type: str, word: str):
     return items
 
 
-def like_pixiv(item_type: str, item_id: str):
+# noinspection PyShadowingBuiltins
+def get_pixiv_novels_recommended(api: AppPixivAPI,
+                                 include_ranking_label=True,
+                                 filter='for_ios',
+                                 req_auth=True):
+    url = '%s/v1/novel/recommended' % api.hosts
+
+    params = {
+        'include_ranking_label': api.format_bool(include_ranking_label),
+        'filter': filter,
+    }
+
+    r = api.no_auth_requests_call('GET', url, params=params, req_auth=req_auth)
+    return api.parse_result(r)
+
+
+def get_pixiv_recommended(item_type: str):
+    api = init_pixiv_api()
+    if item_type == "illusts":
+        return api.illust_recommended(content_type="illust")
+    elif item_type == "manga":
+        return api.illust_recommended(content_type="manga")
+    elif item_type == "novels":
+        return get_pixiv_novels_recommended(api)
+
+
+def like_pixiv(item_type: str,
+               item_id: str):
     api = init_pixiv_api()
     if item_type == "illust" or item_type == "manga":
         func = api.illust_bookmark_add
@@ -271,4 +298,4 @@ def calc_image_similarity(image_path: str,
     hash_1a = imagehash.phash(Image.open(image_path))
     hash_2a = imagehash.phash(Image.open(tweet_image_path))
 
-    return hash_2a-hash_1a
+    return hash_2a - hash_1a

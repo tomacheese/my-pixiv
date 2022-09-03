@@ -1,0 +1,50 @@
+<template>
+  <div>
+    <v-tabs v-model="selected" fixed-tabs color="orange">
+      <v-tab v-for="type of types" :key="type.value" v-text="type.name" />
+    </v-tabs>
+    <v-container>
+      <IllustList
+        v-if="types[selected].value === 'ILLUST'"
+        target-type="ILLUST"
+        :recommended="true"
+      />
+      <NovelList
+        v-else-if="types[selected].value === 'NOVEL'"
+        target-type="NOVEL"
+        :recommended="true"
+      />
+    </v-container>
+  </div>
+</template>
+
+<script lang="ts">
+import Vue from 'vue'
+import { TargetType } from '@/store/settings'
+import { PixivItem } from '@/types/pixivItem'
+export default Vue.extend({
+  name: 'RecommendedPage',
+  data(): {
+    selected: number
+    types: { name: string; value: TargetType }[]
+    items: PixivItem[]
+    loading: boolean
+  } {
+    return {
+      selected: 0,
+      types: [
+        {
+          name: 'イラスト',
+          value: 'ILLUST',
+        },
+        {
+          name: '小説',
+          value: 'NOVEL',
+        },
+      ],
+      items: [],
+      loading: false,
+    }
+  },
+})
+</script>

@@ -30,8 +30,9 @@ export default Vue.extend({
       required: true,
     },
     vieweds: {
-      type: Array as () => number[],
-      required: true,
+      type: Array as () => number[] | undefined,
+      required: false,
+      default: () => undefined,
     },
     loading: {
       type: Boolean,
