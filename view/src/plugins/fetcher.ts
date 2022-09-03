@@ -46,7 +46,7 @@ export class Fetcher {
       this.itemProcessor(item)
     }
 
-    return data
+    return data.filter((item) => !this.isFilterItem(null, item))
   }
 
   public getFetchItemPromise(target: Target) {
@@ -94,7 +94,7 @@ export class Fetcher {
     }
   }
 
-  private isFilterItem(target: Target, item: PixivItem) {
+  private isFilterItem(target: Target | null, item: PixivItem) {
     // グローバルフィルター
     for (const filter of this.globalFilter) {
       switch (filter.type) {
@@ -138,12 +138,14 @@ export class Fetcher {
     }
     // 個別ターゲットフィルター
     // 除外文字列が、タイトル・作者名・タグに含まれていたらフィルタリング対象
-    return target.ignores.some((ignore) => {
-      return (
-        item.title.includes(ignore) ||
-        item.user.name.includes(ignore) ||
-        item.tags.some((tag) => tag.name.includes(ignore))
-      )
-    })
+    return target !== null
+      ? target.ignores.some((ignore) => {
+          return (
+            item.title.includes(ignore) ||
+            item.user.name.includes(ignore) ||
+            item.tags.some((tag) => tag.name.includes(ignore))
+          )
+        })
+      : false
   }
 }
