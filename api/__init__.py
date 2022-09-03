@@ -249,19 +249,19 @@ def get_illust_screen_names(pixiv_api: AppPixivAPI,
 def get_match_tweets(screen_names: set[str],
                      posted_at: datetime,
                      image_path: str):
-    # 投稿日の1日前
-    posted_at_before_1day = posted_at - timedelta(days=1)
-    posted_at_before_1day = posted_at_before_1day.date().isoformat()
-    # 投稿日の1日後
-    posted_at_after_1day = posted_at + timedelta(days=1)
-    posted_at_after_1day = posted_at_after_1day.date().isoformat()
+    # 投稿日の3日前
+    posted_at_before_3day = posted_at - timedelta(days=3)
+    posted_at_before_3day = posted_at_before_3day.date().isoformat()
+    # 投稿日の3日後
+    posted_at_after_3day = posted_at + timedelta(days=3)
+    posted_at_after_3day = posted_at_after_3day.date().isoformat()
 
     rets = []
 
     for screen_name in screen_names:
         word = "from:{0} filter:images since:{1} until:{2} exclude:nativeretweets".format(screen_name,
-                                                                                          posted_at_before_1day,
-                                                                                          posted_at_after_1day)
+                                                                                          posted_at_before_3day,
+                                                                                          posted_at_after_3day)
         tweets = search_tweet(word)
         if not tweets:
             raise HTTPException(status_code=404, detail="tweets not found")
