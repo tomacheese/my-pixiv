@@ -15,6 +15,10 @@
               <v-icon>mdi-heart</v-icon>
               {{ item.total_bookmarks }}
             </v-chip>
+            <v-chip v-if="item.text_length">
+              <v-icon>mdi-format-text</v-icon>
+              {{ item.text_length }}
+            </v-chip>
             <v-chip
               v-for="tag of item.tags"
               :key="item.id + '-' + tag.name"
