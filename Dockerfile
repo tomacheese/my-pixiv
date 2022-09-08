@@ -15,7 +15,7 @@ COPY view/tsconfig.json tsconfig.json
 RUN yarn build && \
   yarn generate
 
-FROM python:3.10.6-bullseye
+FROM python:3.10.7-bullseye
 
 RUN export DEBIAN_FRONTEND=noninteractive && \
   apt-get update && \
