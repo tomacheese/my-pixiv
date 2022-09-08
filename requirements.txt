@@ -6,3 +6,4 @@ tweepy==4.10.1
 starlette==0.19.1
 ImageHash==4.3.0
 websockets==10.3
+six==1.16.0
