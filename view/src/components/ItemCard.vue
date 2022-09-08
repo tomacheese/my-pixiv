@@ -24,6 +24,7 @@
               :key="item.id + '-' + tag.name"
               :color="getTagColor(item.searchTags, tag.name)"
               class="ma-1"
+              @click.stop="copyToClipboard(tag.name)"
               v-text="tag.name"
             ></v-chip>
           </div>
@@ -124,6 +125,15 @@ export default Vue.extend({
         rect.bottom <= window.innerHeight &&
         rect.right <= window.innerWidth
       )
+    },
+    copyToClipboard(text: string) {
+      const textarea = document.createElement('textarea')
+      textarea.value = text
+      document.body.appendChild(textarea)
+      textarea.select()
+      document.execCommand('copy')
+      textarea.remove()
+      alert('コピーしました。')
     },
   },
 })
