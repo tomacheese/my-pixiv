@@ -8,17 +8,6 @@
       @open="open"
       @intersect-item="onItemViewing"
     ></ItemList>
-    <v-dialog
-      v-model="overlay.isIllustOpened"
-      :fullscreen="overlay.isFullscreen"
-    >
-      <IllustPopup
-        :item="overlay.target"
-        :fullscreen="overlay.isFullscreen"
-        @change-fullscreen="overlay.isFullscreen = !overlay.isFullscreen"
-        @close-popup="close()"
-      ></IllustPopup>
-    </v-dialog>
   </v-container>
 </template>
 
@@ -42,11 +31,6 @@ export default Vue.extend({
     vieweds: number[] | undefined
     selectType: ViewType
     page: number
-    overlay: {
-      isIllustOpened: boolean
-      target: PixivItem | null
-      isFullscreen: boolean
-    }
     loading: boolean
   } {
     return {
@@ -54,11 +38,6 @@ export default Vue.extend({
       vieweds: [],
       selectType: 'PAGINATION',
       page: 1,
-      overlay: {
-        isIllustOpened: false,
-        target: null,
-        isFullscreen: false,
-      },
       loading: false,
     }
   },
@@ -103,6 +82,7 @@ export default Vue.extend({
         return
       }
 
+      this.loading = true
       let change = false
       setTimeout(() => {
         if (!change) {
@@ -111,7 +91,8 @@ export default Vue.extend({
             '_blank'
           )
         }
-      }, 625)
+        this.loading = false
+      }, 700)
       window.location.href = `pixiv://novels/${item.id}`
       window.onblur = function () {
         change = true
