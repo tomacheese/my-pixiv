@@ -9,7 +9,7 @@
     <v-card v-if="getItems.length === 0 && !loading">
       <v-card-title>該当するアイテムはありません。</v-card-title>
     </v-card>
-    <MagicGrid ref="magic-grid" :animate="true">
+    <MagicGrid ref="magic-grid" :animate="true" :gap="10">
       <ItemWrapper
         v-for="item of getItems"
         :key="item.id"
