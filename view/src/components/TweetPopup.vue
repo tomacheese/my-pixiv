@@ -42,16 +42,16 @@
               <v-btn
                 icon
                 elevation="5"
-                :color="getHeartColor(tweet, 'book000')"
-                @click.stop="toggleLike(tweet, 'book000')"
+                :color="getHeartColor(tweet, 'main')"
+                @click.stop="toggleLike(tweet, 'main')"
               >
                 <v-icon>mdi-cards-heart</v-icon>
               </v-btn>
               <v-btn
                 icon
                 elevation="5"
-                :color="getHeartColor(tweet, 'ihc_amot')"
-                @click.stop="toggleLike(tweet, 'ihc_amot')"
+                :color="getHeartColor(tweet, 'sub')"
+                @click.stop="toggleLike(tweet, 'sub')"
               >
                 <v-icon>mdi-tag-heart</v-icon>
               </v-btn>
@@ -92,7 +92,7 @@ export interface TweetPopupProp {
   error: string | null
 }
 
-type Accounts = 'book000' | 'ihc_amot'
+type Accounts = 'main' | 'sub'
 
 export interface TweetPopupData {
   loading: boolean
@@ -116,8 +116,8 @@ export default Vue.extend({
     return {
       loading: true,
       liked: {
-        book000: [],
-        ihc_amot: [],
+        main: [],
+        sub: [],
       },
     }
   },
