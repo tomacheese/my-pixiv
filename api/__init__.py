@@ -152,22 +152,6 @@ def get_pixiv(item_type: str,
     return items
 
 
-# noinspection PyShadowingBuiltins
-def get_pixiv_novels_recommended(api: AppPixivAPI,
-                                 include_ranking_label=True,
-                                 filter='for_ios',
-                                 req_auth=True):
-    url = '%s/v1/novel/recommended' % api.hosts
-
-    params = {
-        'include_ranking_label': api.format_bool(include_ranking_label),
-        'filter': filter,
-    }
-
-    r = api.no_auth_requests_call('GET', url, params=params, req_auth=req_auth)
-    return api.parse_result(r)
-
-
 def get_pixiv_recommended(item_type: str):
     api = init_pixiv_api()
     if item_type == "illusts":
@@ -175,7 +159,7 @@ def get_pixiv_recommended(item_type: str):
     elif item_type == "manga":
         return api.illust_recommended(content_type="manga")
     elif item_type == "novels":
-        return get_pixiv_novels_recommended(api)
+        return api.novel_recommended()
 
 
 def like_pixiv(item_type: str,
