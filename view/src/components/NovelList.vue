@@ -111,7 +111,7 @@ export default Vue.extend({
             '_blank'
           )
         }
-      }, 100)
+      }, 625)
       window.location.href = `pixiv://novels/${item.id}`
       window.onblur = function () {
         change = true
