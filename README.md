@@ -1,14 +1,14 @@
 # my-pixiv
 
-Pixiv client for myself.
+pixiv client for myself.
 
 ## Installation
 
-このプロジェクト（クライアント）を利用するためには、有効な [Pixiv](https://www.pixiv.net) アカウントとリフレッシュトークンが必須です。
+このプロジェクト（クライアント）を利用するためには、有効な [pixiv](https://www.pixiv.net) アカウントとリフレッシュトークンが必須です。
 
-### Pixiv
+### pixiv
 
-「おすすめ」の取得、検索処理、イラストの「ブックマーク」登録に Pixiv アカウントを利用します。
+「おすすめ」の取得、検索処理、イラストの「ブックマーク」登録に pixiv アカウントを利用します。
 
 [Retrieving Auth Token (with Selenium)](https://gist.github.com/upbit/6edda27cb1644e94183291109b8a5fde) などを参考にリフレッシュトークンを取得してください。
 
