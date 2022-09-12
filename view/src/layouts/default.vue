@@ -2,7 +2,7 @@
   <v-app>
     <v-main>
       <v-tabs v-model="selected" fixed-tabs>
-        <v-tab v-for="type of types" :key="type.value" v-text="type.name" />
+        <v-tab v-for="t of types" :key="t.value" v-text="t.name" />
         <dark-mode-switch />
       </v-tabs>
       <Nuxt />

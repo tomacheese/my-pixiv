@@ -20,6 +20,10 @@ const config: NuxtConfig = {
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
       { hid: 'description', name: 'description', content: '' },
       { name: 'format-detection', content: 'telephone=no' },
+      { name: 'mobile-web-app-capable', content: 'yes' },
+      { name: 'apple-mobile-web-app-capable', content: 'yes' },
+      { name: 'apple-mobile-web-app-status-bar-style', content: 'black' },
+      { name: 'apple-mobile-web-app-title', content: 'my-pixiv' },
     ],
     link: [
       {
@@ -39,7 +43,6 @@ const config: NuxtConfig = {
         sizes: '16x16',
         href: '/favicons/favicon-16x16.png',
       },
-      { rel: 'manifest', href: '/favicons/site.webmanifest' },
       {
         rel: 'mask-icon',
         href: '/favicons/safari-pinned-tab.svg',
@@ -51,6 +54,21 @@ const config: NuxtConfig = {
         href: '/favicons/favicon.ico',
       },
     ],
+  },
+
+  pwa: {
+    manifest: {
+      lang: 'ja',
+      name: 'my-pixiv',
+      short_name: 'my-pixiv',
+      description: 'pixiv client for myself.',
+      display: 'standalone',
+      theme_color: '#0097fa',
+      background_color: '#fff',
+      orientation: 'portrait',
+      scope: '/',
+      start_url: '/',
+    },
   },
 
   css: ['@/assets/scroll.css'],
@@ -67,6 +85,7 @@ const config: NuxtConfig = {
     '@nuxt/typescript-build',
     '@nuxtjs/stylelint-module',
     '@nuxtjs/vuetify',
+    '@nuxtjs/pwa',
     'nuxt-typed-vuex',
   ],
 

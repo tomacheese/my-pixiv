@@ -8,3 +8,4 @@ data/
 token.json
 config.json
 *.pyc
+sw.*

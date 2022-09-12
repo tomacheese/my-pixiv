@@ -170,7 +170,7 @@ export default Vue.extend({
           alert('Likeに失敗: ' + error)
         })
     },
-    clickImage(e: PointerEvent) {
+    clickImage(e: MouseEvent) {
       if (this.item == null) {
         return
       }
