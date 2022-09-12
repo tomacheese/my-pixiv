@@ -25,7 +25,11 @@
       </v-col>
       <v-col v-for="(item, i) in getItems()" :key="i" cols="12">
         <ItemWrapper :item="item" @intersect="onItemViewing">
-          <ItemCard :item="item" :is-viewed="!isViewed(item)" @open="open" />
+          <ItemCard
+            :item="item"
+            :is-viewed="vieweds !== undefined && !isViewed(item)"
+            @open="open"
+          />
         </ItemWrapper>
       </v-col>
     </v-row>

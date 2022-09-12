@@ -23,7 +23,7 @@
             <ItemWrapper :item="item" @intersect="onItemViewing">
               <ItemCard
                 :item="item"
-                :is-viewed="!isViewed(item)"
+                :is-viewed="vieweds !== undefined && !isViewed(item)"
                 @open="open"
                 @intersect="onItemViewing"
               />

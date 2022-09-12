@@ -1,3 +1,5 @@
+<!-- https://github.com/e-oj/vue-magic-grid -->
+
 <template>
   <div :class="[wrapper]">
     <slot />
