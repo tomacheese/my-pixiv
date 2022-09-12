@@ -2,6 +2,8 @@ Set-Location $PSScriptRoot
 
 Set-Location ..
 venv\Scripts\activate
+pip install -r requirements.txt
+
 $env:PIXIVPY_TOKEN_FILE = "data/token.json"
 $env:CONFIG_FILE = "data/config.json"
 $env:VIEWED_FILE = "data/viewed.json"
