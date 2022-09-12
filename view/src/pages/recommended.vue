@@ -3,7 +3,7 @@
     <v-tabs v-model="selected" fixed-tabs color="orange">
       <v-tab v-for="type of types" :key="type.value" v-text="type.name" />
     </v-tabs>
-    <v-container>
+    <v-container fluid>
       <IllustList
         v-if="types[selected].value === 'ILLUST'"
         target-type="ILLUST"
