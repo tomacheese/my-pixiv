@@ -52,6 +52,28 @@ Twitter API v1.1 が利用できる以下 4 つのキーが必要です。
 }
 ```
 
+### Boot
+
+`docker-compose.yml` に以下を書き込みます。
+
+```yaml
+version: '3.8'
+
+services:
+  app:
+    image: ghcr.io/tomacheese/my-pixiv:latest
+    volumes:
+      - type: bind
+        source: ./data
+        target: /data/
+    ports:
+      - 8080:80
+    init: true
+    restart: always
+```
+
+`docker-compose up --build -d` で起動し、`http://localhost:8080` でアクセスできるはずです。
+
 ## Development
 
 このプロジェクトはフロントエンドの SPA モードの Nuxt.js プロジェクトと Python3 FastAPI プロジェクトで動作しています。  
