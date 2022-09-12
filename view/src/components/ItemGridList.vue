@@ -81,11 +81,6 @@ export default Vue.extend({
     this.isOnlyNew = this.$accessor.settings.onlyNew
   },
   methods: {
-    changePage() {
-      setTimeout(() => {
-        window.scroll({ top: 0, behavior: 'smooth' })
-      }, 100)
-    },
     open(item: PixivItem): void {
       this.$emit('open', item)
     },
