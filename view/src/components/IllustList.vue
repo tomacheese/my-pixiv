@@ -114,6 +114,7 @@ export default Vue.extend({
       if (this.recommended) {
         return
       }
+      console.log('onItemViewing', item)
       this.$accessor.viewed.addIllust(item)
     },
   },

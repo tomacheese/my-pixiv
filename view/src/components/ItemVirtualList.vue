@@ -20,12 +20,14 @@
       >
         <template #default="{ item }">
           <v-col cols="12">
-            <ItemCard
-              :item="item"
-              :is-viewed="!isViewed(item)"
-              @open="open"
-              @intersect="onItemViewing"
-            />
+            <ItemWrapper :item="item" @intersect="onItemViewing">
+              <ItemCard
+                :item="item"
+                :is-viewed="!isViewed(item)"
+                @open="open"
+                @intersect="onItemViewing"
+              />
+            </ItemWrapper>
           </v-col>
         </template>
       </v-virtual-scroll>

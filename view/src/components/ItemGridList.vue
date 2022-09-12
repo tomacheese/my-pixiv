@@ -9,14 +9,25 @@
     <v-card v-if="getItems.length === 0 && !loading">
       <v-card-title>該当するアイテムはありません。</v-card-title>
     </v-card>
-    <MagicGrid ref="magic-grid" :animate="true" :max-cols="6">
-      <v-img
+    <MagicGrid ref="magic-grid" :animate="true">
+      <ItemWrapper
         v-for="item of getItems"
         :key="item.id"
-        width="240px"
-        :height="calcHeight(item)"
-        :src="item.image_urls.large"
-      />
+        :item="item"
+        @intersect="onItemViewing"
+      >
+        <v-card @click="open(item)">
+          <v-img
+            width="240px"
+            :height="calcHeight(item)"
+            :src="item.image_urls.medium"
+            class="white--text align-end"
+            gradient="to bottom, rgba(0,0,0,.1), rgba(0,0,0,.5)"
+          >
+            <v-card-title v-text="item.title"></v-card-title>
+          </v-img>
+        </v-card>
+      </ItemWrapper>
     </MagicGrid>
   </div>
 </template>

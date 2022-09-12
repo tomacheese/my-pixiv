@@ -48,6 +48,7 @@ export interface PixivItem {
   is_bookmarked: boolean
   visible: boolean
   is_muted: boolean
+  text_length?: number
 }
 
 export type PixivItemWithSearchTag = PixivItem & {

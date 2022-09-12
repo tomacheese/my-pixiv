@@ -1,6 +1,6 @@
 <!-- eslint-disable vue/no-v-html -->
 <template>
-  <v-card :id="observName" @click="open(item)">
+  <v-card @click="open(item)">
     <div
       class="d-flex flex-no-wrap justify-space-between"
       style="height: 200px"
@@ -48,64 +48,17 @@
 
 <script lang="ts">
 import Vue from 'vue'
-import { PixivItem } from '@/types/pixivItem'
+import { PixivItem, PixivItemWithSearchTag } from '@/types/pixivItem'
 export default Vue.extend({
   props: {
     item: {
-      type: Object as () => PixivItem,
+      type: Object as () => PixivItemWithSearchTag,
       required: true,
     },
     isViewed: {
       type: Boolean,
       required: true,
     },
-  },
-  data(): {
-    observName: string
-    isIntersecting: boolean
-  } {
-    return {
-      observName: '',
-      isIntersecting: false,
-    }
-  },
-  watch: {
-    item() {
-      const element = document.getElementById(this.observName)
-      if (!element) {
-        return
-      }
-      if (this.isViewing(element)) {
-        this.$emit('intersect', this.item)
-      }
-    },
-    isIntersecting(value: boolean) {
-      if (value) {
-        this.$emit('intersect', this.item)
-      }
-    },
-  },
-  created() {
-    this.observName = this.item.id.toString()
-  },
-  mounted() {
-    if (!window) {
-      return
-    }
-    const element = document.getElementById(this.observName)
-    if (!element) {
-      return
-    }
-    if (this.isViewing(element)) {
-      this.$emit('intersect', this.item)
-    }
-    const handler = (entries: { isIntersecting: boolean }[]) => {
-      this.isIntersecting = entries[0].isIntersecting
-    }
-    const observer = new window.IntersectionObserver(handler, {
-      threshold: 1.0,
-    })
-    observer.observe(element)
   },
   methods: {
     getTagColor(searchTags: string[], tag: string): string {
@@ -116,15 +69,6 @@ export default Vue.extend({
     },
     open(item: PixivItem): void {
       this.$emit('open', item)
-    },
-    isViewing(element: Element) {
-      const rect = element.getBoundingClientRect()
-      return (
-        rect.top >= 0 &&
-        rect.left >= 0 &&
-        rect.bottom <= window.innerHeight &&
-        rect.right <= window.innerWidth
-      )
     },
     copyToClipboard(text: string) {
       const textarea = document.createElement('textarea')

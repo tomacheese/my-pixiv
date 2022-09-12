@@ -14,6 +14,7 @@
     "paths": {
       "@/*": ["./src/*"]
     },
+    "jsx": "preserve",
     "types": ["@nuxt/types", "@nuxtjs/axios", "@types/node", "vuetify"],
     "typeRoots": ["src/types"]
   },

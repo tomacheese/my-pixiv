@@ -24,12 +24,9 @@
         </v-card>
       </v-col>
       <v-col v-for="(item, i) in getItems()" :key="i" cols="12">
-        <ItemCard
-          :item="item"
-          :is-viewed="!isViewed(item)"
-          @open="open"
-          @intersect="onItemViewing"
-        />
+        <ItemWrapper :item="item" @intersect="onItemViewing">
+          <ItemCard :item="item" :is-viewed="!isViewed(item)" @open="open" />
+        </ItemWrapper>
       </v-col>
     </v-row>
     <v-pagination
