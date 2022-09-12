@@ -1,44 +1,50 @@
 <template>
-  <v-container>
+  <div>
     <v-progress-linear v-if="loading" indeterminate></v-progress-linear>
     <v-switch
       v-if="vieweds !== undefined"
       v-model="isOnlyNew"
       label="New のみ表示"
     ></v-switch>
-    <v-row>
-      <v-col v-if="getItems.length === 0 && !loading" cols="12">
-        <v-card>
-          <v-card-title>該当するアイテムはありません。</v-card-title>
-        </v-card>
-      </v-col>
-      <v-virtual-scroll
-        v-if="getItems.length > 0"
-        :items="getItems"
-        item-height="210"
-        style="overflow-y: hidden"
+    <v-card v-if="getItems.length === 0 && !loading">
+      <v-card-title>該当するアイテムはありません。</v-card-title>
+    </v-card>
+    <MagicGrid ref="magic-grid" :animate="true">
+      <ItemWrapper
+        v-for="item of getItems"
+        :key="item.id"
+        :item="item"
+        @intersect="onItemViewing"
       >
-        <template #default="{ item }">
-          <v-col cols="12">
-            <ItemWrapper :item="item" @intersect="onItemViewing">
-              <ItemCard
-                :item="item"
-                :is-viewed="vieweds !== undefined && !isViewed(item)"
-                @open="open"
-                @intersect="onItemViewing"
-              />
-            </ItemWrapper>
-          </v-col>
-        </template>
-      </v-virtual-scroll>
-    </v-row>
-  </v-container>
+        <v-badge
+          overlap
+          :content="'NEW'"
+          offset-x="30"
+          :value="vieweds !== undefined && !isViewed(item)"
+        >
+          <v-card @click="open(item)">
+            <v-img
+              width="240px"
+              :height="calcHeight(item)"
+              :src="item.image_urls.medium"
+              class="white--text align-end"
+              gradient="to bottom, rgba(0,0,0,.1), rgba(0,0,0,.5)"
+            >
+              <v-card-title v-text="item.title"></v-card-title>
+            </v-img>
+          </v-card>
+        </v-badge>
+      </ItemWrapper>
+    </MagicGrid>
+  </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue'
+import MagicGrid from './MagicGrid.vue'
 import { PixivItem } from '@/types/pixivItem'
 export default Vue.extend({
+  components: { MagicGrid },
   props: {
     items: {
       type: Array as () => PixivItem[],
@@ -73,17 +79,15 @@ export default Vue.extend({
   watch: {
     isOnlyNew() {
       this.$accessor.settings.setOnlyNew(this.isOnlyNew)
+      this.$nextTick(() => {
+        ;(this.$refs['magic-grid'] as any).update()
+      })
     },
   },
   mounted() {
     this.isOnlyNew = this.$accessor.settings.onlyNew
   },
   methods: {
-    changePage() {
-      setTimeout(() => {
-        window.scroll({ top: 0, behavior: 'smooth' })
-      }, 100)
-    },
     open(item: PixivItem): void {
       this.$emit('open', item)
     },
@@ -95,6 +99,10 @@ export default Vue.extend({
         return false
       }
       return this.vieweds.includes(item.id)
+    },
+    calcHeight(item: PixivItem): string {
+      if (item.height === undefined) return '338px'
+      return `${(item.height / item.width) * 240}px`
     },
   },
 })

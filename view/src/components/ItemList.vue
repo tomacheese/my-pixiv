@@ -1,7 +1,7 @@
 <template>
   <div>
     <ItemPaginationList
-      v-if="selectType === 'PAGINATION'"
+      v-if="type === 'PAGINATION'"
       :items="items"
       :loading="loading"
       :vieweds="vieweds"
@@ -9,7 +9,15 @@
       @intersect-item="onItemViewing"
     />
     <ItemVirtualList
-      v-if="selectType === 'VIRTUAL_SCROLL'"
+      v-if="type === 'VIRTUAL_SCROLL'"
+      :items="items"
+      :loading="loading"
+      :vieweds="vieweds"
+      @open="open"
+      @intersect-item="onItemViewing"
+    />
+    <ItemGridList
+      v-if="type === 'GRID_LIST'"
       :items="items"
       :loading="loading"
       :vieweds="vieweds"
@@ -25,6 +33,10 @@ import { PixivItem } from '@/types/pixivItem'
 import { ViewType } from '@/store/settings'
 export default Vue.extend({
   props: {
+    type: {
+      type: String as () => ViewType,
+      required: true,
+    },
     items: {
       type: Array as () => PixivItem[],
       required: true,
@@ -38,16 +50,6 @@ export default Vue.extend({
       type: Boolean,
       required: true,
     },
-  },
-  data(): {
-    selectType: ViewType
-  } {
-    return {
-      selectType: 'PAGINATION',
-    }
-  },
-  created() {
-    this.selectType = this.$accessor.settings.viewType
   },
   methods: {
     open(item: PixivItem): void {

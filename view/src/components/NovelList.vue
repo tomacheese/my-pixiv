@@ -4,6 +4,7 @@
       :items="items"
       :loading="loading"
       :vieweds="vieweds"
+      :type="selectType"
       @open="open"
       @intersect-item="onItemViewing"
     ></ItemList>
@@ -25,6 +26,7 @@
 import Vue from 'vue'
 import { PixivItem } from '@/types/pixivItem'
 import { Fetcher } from '@/plugins/fetcher'
+import { ViewType } from '@/store/settings'
 
 export default Vue.extend({
   name: 'NovelList',
@@ -38,6 +40,7 @@ export default Vue.extend({
   data(): {
     items: PixivItem[]
     vieweds: number[] | undefined
+    selectType: ViewType
     page: number
     overlay: {
       isIllustOpened: boolean
@@ -49,6 +52,7 @@ export default Vue.extend({
     return {
       items: [],
       vieweds: [],
+      selectType: 'PAGINATION',
       page: 1,
       overlay: {
         isIllustOpened: false,
@@ -65,6 +69,8 @@ export default Vue.extend({
   },
   async created() {
     await this.fetch()
+
+    this.selectType = this.$accessor.settings.novelViewType
 
     if (!this.recommended) {
       this.vieweds = this.$accessor.viewed.novels
