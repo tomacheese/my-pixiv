@@ -4,7 +4,7 @@ pixiv client for myself.
 
 ## Installation
 
-このプロジェクト（クライアント）を利用するためには、有効な [pixiv](https://www.pixiv.net) アカウントとリフレッシュトークンが必須です。
+このプロジェクト（クライアント）を利用するためには、有効な [pixiv](https://www.pixiv.net) アカウントのリフレッシュトークンが必須です。
 
 ### pixiv
 
@@ -34,6 +34,8 @@ Twitter API v1.1 が利用できる以下 4 つのキーが必要です。
 - サブアカウント (任意)
   - Access Token: `<SUB-ACCOUNT-ACCESS-TOKEN>`
   - Access Token Secret: `<SUB-ACCOUNT-ACCESS-TOKEN-SECRET>`
+
+以下の JSON の該当部分を置き換えた上で、 `data/config.json` に書き込んでください。
 
 ```json
 {
@@ -79,7 +81,7 @@ services:
 このプロジェクトはフロントエンドの SPA モードの Nuxt.js プロジェクトと Python3 FastAPI プロジェクトで動作しています。  
 Docker で動作する場合、Nuxt.js プロジェクトからビルドした成果物をルートにマウントし、API エンドポイントを `/api/` 以下に設定しています。
 
-開発時、ホットリロードのためにそれぞれ独立として動作することをオススメします。以下のコマンドで起動できます。
+開発時、ホットリロードのためにそれぞれ独立して動作することをオススメします。以下のコマンドで起動できます。
 
 - クライアント (フロントエンド): `.\scripts\client-dev.ps1`
 - サーバ (バックエンド): `.\scripts\server-dev.ps1`
