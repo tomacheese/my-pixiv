@@ -21,13 +21,11 @@
 <script lang="ts">
 import Vue from 'vue'
 import { TargetType } from '@/store/settings'
-import { PixivItem } from '@/types/pixivItem'
 export default Vue.extend({
   name: 'RecommendedPage',
   data(): {
     selected: number
     types: { name: string; value: TargetType }[]
-    items: PixivItem[]
     loading: boolean
   } {
     return {
@@ -42,7 +40,6 @@ export default Vue.extend({
           value: 'NOVEL',
         },
       ],
-      items: [],
       loading: false,
     }
   },

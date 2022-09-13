@@ -1,13 +1,18 @@
 import type { NuxtRuntimeConfig } from '@nuxt/types/config/runtime'
 import type { NuxtAxiosInstance } from '@nuxtjs/axios'
 import { Filter, Target, TargetType } from '@/store/settings'
-import { PixivItem, PixivItemWithSearchTag } from '@/types/pixivItem'
+import {
+  PixivItem,
+  PixivItemRecommended,
+  PixivItemWithSearchTag,
+} from '@/types/pixivItem'
 
 export class Fetcher {
   private $config: NuxtRuntimeConfig
   private $axios: NuxtAxiosInstance
   private readonly targetType: TargetType
   private readonly globalFilter: Filter[]
+  private recommendedNextUrl: string | null = null
   public constructor(
     $config: NuxtRuntimeConfig,
     $axios: NuxtAxiosInstance,
@@ -37,16 +42,27 @@ export class Fetcher {
     return results
   }
 
-  public async getFetchRecommended() {
-    const response = await this.$axios.get<PixivItem[]>(
-      `/api/recommended/${this.targetType.toLocaleLowerCase()}`
+  public async getFetchRecommended(more: boolean = false) {
+    const response = await this.$axios.get<PixivItemRecommended>(
+      `/api/recommended/${this.targetType.toLocaleLowerCase()}`,
+      {
+        params: {
+          next_url: more ? this.recommendedNextUrl : null,
+        },
+      }
     )
-    const data = response.data
+    const data = response.data.data
     for (const item of data) {
       this.itemProcessor(item)
     }
 
+    this.recommendedNextUrl = response.data.next_url
+
     return data.filter((item) => !this.isFilterItem(null, item))
+  }
+
+  public isLoadMoreAvailable() {
+    return this.recommendedNextUrl !== null
   }
 
   public getFetchItemPromise(target: Target) {

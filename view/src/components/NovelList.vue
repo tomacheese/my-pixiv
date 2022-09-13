@@ -5,8 +5,10 @@
       :loading="loading"
       :vieweds="vieweds"
       :type="selectType"
+      :is-load-more-available="isLoadMoreAvailable()"
       @open="open"
       @intersect-item="onItemViewing"
+      @load-more="loadMore"
     ></ItemList>
   </v-container>
 </template>
@@ -27,6 +29,7 @@ export default Vue.extend({
     },
   },
   data(): {
+    fetcher: Fetcher | null
     items: PixivItem[]
     vieweds: number[] | undefined
     selectType: ViewType
@@ -34,6 +37,7 @@ export default Vue.extend({
     loading: boolean
   } {
     return {
+      fetcher: null,
       items: [],
       vieweds: [],
       selectType: 'PAGINATION',
@@ -61,21 +65,49 @@ export default Vue.extend({
     async fetch() {
       this.loading = true
 
-      const fetcher = new Fetcher(
-        this.$config,
-        this.$axios,
-        this.$accessor.settings.filters,
-        'NOVEL'
-      )
+      if (!this.fetcher) {
+        this.fetcher = new Fetcher(
+          this.$config,
+          this.$axios,
+          this.$accessor.settings.filters,
+          'NOVEL'
+        )
+      }
       if (!this.recommended) {
-        this.items = await fetcher.getItems(
+        this.items = await this.fetcher.getItems(
           this.$accessor.settings.specificTargets('NOVEL')
         )
       } else {
-        this.items = await fetcher.getFetchRecommended()
+        this.items = await this.fetcher.getFetchRecommended()
       }
 
       this.loading = false
+    },
+    loadMore() {
+      if (!this.fetcher) {
+        return
+      }
+      if (!this.recommended) {
+        return
+      }
+      this.loading = true
+
+      this.fetcher
+        .getFetchRecommended(true)
+        .then((items) => {
+          this.items = [...this.items, ...items].filter((item, index, self) => {
+            return self.map((item) => item.id).indexOf(item.id) === index
+          })
+        })
+        .finally(() => {
+          this.loading = false
+        })
+    },
+    isLoadMoreAvailable(): boolean {
+      if (!this.fetcher) {
+        return false
+      }
+      return this.fetcher.isLoadMoreAvailable()
     },
     open(item: PixivItem): void {
       if (!window) {
