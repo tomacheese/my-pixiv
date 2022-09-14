@@ -34,9 +34,10 @@
         class="mt-3"
       ></v-pagination>
       <div class="text-center">
-        <img
+        <v-img
+          contain
+          max-height="100vh"
           :src="getImage(item)"
-          style="overflow: scroll"
           @click="clickImage"
         />
       </div>

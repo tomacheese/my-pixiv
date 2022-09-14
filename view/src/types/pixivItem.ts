@@ -28,6 +28,7 @@ export interface MetaSinglePage {
 export interface PixivItem {
   id: number
   title: string
+  type?: string
   image_urls: ImageUrls
   caption: string
   restrict: number
