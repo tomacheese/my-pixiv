@@ -9,7 +9,7 @@
     <v-card v-if="getItems.length === 0 && !loading">
       <v-card-title>該当するアイテムはありません。</v-card-title>
     </v-card>
-    <MagicGrid ref="magic-grid" :animate="true" :gap="10">
+    <MagicGrid ref="magic-grid" :animate="true" :use-min="true" :gap="10">
       <ItemWrapper
         v-for="item of getItems"
         :key="item.id"
@@ -36,6 +36,14 @@
         </v-badge>
       </ItemWrapper>
     </MagicGrid>
+    <v-btn
+      v-if="isLoadMoreAvailable"
+      block
+      large
+      class="my-5"
+      @click="loadMore()"
+      >さらに読み込む</v-btn
+    >
   </div>
 </template>
 
@@ -56,6 +64,10 @@ export default Vue.extend({
       default: undefined,
     },
     loading: {
+      type: Boolean,
+      required: true,
+    },
+    isLoadMoreAvailable: {
       type: Boolean,
       required: true,
     },
@@ -83,6 +95,11 @@ export default Vue.extend({
         ;(this.$refs['magic-grid'] as any).update()
       })
     },
+    items() {
+      this.$nextTick(() => {
+        ;(this.$refs['magic-grid'] as any).update()
+      })
+    },
   },
   mounted() {
     this.isOnlyNew = this.$accessor.settings.onlyNew
@@ -103,6 +120,9 @@ export default Vue.extend({
     calcHeight(item: PixivItem): string {
       if (item.height === undefined) return '338px'
       return `${(item.height / item.width) * 240}px`
+    },
+    loadMore(): void {
+      this.$emit('load-more')
     },
   },
 })

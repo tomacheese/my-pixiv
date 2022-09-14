@@ -45,6 +45,20 @@
       class="my-3"
       @input="changePage"
     ></v-pagination>
+    <v-btn
+      v-if="
+        page ===
+          Math.ceil(
+            items.filter((item) => (isOnlyNew ? !isViewed(item) : true))
+              .length / 10
+          ) && isLoadMoreAvailable
+      "
+      block
+      large
+      class="my-5"
+      @click="loadMore()"
+      >さらに読み込む</v-btn
+    >
   </v-container>
 </template>
 
@@ -63,6 +77,10 @@ export default Vue.extend({
       default: undefined,
     },
     loading: {
+      type: Boolean,
+      required: true,
+    },
+    isLoadMoreAvailable: {
       type: Boolean,
       required: true,
     },
@@ -106,6 +124,9 @@ export default Vue.extend({
         return false
       }
       return this.vieweds.includes(item.id)
+    },
+    loadMore(): void {
+      this.$emit('load-more')
     },
   },
 })

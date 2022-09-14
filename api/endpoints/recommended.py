@@ -7,9 +7,15 @@ router = APIRouter(prefix="/recommended")
 
 @router.get("/illust")
 def get_recommended_illusts_req():
-    return get_pixiv_recommended("illusts")["illusts"]
+    result = get_pixiv_recommended("illusts")
+    result["data"] = result["illusts"]
+    del result["illusts"]
+    return result
 
 
 @router.get("/novel")
 def get_recommended_novels_req():
-    return get_pixiv_recommended("novels")["novels"]
+    result = get_pixiv_recommended("novels")
+    result["data"] = result["novels"]
+    del result["novels"]
+    return result

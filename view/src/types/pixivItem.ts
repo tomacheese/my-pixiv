@@ -52,6 +52,11 @@ export interface PixivItem {
   text_length?: number
 }
 
+export interface PixivItemRecommended {
+  data: PixivItem[]
+  next_url: string
+}
+
 export type PixivItemWithSearchTag = PixivItem & {
   searchTags: string[]
 }

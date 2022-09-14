@@ -14,6 +14,7 @@
       </v-col>
       <v-virtual-scroll
         v-if="getItems.length > 0"
+        :bench="10"
         :items="getItems"
         item-height="210"
         style="overflow-y: hidden"
@@ -31,6 +32,7 @@
           </v-col>
         </template>
       </v-virtual-scroll>
+      <!-- バーチャルスクロールでは、さらに読み込むボタン押下後にアイテムがロードされない不具合があるので実装しない -->
     </v-row>
   </v-container>
 </template>
@@ -50,6 +52,10 @@ export default Vue.extend({
       default: undefined,
     },
     loading: {
+      type: Boolean,
+      required: true,
+    },
+    isLoadMoreAvailable: {
       type: Boolean,
       required: true,
     },

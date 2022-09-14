@@ -5,24 +5,30 @@
       :items="items"
       :loading="loading"
       :vieweds="vieweds"
+      :is-load-more-available="isLoadMoreAvailable"
       @open="open"
       @intersect-item="onItemViewing"
+      @load-more="loadMore"
     />
     <ItemVirtualList
       v-if="type === 'VIRTUAL_SCROLL'"
       :items="items"
       :loading="loading"
       :vieweds="vieweds"
+      :is-load-more-available="isLoadMoreAvailable"
       @open="open"
       @intersect-item="onItemViewing"
+      @load-more="loadMore"
     />
     <ItemGridList
       v-if="type === 'GRID_LIST'"
       :items="items"
       :loading="loading"
       :vieweds="vieweds"
+      :is-load-more-available="isLoadMoreAvailable"
       @open="open"
       @intersect-item="onItemViewing"
+      @load-more="loadMore"
     />
   </div>
 </template>
@@ -50,6 +56,10 @@ export default Vue.extend({
       type: Boolean,
       required: true,
     },
+    isLoadMoreAvailable: {
+      type: Boolean,
+      required: true,
+    },
   },
   methods: {
     open(item: PixivItem): void {
@@ -57,6 +67,9 @@ export default Vue.extend({
     },
     onItemViewing(item: PixivItem): void {
       this.$emit('intersect-item', item)
+    },
+    loadMore(): void {
+      this.$emit('load-more')
     },
   },
 })
