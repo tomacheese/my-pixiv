@@ -38,7 +38,12 @@
       </div>
 
       <v-badge overlap :content="'NEW'" offset-x="30" :value="isViewed">
-        <v-avatar class="ma-3" size="125" tile>
+        <v-avatar
+          class="ma-3"
+          size="125"
+          tile
+          :class="{ 'hidden-md-and-down': !item.type }"
+        >
           <v-img :src="item.image_urls.square_medium" />
         </v-avatar>
       </v-badge>
