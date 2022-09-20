@@ -30,7 +30,7 @@
               class="white--text align-end"
               gradient="to bottom, rgba(0,0,0,.1), rgba(0,0,0,.5)"
             >
-              <v-card-title v-text="item.title"></v-card-title>
+              <v-card-title>{{ item.title }}</v-card-title>
             </v-img>
           </v-card>
         </v-badge>

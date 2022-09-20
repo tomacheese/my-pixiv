@@ -25,7 +25,7 @@ env:
 
 jobs:
   job:
-    name: Build
+    name: Docker build
     runs-on: ubuntu-latest
 
     steps:

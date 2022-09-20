@@ -1,12 +1,9 @@
 <template>
   <v-container>
     <h2>設定の同期</h2>
-    <v-btn
-      color="error"
-      :disabled="isDisabled"
-      @click="toggleConnect()"
-      v-text="isConnected ? '同期待ち受け停止' : '同期待ち受け開始'"
-    ></v-btn>
+    <v-btn color="error" :disabled="isDisabled" @click="toggleConnect()">{{
+      isConnected ? '同期待ち受け停止' : '同期待ち受け開始'
+    }}</v-btn>
     <v-btn
       color="error"
       :disabled="isConnected || isDisabled"

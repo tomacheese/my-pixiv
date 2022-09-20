@@ -1,7 +1,7 @@
 <template>
   <div>
     <v-tabs v-model="selected" fixed-tabs color="orange">
-      <v-tab v-for="t of types" :key="t.value" v-text="t.name" />
+      <v-tab v-for="t of types" :key="t.value">{{ t.name }}</v-tab>
     </v-tabs>
     <v-container fluid>
       <IllustList
