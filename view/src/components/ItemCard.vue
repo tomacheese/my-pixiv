@@ -33,8 +33,8 @@
         <v-card-text
           style="height: 5.2em; overflow-y: scroll"
           class="hidden-scrollbar"
-          >{{ item.caption }}</v-card-text
-        >
+          ><span v-html="item.caption"></span
+        ></v-card-text>
       </div>
 
       <v-badge overlap :content="'NEW'" offset-x="30" :value="isViewed">
