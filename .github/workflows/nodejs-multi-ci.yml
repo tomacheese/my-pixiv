@@ -100,10 +100,6 @@ jobs:
         working-directory: ${{ matrix.directory }}
         run: yarn test
 
-      - name: ☑️ Check Dependencies
-        working-directory: ${{ matrix.directory }}
-        run: npx depcheck
-
       - name: Check exists dist directory
         id: check-dist
         working-directory: ${{ matrix.directory }}
