@@ -1,0 +1,118 @@
+# 複数のディレクトリにある Node.js v16 でビルド・テストを実行する
+
+name: Node CI
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+    branches:
+      - main
+      - master
+
+jobs:
+  ci:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        node: [16]
+        directory: [view]
+
+    steps:
+      - name: 🛎 Checkout
+        uses: actions/checkout@v3
+
+      - name: 🏗 Setup node env
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node }}
+
+      - name: 📃 Check package.json definition
+        id: package-json
+        working-directory: ${{ matrix.directory }}
+        run: |
+          compile=$(cat package.json | jq '.scripts | has("compile")')
+          build=$(cat package.json | jq '.scripts | has("build")')
+          generate=$(cat package.json | jq '.scripts | has("generate")')
+          package=$(cat package.json | jq '.scripts | has("package")')
+          lint=$(cat package.json | jq '.scripts | has("lint")')
+          test=$(cat package.json | jq '.scripts | has("test")')
+
+          echo "compile: $compile"
+          echo "build: $build"
+          echo "generate: $generate"
+          echo "package: $package"
+          echo "lint: $lint"
+          echo "test: $test"
+
+          echo "::set-output name=compile::$compile"
+          echo "::set-output name=build::$build"
+          echo "::set-output name=generate::$generate"
+          echo "::set-output name=package::$package"
+          echo "::set-output name=lint::$lint"
+          echo "::set-output name=test::$test"
+
+      - name: 🛠 Get yarn cache directory path
+        id: yarn-cache-dir-path
+        run: echo "::set-output name=dir::$(yarn cache dir)"
+
+      - name: 📦 Cache node_modules
+        uses: actions/cache@v3
+        id: yarn-cache
+        with:
+          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+
+      - name: 👨🏻‍💻 Install dependencies
+        working-directory: ${{ matrix.directory }}
+        run: yarn
+
+      - name: 👀 Run linter
+        if: steps.package-json.outputs.lint == 'true'
+        working-directory: ${{ matrix.directory }}
+        run: yarn lint
+
+      - name: 🎁 Run package
+        if: steps.package-json.outputs.package == 'true'
+        working-directory: ${{ matrix.directory }}
+        run: yarn package
+
+      - name: 🏃 Run compile
+        if: steps.package-json.outputs.compile == 'true'
+        working-directory: ${{ matrix.directory }}
+        run: yarn compile
+
+      - name: 🏗️ Run build & generate (Nuxt.js)
+        if: steps.package-json.outputs.build == 'true' && steps.package-json.outputs.generate == 'true'
+        working-directory: ${{ matrix.directory }}
+        run: |
+          yarn build
+          yarn generate
+
+      - name: 🧪 Run tests
+        if: steps.package-json.outputs.test == 'true'
+        working-directory: ${{ matrix.directory }}
+        run: yarn test
+
+      - name: ☑️ Check Dependencies
+        working-directory: ${{ matrix.directory }}
+        run: npx depcheck
+
+      - name: Check exists dist directory
+        id: check-dist
+        working-directory: ${{ matrix.directory }}
+        run: |
+          echo "::set-output name=exists::$(test -d dist && echo true || echo false)"
+
+      - name: 📦 Upload artifact
+        if: steps.check-dist.outputs.exists == 'true'
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ matrix.directory }}-dist
+          path: ${{ matrix.directory }}/dist

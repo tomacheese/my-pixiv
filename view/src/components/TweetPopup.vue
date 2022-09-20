@@ -8,8 +8,8 @@
         v-for="screen_name of data.screen_names"
         :key="screen_name"
         class="ma-1"
-        v-text="'@' + screen_name"
-      ></v-chip>
+        >@{{ screen_name }}</v-chip
+      >
     </v-card-title>
     <v-card-text>
       <v-row>
@@ -17,19 +17,17 @@
           <v-card @click="open(tweet)">
             <div class="d-flex flex-no-wrap justify-space-between">
               <div>
-                <v-card-subtitle
-                  class="text-h5"
-                  v-text="getUserText(tweet.tweet.user)"
-                ></v-card-subtitle>
+                <v-card-subtitle class="text-h5">{{
+                  getUserText(tweet.tweet.user)
+                }}</v-card-subtitle>
 
                 <v-card-subtitle>
-                  <v-chip class="ma-1" v-text="tweet.similarity"></v-chip>
+                  <v-chip class="ma-1">{{ tweet.similarity }}</v-chip>
                 </v-card-subtitle>
 
-                <v-card-text
-                  style="height: 1.5em; overflow: hidden"
-                  v-text="tweet.tweet.text"
-                ></v-card-text>
+                <v-card-text style="height: 1.5em; overflow: hidden">{{
+                  tweet.tweet.text
+                }}</v-card-text>
               </div>
 
               <v-avatar class="ma-3" size="125" tile>

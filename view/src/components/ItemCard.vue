@@ -6,7 +6,7 @@
       style="height: 200px"
     >
       <div>
-        <v-card-title class="text-h5" v-text="item.title"></v-card-title>
+        <v-card-title class="text-h5">{{ item.title }}</v-card-title>
 
         <v-card-subtitle>
           <div class="grey--text">{{ item.create_date }}</div>
@@ -25,16 +25,16 @@
               :color="getTagColor(item.searchTags, tag.name)"
               class="ma-1"
               @click.stop="copyToClipboard(tag.name)"
-              v-text="tag.name"
-            ></v-chip>
+              >{{ tag.name }}</v-chip
+            >
           </div>
         </v-card-subtitle>
 
         <v-card-text
           style="height: 5.2em; overflow-y: scroll"
           class="hidden-scrollbar"
-          v-html="item.caption"
-        ></v-card-text>
+          >{{ item.caption }}</v-card-text
+        >
       </div>
 
       <v-badge overlap :content="'NEW'" offset-x="30" :value="isViewed">
