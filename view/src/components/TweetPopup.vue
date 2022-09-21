@@ -22,7 +22,9 @@
                 }}</v-card-subtitle>
 
                 <v-card-subtitle>
-                  <v-chip class="ma-1">{{ tweet.similarity }}</v-chip>
+                  <v-chip class="ma-1" :color="getSimilarityColor(tweet)">{{
+                    tweet.similarity
+                  }}</v-chip>
                 </v-card-subtitle>
 
                 <v-card-text style="height: 1.5em; overflow: hidden">{{
@@ -145,6 +147,15 @@ export default Vue.extend({
         return 'red'
       }
       return ''
+    },
+    getSimilarityColor(tweet: Tweet) {
+      if (tweet.similarity === 0) {
+        return 'green'
+      }
+      if (tweet.similarity <= 10) {
+        return 'yellow'
+      }
+      return 'red'
     },
     toggleLike(tweet: Tweet, account: Accounts) {
       if (!this.item) {
