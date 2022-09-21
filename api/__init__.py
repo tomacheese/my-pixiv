@@ -16,7 +16,7 @@ from PIL import Image
 TOKEN_FILE = os.environ.setdefault('PIXIVPY_TOKEN_FILE', '/data/token.json')
 CONFIG_FILE = os.environ.setdefault('CONFIG_FILE', '/data/config.json')
 VIEWED_FILE = os.environ.setdefault('VIEWED_FILE', '/data/viewed.json')
-ILLUST_CACHE_DIR = os.environ.setdefault('IMAGE_CACHE_DIR', '/cache/illusts/')
+ILLUST_CACHE_DIR = os.environ.setdefault('ILLUST_CACHE_DIR', '/cache/illusts/')
 NOVEL_CACHE_DIR = os.environ.setdefault('NOVEL_CACHE_DIR', '/cache/novels/')
 MANGA_CACHE_DIR = os.environ.setdefault('MANGA_CACHE_DIR', '/cache/manga/')
 IMAGE_CACHE_DIR = os.environ.setdefault('IMAGE_CACHE_DIR', '/cache/images/')
@@ -65,8 +65,15 @@ def init_pixiv_api():
 
 
 def pixiv_download(url: str,
-                   illust_id: str):
-    path = os.path.join(IMAGE_CACHE_DIR, illust_id, url.split("/")[-1])
+                   item_type: str,
+                   item_id: str):
+    size_regex = re.compile(r"\d+x\d+")
+    page_regex = re.compile(r"p\d+")
+    size = size_regex.search(url).group(0)
+    extension = url.split(".")[-1]
+    page = None if page_regex.search(url) is None else page_regex.search(url).group(0)
+    filename = size + ("" if page is None else "-" + page) + "." + extension
+    path = os.path.join(IMAGE_CACHE_DIR, item_type, item_id, filename)
     os.makedirs(os.path.dirname(path), exist_ok=True)
 
     if os.path.exists(path):
@@ -176,8 +183,9 @@ def like_pixiv(item_type: str,
 
 
 def get_image(url: str,
-              illust_id: str):
-    path = pixiv_download(url, illust_id)
+              item_type: str,
+              item_id: str):
+    path = pixiv_download(url, item_type, item_id)
     return FileResponse(path, media_type="image/png")
 
 
@@ -191,7 +199,7 @@ def get_search_tweets(illust_id: str):
     illust_url = result["illust"]["image_urls"]["large"]
 
     # 画像をダウンロード
-    path = pixiv_download(illust_url, illust_id)
+    path = pixiv_download(illust_url, result["illust"]["type"], illust_id)
 
     screen_names = get_illust_screen_names(pixiv_api, result["illust"])
     if len(screen_names) == 0:
