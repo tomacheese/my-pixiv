@@ -97,17 +97,38 @@ export class Fetcher {
   }
 
   private itemProcessor(item: PixivItem) {
-    item.image_urls.large = `${this.$config.baseURL}api/images/${item.id}?url=${item.image_urls.large}`
-    item.image_urls.medium = `${this.$config.baseURL}api/images/${item.id}?url=${item.image_urls.medium}`
-    item.image_urls.square_medium = `${this.$config.baseURL}api/images/${item.id}?url=${item.image_urls.square_medium}`
+    item.image_urls.large = this.convertImageUrl(item, item.image_urls.large)
+    item.image_urls.medium = this.convertImageUrl(item, item.image_urls.medium)
+    item.image_urls.square_medium = this.convertImageUrl(
+      item,
+      item.image_urls.square_medium
+    )
 
     if (this.targetType === 'ILLUST' || this.targetType === 'MANGA') {
       for (const metaPage of item.meta_pages) {
-        metaPage.image_urls.large = `${this.$config.baseURL}api/images/${item.id}?url=${metaPage.image_urls.large}`
-        metaPage.image_urls.medium = `${this.$config.baseURL}api/images/${item.id}?url=${metaPage.image_urls.medium}`
-        metaPage.image_urls.square_medium = `${this.$config.baseURL}api/images/${item.id}?url=${metaPage.image_urls.square_medium}`
+        metaPage.image_urls.large = this.convertImageUrl(
+          item,
+          metaPage.image_urls.large
+        )
+        metaPage.image_urls.medium = this.convertImageUrl(
+          item,
+          metaPage.image_urls.medium
+        )
+        metaPage.image_urls.square_medium = this.convertImageUrl(
+          item,
+          metaPage.image_urls.square_medium
+        )
       }
     }
+  }
+
+  private convertImageUrl(item: PixivItem, url: string) {
+    return [
+      `${this.$config.baseURL}api`,
+      'images',
+      this.targetType.toLocaleLowerCase(),
+      `${item.id}?url=${url}`,
+    ].join('/')
   }
 
   private isFilterItem(target: Target | null, item: PixivItem) {
