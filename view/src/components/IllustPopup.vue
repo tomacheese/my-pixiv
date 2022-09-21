@@ -1,5 +1,5 @@
 <template>
-  <v-card v-if="item">
+  <v-card v-if="item" :loading="loading">
     <v-card-actions>
       <v-spacer></v-spacer>
 
@@ -13,10 +13,6 @@
 
       <v-btn icon :color="getTweetFoundColor()" @click="openTwitter()">
         <v-icon>mdi-twitter</v-icon>
-      </v-btn>
-
-      <v-btn icon @click="openApp(item)">
-        <pixiv-icon />
       </v-btn>
 
       <v-btn icon @click="openPage(item)">
@@ -51,10 +47,6 @@
 
       <v-btn icon :color="getTweetFoundColor()" @click="openTwitter()">
         <v-icon>mdi-twitter</v-icon>
-      </v-btn>
-
-      <v-btn icon @click="openApp(item)">
-        <PixivIcon />
       </v-btn>
 
       <v-btn icon @click="openPage(item)">
@@ -99,6 +91,7 @@ export default Vue.extend({
     isTweetOpened: boolean
     isTweetFound: boolean | null
     tweets: TweetPopupProp | null
+    loading: boolean
   } {
     return {
       liked: false,
@@ -106,6 +99,7 @@ export default Vue.extend({
       isTweetOpened: false,
       isTweetFound: null,
       tweets: null,
+      loading: false,
     }
   },
   watch: {
@@ -133,15 +127,23 @@ export default Vue.extend({
       if (!window) {
         return
       }
-      this.$emit('close-popup')
-      window.open(`https://www.pixiv.net/artworks/${item.id}`, '_blank')
-    },
-    openApp(item: PixivItem) {
-      if (!window) {
-        return
+
+      this.loading = true
+      let change = false
+      setTimeout(() => {
+        this.$emit('close-popup')
+        if (!change) {
+          window.open(`https://www.pixiv.net/artworks/${item.id}`, '_blank')
+        }
+        this.loading = false
+      }, 700)
+      window.location.href = `pixiv://illusts/${item.id}`
+      window.onblur = function () {
+        change = true
       }
-      this.$emit('close-popup')
-      location.href = `pixiv://illusts/${item.id}`
+      window.onfocus = function () {
+        change = false
+      }
     },
     openTwitter() {
       this.isTweetOpened = true
