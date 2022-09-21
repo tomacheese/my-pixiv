@@ -199,7 +199,7 @@ def get_search_tweets(illust_id: str):
     illust_url = result["illust"]["image_urls"]["large"]
 
     # 画像をダウンロード
-    path = pixiv_download(illust_url, illust_id)
+    path = pixiv_download(illust_url, result["illust"]["type"], illust_id)
 
     screen_names = get_illust_screen_names(pixiv_api, result["illust"])
     if len(screen_names) == 0:
