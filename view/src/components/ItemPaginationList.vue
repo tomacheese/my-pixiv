@@ -6,7 +6,7 @@
       :length="
         Math.ceil(
           items.filter((item) => (isOnlyNew ? !isViewed(item) : true)).length /
-            10
+            getPaginationLimit()
         )
       "
       :total-visible="11"
@@ -38,7 +38,7 @@
       :length="
         Math.ceil(
           items.filter((item) => (isOnlyNew ? !isViewed(item) : true)).length /
-            10
+            getPaginationLimit()
         )
       "
       :total-visible="11"
@@ -50,7 +50,7 @@
         page ===
           Math.ceil(
             items.filter((item) => (isOnlyNew ? !isViewed(item) : true))
-              .length / 10
+              .length / getPaginationLimit()
           ) && isLoadMoreAvailable
       "
       block
@@ -103,10 +103,16 @@ export default Vue.extend({
     this.isOnlyNew = this.$accessor.settings.onlyNew
   },
   methods: {
+    getPaginationLimit() {
+      return this.$accessor.settings.paginationLimit
+    },
     getItems(): PixivItem[] {
       return this.items
         .filter((item) => (this.isOnlyNew ? !this.isViewed(item) : true))
-        .slice((this.page - 1) * 10, this.page * 10)
+        .slice(
+          (this.page - 1) * this.getPaginationLimit(),
+          this.page * this.getPaginationLimit()
+        )
     },
     changePage() {
       setTimeout(() => {
