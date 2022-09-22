@@ -2,6 +2,7 @@
   <v-container>
     <TargetSearch />
     <ViewTypeSelector />
+    <PaginationSettings />
     <TitleFilter />
     <TagFilter />
     <ImportExportForm />
@@ -17,6 +18,7 @@ import TargetSearch from '@/components/settings/TargetSearch.vue'
 import ImportExportForm from '@/components/settings/ImportExportForm.vue'
 import ViewTypeSelector from '@/components/settings/ViewTypeSelector.vue'
 import SyncSettings from '@/components/settings/SyncSettings.vue'
+import PaginationSettings from '@/components/settings/PaginationSettings.vue'
 
 export default Vue.extend({
   name: 'SettingsPage',
@@ -27,6 +29,7 @@ export default Vue.extend({
     TargetSearch,
     ImportExportForm,
     SyncSettings,
+    PaginationSettings,
   },
 })
 </script>

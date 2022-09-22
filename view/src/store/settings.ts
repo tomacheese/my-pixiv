@@ -22,6 +22,7 @@ interface Settings {
   isAutoSyncVieweds: boolean
   viewType: ViewType
   novelViewType: ViewType
+  paginationLimit: number
   targets: Target[]
   filters: Filter[]
 }
@@ -32,6 +33,7 @@ export const state = (): Settings => ({
   isAutoSyncVieweds: false,
   viewType: 'PAGINATION',
   novelViewType: 'PAGINATION',
+  paginationLimit: 10,
   targets: [],
   filters: [],
 })
@@ -45,6 +47,7 @@ export const getters = getterTree(state, {
   autoSyncVieweds: (state) => state.isAutoSyncVieweds,
   viewType: (state) => state.viewType,
   novelViewType: (state) => state.novelViewType,
+  paginationLimit: (state) => state.paginationLimit,
   targets: (state) => state.targets,
   specificTargets: (state) => (targetType: TargetType) => {
     return state.targets.filter((target) =>
@@ -81,6 +84,9 @@ export const mutations = mutationTree(state, {
   },
   setNovelViewType(state, novelViewType: ViewType) {
     state.novelViewType = novelViewType
+  },
+  setPaginationLimit(state, paginationLimit: number) {
+    state.paginationLimit = paginationLimit
   },
   setTargets: (state, targets: Target[]) => {
     state.targets = targets
