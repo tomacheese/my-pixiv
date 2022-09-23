@@ -31,6 +31,7 @@
       ></v-pagination>
       <div class="text-center">
         <v-img
+          ref="image"
           contain
           max-height="100vh"
           :src="getImage(item)"
@@ -174,6 +175,7 @@ export default Vue.extend({
         })
     },
     clickImage(e: MouseEvent) {
+      const { naturalWidth } = this.$refs.image as HTMLImageElement
       if (this.item == null) {
         return
       }
@@ -181,8 +183,7 @@ export default Vue.extend({
         // 画像数が1個（meta_pagesは0）ならクリックしても何もおきない
         return
       }
-      const isRight =
-        e.offsetX > (e.target as HTMLImageElement).naturalWidth / 2
+      const isRight = e.offsetX > naturalWidth / 2
       if (isRight && this.page < this.item.meta_pages.length) {
         this.page++
       } else if (!isRight && this.page > 1) {
