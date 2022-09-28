@@ -31,7 +31,10 @@ def post_like(account: str, tweet_id: str):
     if api is None:
         raise HTTPException(status_code=404, detail="account not found")
 
-    api.create_favorite(tweet_id)
+    try:
+        api.create_favorite(tweet_id)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.delete("/{account}/{tweet_id}")
@@ -40,4 +43,7 @@ def delete_like(account: str, tweet_id: str):
     if api is None:
         raise HTTPException(status_code=404, detail="account not found")
 
-    api.destroy_favorite(tweet_id)
+    try:
+        api.destroy_favorite(tweet_id)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
