@@ -171,6 +171,10 @@ export default Vue.extend({
           this.liked = true
         })
         .catch((error) => {
+          if (error.response.data.detail) {
+            alert('Likeに失敗: ' + error.response.data.detail)
+            return
+          }
           alert('Likeに失敗: ' + error)
         })
     },
