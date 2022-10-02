@@ -11,6 +11,10 @@
         <v-icon>mdi-heart</v-icon>
       </v-btn>
 
+      <v-btn icon @click="addMute()">
+        <v-icon>mdi-image-remove-outline</v-icon>
+      </v-btn>
+
       <v-btn icon :color="getTweetFoundColor()" @click="openTwitter()">
         <v-icon>mdi-twitter</v-icon>
       </v-btn>
@@ -160,6 +164,20 @@ export default Vue.extend({
         return ''
       }
       return this.isTweetFound ? 'primary' : 'error'
+    },
+    addMute() {
+      if (!this.item) {
+        return
+      }
+      if (!confirm('このイラストをミュートしますか？')) {
+        return
+      }
+
+      this.$accessor.settings.addMuteItem({
+        targetType: 'ILLUST',
+        targetId: this.item.id,
+      })
+      this.$emit('close-popup')
     },
     addHeart() {
       if (this.item == null) {

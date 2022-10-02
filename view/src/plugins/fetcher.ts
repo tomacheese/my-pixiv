@@ -1,6 +1,6 @@
 import type { NuxtRuntimeConfig } from '@nuxt/types/config/runtime'
 import type { NuxtAxiosInstance } from '@nuxtjs/axios'
-import { Filter, Target, TargetType } from '@/store/settings'
+import { Filter, MuteItem, Target, TargetType } from '@/store/settings'
 import {
   PixivItem,
   PixivItemRecommended,
@@ -12,16 +12,19 @@ export class Fetcher {
   private $axios: NuxtAxiosInstance
   private readonly targetType: TargetType
   private readonly globalFilter: Filter[]
+  private readonly mutedItems: MuteItem[]
   private recommendedNextUrl: string | null = null
   public constructor(
     $config: NuxtRuntimeConfig,
     $axios: NuxtAxiosInstance,
     globalFilter: Filter[],
+    mutedItems: MuteItem[],
     targetType: TargetType
   ) {
     this.$axios = $axios
     this.$config = $config
     this.globalFilter = globalFilter
+    this.mutedItems = mutedItems
     this.targetType = targetType
   }
 
@@ -58,7 +61,9 @@ export class Fetcher {
 
     this.recommendedNextUrl = response.data.next_url
 
-    return data.filter((item) => !this.isFilterItem(null, item))
+    return data
+      .filter((item) => !this.isFilterItem(null, item))
+      .filter((item) => !this.isMutedItem(item))
   }
 
   public isLoadMoreAvailable() {
@@ -67,10 +72,11 @@ export class Fetcher {
 
   public getFetchItemPromise(target: Target) {
     return new Promise<PixivItemWithSearchTag[]>((resolve, reject) => {
-      // /api/illust/XXXXX or /api/novel/XXXXX
+      // /api/search/illust/XXXXX or /api/search/manga/XXXXX or /api/search/novel/XXXXX
       this.$axios
         .get<PixivItem[]>(
-          `/api/${this.targetType.toLocaleLowerCase()}/` + target.tag.join(' ')
+          `/api/search/${this.targetType.toLocaleLowerCase()}/` +
+            target.tag.join(' ')
         )
         .then((result) => {
           const data = result.data
@@ -81,6 +87,7 @@ export class Fetcher {
           resolve(
             data
               .filter((item) => !this.isFilterItem(target, item))
+              .filter((item) => !this.isMutedItem(item))
               .filter(
                 (item: PixivItem) => item.total_bookmarks >= target.minLikeCount
               )
@@ -184,5 +191,22 @@ export class Fetcher {
           )
         })
       : false
+  }
+
+  private isMutedItem(item: PixivItem) {
+    return this.mutedItems.some((mutedItem) => {
+      switch (mutedItem.targetType) {
+        case 'ILLUST':
+          // イラストとマンガの場合は item.type が undefined ではない
+          return item.type !== undefined && item.id === mutedItem.targetId
+        case 'NOVEL':
+          // 小説の場合は item.type が undefined
+          return item.type === undefined && item.id === mutedItem.targetId
+        case 'USER':
+          return item.user.id === mutedItem.targetId
+        default:
+          return false
+      }
+    })
   }
 }

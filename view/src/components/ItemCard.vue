@@ -1,6 +1,6 @@
 <!-- eslint-disable vue/no-v-html -->
 <template>
-  <v-card @click="open(item)">
+  <v-card v-longclick="() => addMute()" @click="open(item)">
     <div
       class="d-flex flex-no-wrap justify-space-between"
       style="height: 200px"
@@ -74,6 +74,10 @@ export default Vue.extend({
     },
     open(item: PixivItem): void {
       this.$emit('open', item)
+    },
+    addMute(): void {
+      console.log('addMute')
+      this.$emit('add-mute', this.item)
     },
     copyToClipboard(text: string) {
       const textarea = document.createElement('textarea')

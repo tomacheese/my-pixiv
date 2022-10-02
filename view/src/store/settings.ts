@@ -16,6 +16,13 @@ export interface Filter {
   value: string
 }
 
+export type MuteTargetType = 'ILLUST' | 'NOVEL' | 'USER'
+
+export interface MuteItem {
+  targetType: MuteTargetType
+  targetId: number
+}
+
 interface Settings {
   isDarkMode: boolean
   isOnlyNew: boolean
@@ -25,6 +32,7 @@ interface Settings {
   paginationLimit: number
   targets: Target[]
   filters: Filter[]
+  muted: MuteItem[]
 }
 
 export const state = (): Settings => ({
@@ -36,6 +44,7 @@ export const state = (): Settings => ({
   paginationLimit: 10,
   targets: [],
   filters: [],
+  muted: [],
 })
 
 export type RootState = ReturnType<typeof state>
@@ -55,6 +64,7 @@ export const getters = getterTree(state, {
     )
   },
   filters: (state) => state.filters,
+  muted: (state) => state.muted,
 })
 
 export const mutations = mutationTree(state, {
@@ -69,6 +79,7 @@ export const mutations = mutationTree(state, {
       state.novelViewType = settings.novelViewType
     if (settings.targets !== undefined) state.targets = settings.targets
     if (settings.filters !== undefined) state.filters = settings.filters
+    if (settings.muted !== undefined) state.muted = settings.muted
   },
   setDarkMode(state, isDarkMode: boolean) {
     state.isDarkMode = isDarkMode
@@ -93,6 +104,9 @@ export const mutations = mutationTree(state, {
   },
   setFilters(state, filters: Filter[]) {
     state.filters = filters
+  },
+  setMuted(state, muted: MuteItem[]) {
+    state.muted = muted
   },
 })
 
@@ -135,6 +149,19 @@ export const actions = actionTree(
         'setFilters',
         state.filters.filter(
           (f) => f.type !== filter.type || f.value !== filter.value
+        )
+      )
+    },
+    addMuteItem({ state, commit }, muteItem: MuteItem) {
+      commit('setMuted', [...state.muted, muteItem])
+    },
+    removeMuteItem({ state, commit }, muteItem: MuteItem) {
+      commit(
+        'setMuted',
+        state.muted.filter(
+          (m) =>
+            m.targetType !== muteItem.targetType ||
+            m.targetId !== muteItem.targetId
         )
       )
     },
