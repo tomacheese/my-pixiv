@@ -5,6 +5,7 @@
     <PaginationSettings />
     <TitleFilter />
     <TagFilter />
+    <MutedItemSettings />
     <ImportExportForm />
     <SyncSettings />
   </v-container>
@@ -19,6 +20,7 @@ import ImportExportForm from '@/components/settings/ImportExportForm.vue'
 import ViewTypeSelector from '@/components/settings/ViewTypeSelector.vue'
 import SyncSettings from '@/components/settings/SyncSettings.vue'
 import PaginationSettings from '@/components/settings/PaginationSettings.vue'
+import MutedItemSettings from '@/components/settings/MutedItemSettings.vue'
 
 export default Vue.extend({
   name: 'SettingsPage',
@@ -30,6 +32,7 @@ export default Vue.extend({
     ImportExportForm,
     SyncSettings,
     PaginationSettings,
+    MutedItemSettings,
   },
 })
 </script>

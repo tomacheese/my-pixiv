@@ -9,6 +9,7 @@
       @open="open"
       @intersect-item="onItemViewing"
       @load-more="loadMore"
+      @add-mute="addMute"
     ></ItemList>
     <v-dialog
       v-model="overlay.isIllustOpened"
@@ -95,6 +96,7 @@ export default Vue.extend({
           this.$config,
           this.$axios,
           this.$accessor.settings.filters,
+          this.$accessor.settings.muted,
           this.targetType
         )
       }
@@ -147,6 +149,16 @@ export default Vue.extend({
         return
       }
       this.$accessor.viewed.addIllust(item)
+    },
+    addMute(item: PixivItem) {
+      if (!confirm(`「${item.title}」をミュートしますか？`)) {
+        return
+      }
+      this.$accessor.settings.addMuteItem({
+        targetType: 'ILLUST',
+        targetId: item.id,
+      })
+      this.items = this.items.filter((i) => i.id !== item.id)
     },
   },
 })

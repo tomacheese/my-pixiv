@@ -9,6 +9,7 @@
       @open="open"
       @intersect-item="onItemViewing"
       @load-more="loadMore"
+      @add-mute="addMute"
     />
     <ItemVirtualList
       v-if="type === 'VIRTUAL_SCROLL'"
@@ -19,6 +20,7 @@
       @open="open"
       @intersect-item="onItemViewing"
       @load-more="loadMore"
+      @add-mute="addMute"
     />
     <ItemGridList
       v-if="type === 'GRID_LIST'"
@@ -29,6 +31,7 @@
       @open="open"
       @intersect-item="onItemViewing"
       @load-more="loadMore"
+      @add-mute="addMute"
     />
   </div>
 </template>
@@ -70,6 +73,9 @@ export default Vue.extend({
     },
     loadMore(): void {
       this.$emit('load-more')
+    },
+    addMute(item: PixivItem): void {
+      this.$emit('add-mute', item)
     },
   },
 })

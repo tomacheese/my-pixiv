@@ -1,10 +1,10 @@
 from fastapi import APIRouter
 
-from api import get_pixiv
+from api import get_pixiv_item
 
 router = APIRouter(prefix="/illust")
 
 
-@router.get("/{word}")
-def get_illusts_req(word: str):
-    return get_pixiv("illust", word)
+@router.get("/{item_id}")
+def get_illust_req(item_id: str):
+    return get_pixiv_item("illust", item_id)
