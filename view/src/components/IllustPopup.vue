@@ -50,6 +50,10 @@
         <v-icon>mdi-heart</v-icon>
       </v-btn>
 
+      <v-btn icon @click="addMute()">
+        <v-icon>mdi-image-remove-outline</v-icon>
+      </v-btn>
+
       <v-btn icon :color="getTweetFoundColor()" @click="openTwitter()">
         <v-icon>mdi-twitter</v-icon>
       </v-btn>
