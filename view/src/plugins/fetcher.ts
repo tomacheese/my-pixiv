@@ -63,7 +63,7 @@ export class Fetcher {
 
     return data
       .filter((item) => !this.isFilterItem(null, item))
-      .filter((item) => !this.isMutedItem(item))
+      .filter((item) => !Fetcher.isMutedItem(this.mutedItems, item))
   }
 
   public isLoadMoreAvailable() {
@@ -87,7 +87,7 @@ export class Fetcher {
           resolve(
             data
               .filter((item) => !this.isFilterItem(target, item))
-              .filter((item) => !this.isMutedItem(item))
+              .filter((item) => !Fetcher.isMutedItem(this.mutedItems, item))
               .filter(
                 (item: PixivItem) => item.total_bookmarks >= target.minLikeCount
               )
@@ -193,8 +193,8 @@ export class Fetcher {
       : false
   }
 
-  private isMutedItem(item: PixivItem) {
-    return this.mutedItems.some((mutedItem) => {
+  public static isMutedItem(mutedItems: MuteItem[], item: PixivItem) {
+    return mutedItems.some((mutedItem) => {
       switch (mutedItem.targetType) {
         case 'ILLUST':
           // イラストとマンガの場合は item.type が undefined ではない

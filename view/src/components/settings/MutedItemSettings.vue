@@ -88,7 +88,7 @@
                 >
               </v-list-item-content>
               <v-list-item-action>
-                <v-btn icon @click="remove(item)">
+                <v-btn icon @click.stop="remove(item)">
                   <v-icon>mdi-close</v-icon>
                 </v-btn>
               </v-list-item-action>
