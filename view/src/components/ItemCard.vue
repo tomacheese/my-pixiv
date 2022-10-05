@@ -1,60 +1,64 @@
 <!-- eslint-disable vue/no-v-html -->
 <template>
-  <v-card v-longclick="() => addMute()" @click="open(item)">
-    <div
-      class="d-flex flex-no-wrap justify-space-between"
-      style="height: 200px"
-    >
-      <div>
-        <v-card-title class="text-h5">{{ item.title }}</v-card-title>
+  <ItemMuting :item="item">
+    <v-card @click="open(item)">
+      <div
+        class="d-flex flex-no-wrap justify-space-between"
+        style="height: 200px"
+      >
+        <div>
+          <v-card-title class="text-h5">{{ item.title }}</v-card-title>
 
-        <v-card-subtitle>
-          <div class="grey--text">{{ item.create_date }}</div>
-          <div class="item-card-tags hidden-scrollbar">
-            <v-chip :color="item.is_bookmarked ? 'warning' : ''">
-              <v-icon>mdi-heart</v-icon>
-              {{ item.total_bookmarks }}
-            </v-chip>
-            <v-chip v-if="item.text_length">
-              <v-icon>mdi-format-text</v-icon>
-              {{ item.text_length }}
-            </v-chip>
-            <v-chip
-              v-for="tag of item.tags"
-              :key="item.id + '-' + tag.name"
-              :color="getTagColor(item.searchTags, tag.name)"
-              class="ma-1"
-              @click.stop="copyToClipboard(tag.name)"
-              >{{ tag.name }}</v-chip
-            >
-          </div>
-        </v-card-subtitle>
+          <v-card-subtitle>
+            <div class="grey--text">{{ item.create_date }}</div>
+            <div class="item-card-tags hidden-scrollbar">
+              <v-chip :color="item.is_bookmarked ? 'warning' : ''">
+                <v-icon>mdi-heart</v-icon>
+                {{ item.total_bookmarks }}
+              </v-chip>
+              <v-chip v-if="item.text_length">
+                <v-icon>mdi-format-text</v-icon>
+                {{ item.text_length }}
+              </v-chip>
+              <v-chip
+                v-for="tag of item.tags"
+                :key="item.id + '-' + tag.name"
+                :color="getTagColor(item.searchTags, tag.name)"
+                class="ma-1"
+                @click.stop="copyToClipboard(tag.name)"
+                >{{ tag.name }}</v-chip
+              >
+            </div>
+          </v-card-subtitle>
 
-        <v-card-text
-          style="height: 5.2em; overflow-y: scroll"
-          class="hidden-scrollbar"
-          ><span v-html="item.caption"></span
-        ></v-card-text>
+          <v-card-text
+            style="height: 5.2em; overflow-y: scroll"
+            class="hidden-scrollbar"
+            ><span v-html="item.caption"></span
+          ></v-card-text>
+        </div>
+
+        <v-badge overlap :content="'NEW'" offset-x="30" :value="isViewed">
+          <v-avatar
+            class="ma-3"
+            size="125"
+            tile
+            :class="{ 'hidden-md-and-down': !item.type }"
+          >
+            <v-img :src="item.image_urls.square_medium" />
+          </v-avatar>
+        </v-badge>
       </div>
-
-      <v-badge overlap :content="'NEW'" offset-x="30" :value="isViewed">
-        <v-avatar
-          class="ma-3"
-          size="125"
-          tile
-          :class="{ 'hidden-md-and-down': !item.type }"
-        >
-          <v-img :src="item.image_urls.square_medium" />
-        </v-avatar>
-      </v-badge>
-    </div>
-  </v-card>
+    </v-card>
+  </ItemMuting>
 </template>
 
 <script lang="ts">
 import Vue from 'vue'
+import ItemMuting from './ItemMuting.vue'
 import { PixivItem, PixivItemWithSearchTag } from '@/types/pixivItem'
 export default Vue.extend({
+  components: { ItemMuting },
   props: {
     item: {
       type: Object as () => PixivItemWithSearchTag,
@@ -74,10 +78,6 @@ export default Vue.extend({
     },
     open(item: PixivItem): void {
       this.$emit('open', item)
-    },
-    addMute(): void {
-      console.log('addMute')
-      this.$emit('add-mute', this.item)
     },
     copyToClipboard(text: string) {
       const textarea = document.createElement('textarea')
