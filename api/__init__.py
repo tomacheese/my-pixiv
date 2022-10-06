@@ -22,6 +22,7 @@ NOVEL_CACHE_DIR = os.environ.setdefault('NOVEL_CACHE_DIR', '/cache/novels/')
 USER_CACHE_DIR = os.environ.setdefault('USER_CACHE_DIR', '/cache/users/')
 IMAGE_CACHE_DIR = os.environ.setdefault('IMAGE_CACHE_DIR', '/cache/images/')
 TWEET_CACHE_DIR = os.environ.setdefault('TWEET_CACHE_DIR', '/cache/tweets/')
+SHADOW_BAN_CACHE_DIR = os.environ.setdefault('SHADOW_BAN_CACHE_DIR', '/cache/shadow-ban/')
 
 
 def init_twitter_api(account: str = None):
@@ -160,7 +161,8 @@ def search_pixiv(item_type: str,
     return items
 
 
-def get_pixiv_item(item_type: str, item_id: str):
+def get_pixiv_item(item_type: str,
+                   item_id: str):
     api = init_pixiv_api()
     if item_type == "illust":
         func = api.illust_detail
@@ -258,7 +260,11 @@ def get_search_tweets(illust_id: str):
     # ツイートを検索
     tweets = get_match_tweets(screen_names, posted_at, path)
     if len(tweets) == 0:
-        raise HTTPException(status_code=404, detail="tweets not found")
+        return {
+            "screen_names": screen_names,
+            "tweets": []
+        }
+
     return {"screen_names": screen_names, "tweets": tweets}
 
 
@@ -281,7 +287,7 @@ def get_illust_screen_names(pixiv_api: AppPixivAPI,
         if "twitter_account" in user["profile"]:
             screen_names.add(user["profile"]["twitter_account"])
 
-    return set(filter(lambda x: x != "", screen_names))
+    return set(filter(lambda x: x != "", list(map(lambda x: x.lower(), screen_names))))
 
 
 def get_match_tweets(screen_names: set[str],
@@ -300,9 +306,10 @@ def get_match_tweets(screen_names: set[str],
         word = "from:{0} filter:images since:{1} until:{2} exclude:nativeretweets".format(screen_name,
                                                                                           posted_at_before_3day,
                                                                                           posted_at_after_3day)
+        print(word)
         tweets = search_tweet(word)
-        if not tweets:
-            raise HTTPException(status_code=404, detail="tweets not found")
+        if tweets is None:
+            raise HTTPException(status_code=404, detail="search tweets failed")
         for tweet in tweets:
             if "media" not in tweet.entities:
                 continue
@@ -337,3 +344,25 @@ def calc_image_similarity(image_path: str,
     hash_2a = imagehash.phash(Image.open(tweet_image_path))
 
     return hash_2a - hash_1a
+
+
+def get_shadow_ban(screen_name: str):
+    path = os.path.join(SHADOW_BAN_CACHE_DIR, screen_name + ".json")
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+
+    if os.path.exists(path):
+        with open(path, "r", encoding="utf-8") as f:
+            cache = json.load(f)
+            # 24時間以内のキャッシュか
+            if cache["updated_at"] > time.time() - 60 * 60 * 24:
+                return cache["result"]
+
+    response = requests.get("https://shadowban.hmpf.club/" + screen_name)
+    result = response.json()
+    if "screen_name" not in result["profile"]:
+        result["profile"]["screen_name"] = screen_name
+
+    with open(path, "w", encoding="utf-8") as f:
+        f.write(json.dumps({"result": result, "updated_at": time.time()}))
+
+    return result

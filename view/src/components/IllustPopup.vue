@@ -3,8 +3,10 @@
     <IllustPopupActions
       :item="item"
       :fullscreen="fullscreen"
-      :is-tweet-found="isTweetFound"
+      :tweet-status="tweetStatus"
       :is-liked="isLiked"
+      :is-shadow-banned="isShadowBanned()"
+      :is-checking-shadow-banned="isCheckingShadowBanned()"
       @change-fullscreen="changeFullScreen"
       @like="onLike"
       @open-twitter="openTwitter"
@@ -31,8 +33,10 @@
     <IllustPopupActions
       :item="item"
       :fullscreen="fullscreen"
-      :is-tweet-found="isTweetFound"
+      :tweet-status="tweetStatus"
       :is-liked="isLiked"
+      :is-shadow-banned="isShadowBanned()"
+      :is-checking-shadow-banned="isCheckingShadowBanned()"
       @change-fullscreen="changeFullScreen"
       @like="onLike"
       @open-twitter="openTwitter"
@@ -43,6 +47,7 @@
       <TweetPopup
         :item="item"
         :data="tweets"
+        :shadow-bans="shadowBans"
         @close-popup="close()"
       ></TweetPopup>
     </v-dialog>
@@ -51,8 +56,13 @@
 
 <script lang="ts">
 import Vue from 'vue'
-import TweetPopup, { TweetPopupProp } from './TweetPopup.vue'
-import IllustPopupActions from './IllustPopupActions.vue'
+import TweetPopup, {
+  isCheckingShadowBan,
+  isShadowBanned,
+  ShadowBanResult,
+  TweetPopupProp,
+} from './TweetPopup.vue'
+import IllustPopupActions, { TweetStatus } from './IllustPopupActions.vue'
 import { PixivItem } from '@/types/pixivItem'
 
 export default Vue.extend({
@@ -76,16 +86,18 @@ export default Vue.extend({
     isLiked: boolean
     page: number
     isTweetOpened: boolean
-    isTweetFound: boolean | null
+    tweetStatus: TweetStatus
     tweets: TweetPopupProp | null
+    shadowBans: ShadowBanResult[]
     loading: boolean
   } {
     return {
       isLiked: false,
       page: 1,
       isTweetOpened: false,
-      isTweetFound: null,
+      tweetStatus: 'LOADING',
       tweets: null,
+      shadowBans: [],
       loading: false,
     }
   },
@@ -139,9 +151,9 @@ export default Vue.extend({
       if (this.item == null) {
         return
       }
-      this.isTweetFound = null
+      this.tweetStatus = 'LOADING'
       this.$axios
-        .get<TweetPopupProp>(`/api/tweet/${this.item.id}`)
+        .get<TweetPopupProp>(`/api/tweet/search/${this.item.id}`)
         .then((response) => {
           this.tweets = {
             screen_names: response.data.screen_names,
@@ -150,10 +162,23 @@ export default Vue.extend({
             }),
             error: null,
           }
-          this.isTweetFound = true
+          this.checkShadowBan()
+          if (this.tweets.tweets.some((t) => t.similarity === 0)) {
+            this.tweetStatus = 'EXACT_TWEET_FOUND'
+            return
+          }
+          if (this.tweets.tweets.length > 0) {
+            this.tweetStatus = 'TWEET_FOUND'
+            return
+          }
+          if (this.tweets.screen_names.length > 0) {
+            this.tweetStatus = 'ACCOUNT_FOUND'
+            return
+          }
+          this.tweetStatus = 'FAILED'
         })
         .catch((error) => {
-          this.isTweetFound = false
+          this.tweetStatus = 'FAILED'
           if (error.response.status === 404) {
             this.tweets = {
               screen_names: [],
@@ -164,6 +189,7 @@ export default Vue.extend({
                 ')',
             }
           } else {
+            this.tweetStatus = 'FAILED'
             this.tweets = {
               screen_names: [],
               tweets: [],
@@ -172,9 +198,47 @@ export default Vue.extend({
           }
         })
     },
+    checkShadowBan() {
+      if (this.tweets == null || this.tweets.screen_names.length === 0) {
+        return
+      }
+      for (const screenName of this.tweets.screen_names) {
+        if (
+          this.shadowBans.some(
+            (result) => result.profile.screen_name === screenName
+          )
+        ) {
+          continue
+        }
+        this.$axios
+          .get<ShadowBanResult>(`/api/tweet/shadow-ban/${screenName}`)
+          .then((response) => {
+            this.shadowBans.push(response.data)
+          })
+          .catch((error) => {
+            console.error(error)
+          })
+      }
+    },
+    isShadowBanned(): boolean {
+      if (this.tweets == null) {
+        return false
+      }
+      return this.tweets.screen_names.some((screenName) => {
+        return isShadowBanned(this.shadowBans, screenName)
+      })
+    },
+    isCheckingShadowBanned(): boolean {
+      if (this.tweets == null) {
+        return false
+      }
+      return this.tweets.screen_names.some((screenName) => {
+        return isCheckingShadowBan(this.shadowBans, screenName)
+      })
+    },
     close() {
       this.isTweetOpened = false
-      this.isTweetFound = null
+      this.tweetStatus = 'FAILED'
       this.$emit('close-popup')
     },
     changeFullScreen() {
