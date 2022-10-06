@@ -29,7 +29,6 @@
             :item="item"
             :is-viewed="vieweds !== undefined && !isViewed(item)"
             @open="open"
-            @add-mute="addMute"
           />
         </ItemWrapper>
       </v-col>
@@ -122,9 +121,6 @@ export default Vue.extend({
     },
     open(item: PixivItem): void {
       this.$emit('open', item)
-    },
-    addMute(item: PixivItem): void {
-      this.$emit('add-mute', item)
     },
     onItemViewing(item: PixivItem): void {
       this.$emit('intersect-item', item)

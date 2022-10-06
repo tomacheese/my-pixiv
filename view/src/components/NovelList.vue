@@ -9,7 +9,6 @@
       @open="open"
       @intersect-item="onItemViewing"
       @load-more="loadMore"
-      @add-mute="addMute"
     ></ItemList>
   </v-container>
 </template>
@@ -140,18 +139,6 @@ export default Vue.extend({
         return
       }
       this.$accessor.viewed.addNovel(item)
-    },
-    addMute(item: PixivItem) {
-      if (
-        !confirm(`「${item.title} (${item.user.name})」をミュートしますか？`)
-      ) {
-        return
-      }
-      this.$accessor.settings.addMuteItem({
-        targetType: 'NOVEL',
-        targetId: item.id,
-      })
-      this.items = this.items.filter((i) => i.id !== item.id)
     },
   },
 })
