@@ -115,6 +115,10 @@ const config: NuxtConfig = {
     host: '0.0.0.0',
   },
 
-  build: {},
+  build: {
+    parallel: true,
+    cache: true,
+    hardSource: true,
+  },
 }
 export default config
