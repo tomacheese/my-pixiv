@@ -21,7 +21,7 @@
                 {{ item.text_length }}
               </v-chip>
               <v-chip
-                v-for="tag of item.tags"
+                v-for="tag of tags"
                 :key="item.id + '-' + tag.name"
                 :color="getTagColor(item.searchTags, tag.name)"
                 class="ma-1"
@@ -67,6 +67,15 @@ export default Vue.extend({
     isViewed: {
       type: Boolean,
       required: true,
+    },
+  },
+  computed: {
+    tags(): PixivItem['tags'] {
+      const tag = this.item.tags
+      return [
+        tag.some((t) => t.name === 'R-18') ? { name: 'R-18' } : null,
+        ...tag.filter((t) => t.name !== 'R-18'),
+      ].filter((t) => t) as PixivItem['tags']
     },
   },
   methods: {
