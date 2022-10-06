@@ -1,28 +1,16 @@
 <template>
   <v-card v-if="item" :loading="loading">
-    <v-card-actions>
-      <v-spacer></v-spacer>
+    <IllustPopupActions
+      :item="item"
+      :fullscreen="fullscreen"
+      :is-tweet-found="isTweetFound"
+      :is-liked="isLiked"
+      @change-fullscreen="changeFullScreen"
+      @like="onLike"
+      @open-twitter="openTwitter"
+      @close-popup="close"
+    />
 
-      <v-btn icon @click="changeFullScreen()">
-        <v-icon>mdi-{{ fullscreen ? 'fullscreen-exit' : 'fullscreen' }}</v-icon>
-      </v-btn>
-
-      <v-btn icon :color="liked ? 'green' : ''" @click="addHeart()">
-        <v-icon>mdi-heart</v-icon>
-      </v-btn>
-
-      <v-btn icon :color="getTweetFoundColor()" @click="openTwitter()">
-        <v-icon>mdi-twitter</v-icon>
-      </v-btn>
-
-      <v-btn icon @click="openPage(item)">
-        <v-icon>mdi-open-in-new</v-icon>
-      </v-btn>
-
-      <v-btn icon @click="close()">
-        <v-icon>mdi-close</v-icon>
-      </v-btn>
-    </v-card-actions>
     <v-card-text>
       <v-pagination
         v-model="page"
@@ -39,25 +27,17 @@
         />
       </div>
     </v-card-text>
-    <v-card-actions>
-      <v-spacer></v-spacer>
 
-      <v-btn icon :color="liked ? 'green' : ''" @click="addHeart()">
-        <v-icon>mdi-heart</v-icon>
-      </v-btn>
-
-      <v-btn icon :color="getTweetFoundColor()" @click="openTwitter()">
-        <v-icon>mdi-twitter</v-icon>
-      </v-btn>
-
-      <v-btn icon @click="openPage(item)">
-        <v-icon>mdi-open-in-new</v-icon>
-      </v-btn>
-
-      <v-btn icon @click="close()">
-        <v-icon>mdi-close</v-icon>
-      </v-btn>
-    </v-card-actions>
+    <IllustPopupActions
+      :item="item"
+      :fullscreen="fullscreen"
+      :is-tweet-found="isTweetFound"
+      :is-liked="isLiked"
+      @change-fullscreen="changeFullScreen"
+      @like="onLike"
+      @open-twitter="openTwitter"
+      @close-popup="close"
+    />
 
     <v-dialog v-model="isTweetOpened">
       <TweetPopup
@@ -71,9 +51,15 @@
 
 <script lang="ts">
 import Vue from 'vue'
-import { TweetPopupProp } from './TweetPopup.vue'
+import TweetPopup, { TweetPopupProp } from './TweetPopup.vue'
+import IllustPopupActions from './IllustPopupActions.vue'
 import { PixivItem } from '@/types/pixivItem'
+
 export default Vue.extend({
+  components: {
+    IllustPopupActions,
+    TweetPopup,
+  },
   props: {
     item: {
       type: Object as () => PixivItem,
@@ -87,7 +73,7 @@ export default Vue.extend({
     },
   },
   data(): {
-    liked: boolean
+    isLiked: boolean
     page: number
     isTweetOpened: boolean
     isTweetFound: boolean | null
@@ -95,7 +81,7 @@ export default Vue.extend({
     loading: boolean
   } {
     return {
-      liked: false,
+      isLiked: false,
       page: 1,
       isTweetOpened: false,
       isTweetFound: null,
@@ -108,7 +94,7 @@ export default Vue.extend({
       if (!this.item) {
         return
       }
-      this.liked = this.item.is_bookmarked
+      this.isLiked = this.item.is_bookmarked
       this.page = 1
 
       this.getTweets()
@@ -118,34 +104,12 @@ export default Vue.extend({
     if (!this.item) {
       return
     }
-    this.liked = this.item.is_bookmarked
+    this.isLiked = this.item.is_bookmarked
     this.page = 1
 
     this.getTweets()
   },
   methods: {
-    openPage(item: PixivItem) {
-      if (!window) {
-        return
-      }
-
-      this.loading = true
-      let change = false
-      setTimeout(() => {
-        this.$emit('close-popup')
-        if (!change) {
-          window.open(`https://www.pixiv.net/artworks/${item.id}`, '_blank')
-        }
-        this.loading = false
-      }, this.$accessor.settings.appCheckTimeout)
-      window.location.href = `pixiv://illusts/${item.id}`
-      window.onblur = function () {
-        change = true
-      }
-      window.onfocus = function () {
-        change = false
-      }
-    },
     openTwitter() {
       this.isTweetOpened = true
     },
@@ -154,29 +118,6 @@ export default Vue.extend({
         return item.image_urls.large
       }
       return item.meta_pages[this.page - 1].image_urls.large
-    },
-    getTweetFoundColor(): string {
-      if (this.isTweetFound === null) {
-        return ''
-      }
-      return this.isTweetFound ? 'primary' : 'error'
-    },
-    addHeart() {
-      if (this.item == null) {
-        return
-      }
-      this.$axios
-        .get<TweetPopupProp>(`/api/like/illust/${this.item.id}`)
-        .then(() => {
-          this.liked = true
-        })
-        .catch((error) => {
-          if (error.response.data.detail) {
-            alert('Likeに失敗: ' + error.response.data.detail)
-            return
-          }
-          alert('Likeに失敗: ' + error)
-        })
     },
     clickImage(e: MouseEvent) {
       const { naturalWidth } = this.$refs.image as HTMLImageElement
@@ -238,6 +179,9 @@ export default Vue.extend({
     },
     changeFullScreen() {
       this.$emit('change-fullscreen')
+    },
+    onLike(value: boolean) {
+      this.isLiked = value
     },
   },
 })

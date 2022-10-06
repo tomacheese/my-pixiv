@@ -23,6 +23,8 @@ export interface MuteItem {
   targetId: number
 }
 
+export type ActionPosition = 'LEFT' | 'RIGHT'
+
 interface Settings {
   isDarkMode: boolean
   isOnlyNew: boolean
@@ -31,6 +33,7 @@ interface Settings {
   novelViewType: ViewType
   paginationLimit: number
   appCheckTimeout: number
+  actionPosition: ActionPosition
   targets: Target[]
   filters: Filter[]
   muted: MuteItem[]
@@ -44,6 +47,7 @@ export const state = (): Settings => ({
   novelViewType: 'PAGINATION',
   paginationLimit: 10,
   appCheckTimeout: 700,
+  actionPosition: 'RIGHT',
   targets: [],
   filters: [],
   muted: [],
@@ -60,6 +64,7 @@ export const getters = getterTree(state, {
   novelViewType: (state) => state.novelViewType,
   paginationLimit: (state) => state.paginationLimit,
   appCheckTimeout: (state) => state.appCheckTimeout,
+  actionPosition: (state) => state.actionPosition,
   targets: (state) => state.targets,
   specificTargets: (state) => (targetType: TargetType) => {
     return state.targets.filter((target) =>
@@ -84,6 +89,8 @@ export const mutations = mutationTree(state, {
       state.paginationLimit = settings.paginationLimit
     if (settings.appCheckTimeout !== undefined)
       state.appCheckTimeout = settings.appCheckTimeout
+    if (settings.actionPosition !== undefined)
+      state.actionPosition = settings.actionPosition
     if (settings.targets !== undefined) state.targets = settings.targets
     if (settings.filters !== undefined) state.filters = settings.filters
     if (settings.muted !== undefined) state.muted = settings.muted
@@ -108,6 +115,9 @@ export const mutations = mutationTree(state, {
   },
   setAppCheckTimeout(state, appCheckTimeout: number) {
     state.appCheckTimeout = appCheckTimeout
+  },
+  setActionPosition(state, actionPosition: ActionPosition) {
+    state.actionPosition = actionPosition
   },
   setTargets: (state, targets: Target[]) => {
     state.targets = targets
