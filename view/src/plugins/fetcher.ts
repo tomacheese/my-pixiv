@@ -54,6 +54,10 @@ export class Fetcher {
         },
       }
     )
+    if (response.status !== 200) {
+      throw new Error('Failed to fetch recommended')
+    }
+
     const data = response.data.data
     for (const item of data) {
       this.itemProcessor(item)
