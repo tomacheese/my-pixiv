@@ -3,17 +3,25 @@
     <v-main>
       <v-tabs v-model="selected" fixed-tabs>
         <v-tab v-for="t of types" :key="t.value">{{ t.name }}</v-tab>
-        <dark-mode-switch />
+        <DarkModeSwitch />
       </v-tabs>
       <Nuxt />
+      <GlobalSnackbar />
     </v-main>
   </v-app>
 </template>
 
 <script lang="ts">
 import Vue from 'vue'
+import DarkModeSwitch from '@/components/DarkModeSwitch.vue'
+import GlobalSnackbar from '@/components/GlobalSnackbar.vue'
+
 export default Vue.extend({
   name: 'DefaultLayout',
+  components: {
+    DarkModeSwitch,
+    GlobalSnackbar,
+  },
   data() {
     return {
       selected: -1,

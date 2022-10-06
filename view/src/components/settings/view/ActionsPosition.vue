@@ -4,7 +4,6 @@
     <v-select
       v-model="actionsPosition"
       :items="actionsPositionItems"
-      @change="changeActionsPosition"
     ></v-select>
   </v-container>
 </template>
