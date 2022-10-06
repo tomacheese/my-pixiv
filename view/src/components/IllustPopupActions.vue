@@ -52,6 +52,14 @@
 import Vue from 'vue'
 import { TweetPopupProp } from './TweetPopup.vue'
 import { PixivItem } from '@/types/pixivItem'
+
+export type TweetStatus =
+  | 'LOADING'
+  | 'EXACT_TWEET_FOUND'
+  | 'TWEET_FOUND'
+  | 'ACCOUNT_FOUND'
+  | 'FAILED'
+
 export default Vue.extend({
   name: 'IllustPopupActions',
   props: {
@@ -65,12 +73,22 @@ export default Vue.extend({
       required: false,
       default: false,
     },
-    isTweetFound: {
-      type: Boolean,
+    tweetStatus: {
+      type: Object as () => TweetStatus,
       required: false,
       default: null,
     },
     isLiked: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+    isShadowBanned: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+    isCheckingShadowBanned: {
       type: Boolean,
       required: false,
       default: false,
@@ -119,10 +137,24 @@ export default Vue.extend({
       }
     },
     getTweetFoundColor(): string {
-      if (this.isTweetFound === null) {
-        return ''
+      switch (this.tweetStatus) {
+        case 'EXACT_TWEET_FOUND':
+          return 'primary'
+        case 'TWEET_FOUND':
+          return 'secondary'
+        case 'ACCOUNT_FOUND':
+          if (this.isShadowBanned) {
+            return 'orange'
+          }
+          if (this.isCheckingShadowBanned) {
+            return 'grey'
+          }
+          return 'red'
+        case 'FAILED':
+          return 'error'
+        default:
+          return 'gray'
       }
-      return this.isTweetFound ? 'primary' : 'error'
     },
     addHeart() {
       if (this.item == null) {

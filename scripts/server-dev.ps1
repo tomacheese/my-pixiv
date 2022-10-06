@@ -14,5 +14,6 @@ $env:NOVEL_CACHE_DIR = "cache/novels/"
 $env:USER_CACHE_DIR = "cache/users/"
 $env:IMAGE_CACHE_DIR = "cache/images/"
 $env:TWEET_CACHE_DIR = "cache/tweets/"
+$env:SHADOW_BAN_CACHE_DIR = "cache/shadow_bans/"
 
 python -m uvicorn api.__main__:app --host=0.0.0.0 --port=8000 --reload

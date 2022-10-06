@@ -8,6 +8,14 @@
         v-for="screen_name of data.screen_names"
         :key="screen_name"
         class="ma-1"
+        :color="getAccountColor(screen_name)"
+        @click="openTwitter(screen_name)"
+        ><v-progress-circular
+          v-if="isCheckingShadowBan(screen_name)"
+          :size="20"
+          indeterminate
+          class="mr-2"
+        ></v-progress-circular
         >@{{ screen_name }}</v-chip
       >
     </v-card-title>
@@ -94,9 +102,63 @@ export interface TweetPopupProp {
 
 type Accounts = 'main' | 'sub'
 
+export interface ShadowBanResult {
+  profile: {
+    error?: any
+    exists: boolean
+    has_tweets: boolean
+    id: string
+    screen_name: string
+  }
+  tests: {
+    ghost: {
+      ban: boolean
+    }
+    more_replies: {
+      ban: boolean
+      in_reply_to: string
+      tweet: string
+    }
+    search: boolean
+    typeahead: boolean
+  }
+  timestamp: number
+}
+
 export interface TweetPopupData {
   loading: boolean
   liked: { [key in Accounts]: string[] }
+}
+
+export function isShadowBanned(
+  shadowBans: ShadowBanResult[],
+  screenName: string
+) {
+  const item = shadowBans.find(
+    (result) =>
+      result.profile.screen_name.toLocaleLowerCase() ===
+      screenName.toLocaleLowerCase()
+  )
+  if (item == null) {
+    return false
+  }
+  return (
+    item.tests.ghost.ban ||
+    item.tests.more_replies.ban ||
+    !item.tests.search ||
+    !item.tests.typeahead
+  )
+}
+
+export function isCheckingShadowBan(
+  shadowBans: ShadowBanResult[],
+  screenName: string
+) {
+  return !shadowBans.some(
+    (result) =>
+      result.profile.screen_name.toLocaleLowerCase() ===
+      screenName.toLocaleLowerCase()
+  )
 }
 
 export default Vue.extend({
@@ -111,6 +173,11 @@ export default Vue.extend({
       required: false,
       default: null,
     },
+    shadowBans: {
+      type: Array as () => ShadowBanResult[],
+      required: false,
+      default: () => [],
+    },
   },
   data(): TweetPopupData {
     return {
@@ -121,7 +188,6 @@ export default Vue.extend({
       },
     }
   },
-
   methods: {
     getUserText(user: User): string {
       return `${user.name} (@${user.screen_name})`
@@ -187,6 +253,31 @@ export default Vue.extend({
               (err.response?.data.detail || '')
           )
         })
+    },
+    isCheckingShadowBan(screenName: string) {
+      return isCheckingShadowBan(this.shadowBans, screenName)
+    },
+    isShadowBanned(screenName: string) {
+      return isShadowBanned(this.shadowBans, screenName)
+    },
+    getAccountColor(screenName: string) {
+      if (
+        !this.shadowBans.some(
+          (result) => result.profile.screen_name === screenName
+        )
+      ) {
+        return 'grey'
+      }
+      if (this.isShadowBanned(screenName)) {
+        return 'red'
+      }
+      return 'green'
+    },
+    openTwitter(screenName: string) {
+      if (!window) {
+        return
+      }
+      window.open(`https://twitter.com/${screenName}`, '_blank')
     },
   },
 })
