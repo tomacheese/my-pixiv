@@ -16,24 +16,26 @@
         :item="item"
         @intersect="onItemViewing"
       >
-        <v-badge
-          overlap
-          :content="'NEW'"
-          offset-x="30"
-          :value="vieweds !== undefined && !isViewed(item)"
-        >
-          <v-card @click="open(item)">
-            <v-img
-              width="240px"
-              :height="calcHeight(item)"
-              :src="item.image_urls.medium"
-              class="white--text align-end"
-              gradient="to bottom, rgba(0,0,0,.1), rgba(0,0,0,.5)"
-            >
-              <v-card-title>{{ item.title }}</v-card-title>
-            </v-img>
-          </v-card>
-        </v-badge>
+        <ItemMuting :item="item">
+          <v-badge
+            overlap
+            :content="'NEW'"
+            offset-x="30"
+            :value="vieweds !== undefined && !isViewed(item)"
+          >
+            <v-card @click="open(item)">
+              <v-img
+                width="240px"
+                :height="calcHeight(item)"
+                :src="item.image_urls.medium"
+                class="white--text align-end"
+                gradient="to bottom, rgba(0,0,0,.1), rgba(0,0,0,.5)"
+              >
+                <v-card-title>{{ item.title }}</v-card-title>
+              </v-img>
+            </v-card>
+          </v-badge>
+        </ItemMuting>
       </ItemWrapper>
     </MagicGrid>
     <v-btn
