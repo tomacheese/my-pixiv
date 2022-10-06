@@ -4,9 +4,9 @@
     <v-card @click="open(item)">
       <div
         class="d-flex flex-no-wrap justify-space-between"
-        style="height: 200px"
+        style="min-height: 200px"
       >
-        <div>
+        <div class="wrap-text">
           <v-card-title class="text-h5">{{ item.title }}</v-card-title>
 
           <v-card-subtitle>
@@ -105,5 +105,10 @@ export default Vue.extend({
 
 .hidden-scrollbar::-webkit-scrollbar {
   display: none;
+}
+
+.wrap-text {
+  word-break: break-all;
+  white-space: normal;
 }
 </style>
