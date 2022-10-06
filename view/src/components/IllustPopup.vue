@@ -137,7 +137,7 @@ export default Vue.extend({
           window.open(`https://www.pixiv.net/artworks/${item.id}`, '_blank')
         }
         this.loading = false
-      }, 700)
+      }, this.$accessor.settings.appCheckTimeout)
       window.location.href = `pixiv://illusts/${item.id}`
       window.onblur = function () {
         change = true

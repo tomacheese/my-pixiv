@@ -30,6 +30,7 @@ interface Settings {
   viewType: ViewType
   novelViewType: ViewType
   paginationLimit: number
+  appCheckTimeout: number
   targets: Target[]
   filters: Filter[]
   muted: MuteItem[]
@@ -42,6 +43,7 @@ export const state = (): Settings => ({
   viewType: 'PAGINATION',
   novelViewType: 'PAGINATION',
   paginationLimit: 10,
+  appCheckTimeout: 700,
   targets: [],
   filters: [],
   muted: [],
@@ -57,6 +59,7 @@ export const getters = getterTree(state, {
   viewType: (state) => state.viewType,
   novelViewType: (state) => state.novelViewType,
   paginationLimit: (state) => state.paginationLimit,
+  appCheckTimeout: (state) => state.appCheckTimeout,
   targets: (state) => state.targets,
   specificTargets: (state) => (targetType: TargetType) => {
     return state.targets.filter((target) =>
@@ -77,6 +80,10 @@ export const mutations = mutationTree(state, {
     if (settings.viewType !== undefined) state.viewType = settings.viewType
     if (settings.novelViewType !== undefined)
       state.novelViewType = settings.novelViewType
+    if (settings.paginationLimit !== undefined)
+      state.paginationLimit = settings.paginationLimit
+    if (settings.appCheckTimeout !== undefined)
+      state.appCheckTimeout = settings.appCheckTimeout
     if (settings.targets !== undefined) state.targets = settings.targets
     if (settings.filters !== undefined) state.filters = settings.filters
     if (settings.muted !== undefined) state.muted = settings.muted
@@ -98,6 +105,9 @@ export const mutations = mutationTree(state, {
   },
   setPaginationLimit(state, paginationLimit: number) {
     state.paginationLimit = paginationLimit
+  },
+  setAppCheckTimeout(state, appCheckTimeout: number) {
+    state.appCheckTimeout = appCheckTimeout
   },
   setTargets: (state, targets: Target[]) => {
     state.targets = targets

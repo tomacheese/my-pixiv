@@ -50,6 +50,13 @@ jobs:
           username: ${{ env.DOCKER_USERNAME }}
           password: ${{ env.DOCKER_PASSWORD }}
 
+      - name: package.json update version
+        if: github.event_name == 'release'
+        working-directory: ./view
+        run: |
+          sed -r -i "1,/version/s/\"version\": \".+\"/\"version\": \"${{ github.event.release.tag_name }}\"/" package.json
+          git diff
+
       - name: Extract metadata (tags, labels) for Docker
         id: meta
         uses: docker/metadata-action@v4.0.1

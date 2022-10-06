@@ -1,6 +1,8 @@
 <template>
-  <v-container>
-    <h2>グローバルタイトルフィルター</h2>
+  <div>
+    <h2>タグ</h2>
+    <p>タグに登録した文字列が含まれている場合、そのアイテムを表示しません。</p>
+
     <v-text-field v-model="input" label="テキスト">
       <template #append>
         <v-btn icon @click="add()">
@@ -15,13 +17,13 @@
       @click:close="remove(item)"
       >{{ item }}</v-chip
     >
-  </v-container>
+  </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue'
 export default Vue.extend({
-  name: 'TitleFilterSetting',
+  name: 'TagFilterSetting',
   data(): {
     input: string
   } {
@@ -31,15 +33,15 @@ export default Vue.extend({
   },
   methods: {
     add(): void {
-      this.$accessor.settings.addFilter({ type: 'TITLE', value: this.input })
+      this.$accessor.settings.addFilter({ type: 'TAG', value: this.input })
       this.input = ''
     },
     remove(item: string): void {
-      this.$accessor.settings.removeFilter({ type: 'TITLE', value: item })
+      this.$accessor.settings.removeFilter({ type: 'TAG', value: item })
     },
     getItems() {
       return this.$accessor.settings.filters
-        .filter((f) => f.type === 'TITLE')
+        .filter((f) => f.type === 'TAG')
         .map((f) => f.value)
     },
   },

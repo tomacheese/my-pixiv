@@ -98,6 +98,10 @@ const config: NuxtConfig = {
 
   publicRuntimeConfig: {
     baseURL,
+    appVersion: process.env.npm_package_version,
+    os: process.platform,
+    nodeVersion: process.version,
+    environment: process.env.NODE_ENV,
   },
 
   vuetify: {

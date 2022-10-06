@@ -125,7 +125,7 @@ export default Vue.extend({
           )
         }
         this.loading = false
-      }, 700)
+      }, this.$accessor.settings.appCheckTimeout)
       window.location.href = `pixiv://novels/${item.id}`
       window.onblur = function () {
         change = true
