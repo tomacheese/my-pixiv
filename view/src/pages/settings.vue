@@ -48,7 +48,7 @@
           </v-btn>
         </v-card-actions>
 
-        <v-card-text>
+        <v-card-text class="white--text">
           <p class="mb-3" v-text="selectedCategory.description" />
 
           <div v-for="(value, v) of selectedCategory.values" :key="v">
@@ -120,9 +120,10 @@ export default Vue.extend({
         {
           name: '表示設定',
           icon: 'mdi-view-list',
-          shortDescription: '一覧表示の表示種別の設定',
+          shortDescription:
+            '一覧表示の表示種別・イラストポップアップのボタン位置',
           description:
-            'おすすめタブ・各検索タブにおいて、アイテムを一覧表示する際の表示方法について設定できます。',
+            'おすすめタブ・各検索タブにおける表示について設定できます。',
           values: [
             {
               component: ViewSetting,
