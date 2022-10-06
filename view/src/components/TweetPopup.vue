@@ -246,12 +246,12 @@ export default Vue.extend({
           }
         })
         .catch((err) => {
-          alert(
-            'Likeに失敗: ' +
-              err.message +
-              '\n' +
-              (err.response?.data.detail || '')
-          )
+          this.$nuxt.$emit('snackbar', {
+            message: `Likeに失敗: ${err.message}\n${
+              err.response?.data.detail || ''
+            }`,
+            color: 'error',
+          })
         })
     },
     isCheckingShadowBan(screenName: string) {

@@ -213,6 +213,9 @@ export default Vue.extend({
         this.$axios
           .get<ShadowBanResult>(`/api/tweet/shadow-ban/${screenName}`)
           .then((response) => {
+            if (!response.data.profile.error) {
+              return
+            }
             this.shadowBans.push(response.data)
           })
           .catch((error) => {

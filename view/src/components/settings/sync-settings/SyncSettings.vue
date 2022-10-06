@@ -79,8 +79,13 @@ export default Vue.extend({
           }
           this.$accessor.settings.setAllSettings(data.data)
           this.$nextTick(() => {
-            alert('他の端末から設定データを受信しました。リロードします。')
-            location.reload()
+            this.$nuxt.$emit('snackbar', {
+              message: `他の端末から設定データを受信しました。3秒後にリロードします。`,
+              color: 'success',
+            })
+            setTimeout(() => {
+              location.reload()
+            }, 3000)
           })
         })
         .build()
@@ -111,7 +116,10 @@ export default Vue.extend({
           if (data.action !== 'synced') {
             return
           }
-          alert(`設定データを送信し、${data.data} 件の端末に同期しました。`)
+          this.$nuxt.$emit('snackbar', {
+            message: `設定データを送信し、${data.data} 件の端末に同期しました。`,
+            color: 'success',
+          })
           this.client?.close(1000)
         })
         .onClose(() => {

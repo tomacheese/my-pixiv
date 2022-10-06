@@ -147,7 +147,10 @@ export default Vue.extend({
             item.targetType === this.targetType.key
         )
       ) {
-        alert('既に追加されています')
+        this.$nuxt.$emit('snackbar', {
+          message: `既に追加されています`,
+          color: 'error',
+        })
         return
       }
       this.$accessor.settings.addMuteItem({

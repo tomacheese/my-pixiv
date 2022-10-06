@@ -74,7 +74,7 @@ export default Vue.extend({
       default: false,
     },
     tweetStatus: {
-      type: Object as () => TweetStatus,
+      type: String as () => TweetStatus,
       required: false,
       default: null,
     },
@@ -167,10 +167,16 @@ export default Vue.extend({
         })
         .catch((error) => {
           if (error.response.data.detail) {
-            alert('Likeに失敗: ' + error.response.data.detail)
+            this.$nuxt.$emit('snackbar', {
+              message: `Likeに失敗: ${error.response.data.detail}`,
+              color: 'error',
+            })
             return
           }
-          alert('Likeに失敗: ' + error)
+          this.$nuxt.$emit('snackbar', {
+            message: `Likeに失敗: ${error}`,
+            color: 'error',
+          })
         })
     },
     close() {

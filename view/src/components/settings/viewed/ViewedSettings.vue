@@ -92,7 +92,10 @@ export default Vue.extend({
       textarea.select()
       document.execCommand('copy')
       textarea.remove()
-      alert('コピーしました。')
+      this.$nuxt.$emit('snackbar', {
+        message: `コピーしました。`,
+        color: 'success',
+      })
     },
     downloadData(text: string, filename: string) {
       const blob = new Blob([text], { type: 'text/plain' })
@@ -119,10 +122,18 @@ export default Vue.extend({
       }
       try {
         this.$accessor.viewed.setAllVieweds(JSON.parse(this.viewedsText))
-        alert('既読情報をインポートしました。リロードします。')
-        window.location.reload()
+        this.$nuxt.$emit('snackbar', {
+          message: `既読情報をインポートしました。3秒後にリロードします。`,
+          color: 'success',
+        })
+        setTimeout(() => {
+          location.reload()
+        }, 3000)
       } catch (e) {
-        alert('既読情報のインポートに失敗しました')
+        this.$nuxt.$emit('snackbar', {
+          message: `既読情報のインポートに失敗しました`,
+          color: 'error',
+        })
       }
     },
     importViewedsFile() {

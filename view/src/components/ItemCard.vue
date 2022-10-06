@@ -95,7 +95,11 @@ export default Vue.extend({
       textarea.select()
       document.execCommand('copy')
       textarea.remove()
-      alert('コピーしました。')
+
+      this.$nuxt.$emit('snackbar', {
+        message: `コピーしました。`,
+        color: 'success',
+      })
     },
   },
 })
