@@ -1,108 +1,83 @@
 <template>
   <v-container>
-    <h2>アイテムミュート設定</h2>
+    <h2>ミュート対象に追加</h2>
 
-    <v-btn color="success" block class="ma-3" @click="isOpen = true"
-      >設定を開く</v-btn
-    >
+    <v-form ref="addForm" class="my-3">
+      <div class="my-2">
+        <v-select
+          v-model="targetType"
+          :items="targetTypes"
+          item-text="name"
+          item-value="key"
+          return-object
+          label="アイテム種別"
+        ></v-select>
+        <v-text-field
+          v-model="targetId"
+          label="ミュート対象のアイテムID"
+          placeholder="例: 1234567890"
+          :rules="[(v) => !!v || '必須項目です']"
+          @blur="checkUrl()"
+        ></v-text-field>
+      </div>
+      <v-btn color="success" block @click="add()">追加</v-btn>
+    </v-form>
 
-    <v-dialog v-model="isOpen" fullscreen transition="dialog-bottom-transition">
-      <v-card v-if="isOpen">
-        <v-toolbar flat dark color="primary">
-          <v-btn icon dark @click="isOpen = false">
+    <h2>ミュート対象一覧</h2>
+
+    <v-pagination v-model="page" :length="pageCount" circle></v-pagination>
+
+    <v-list class="my-3">
+      <v-list-item v-for="(item, i) of getItems()" :key="i" @click="open(item)">
+        <v-list-item-icon>
+          <v-icon>{{ getTypeIcon(item.targetType) }}</v-icon>
+        </v-list-item-icon>
+
+        <v-list-item-content v-if="item.detail">
+          <v-list-item-title v-if="item.targetType !== 'USER'"
+            >{{ item.detail.title }}
+          </v-list-item-title>
+          <v-list-item-title v-else>{{ item.detail.name }} </v-list-item-title>
+
+          <v-list-item-subtitle v-if="item.targetType !== 'USER'">
+            {{ getTypeName(item.targetType) }} ―
+            {{ item.detail.user.name }}</v-list-item-subtitle
+          >
+          <v-list-item-subtitle v-else>
+            {{ item.detail.id }}</v-list-item-subtitle
+          >
+        </v-list-item-content>
+        <v-list-item-content v-else-if="item.detail === undefined">
+          <v-list-item-title>読み込み中</v-list-item-title>
+          <v-list-item-subtitle>
+            {{ getTypeName(item.targetType) }} ―
+            {{ item.targetId }}</v-list-item-subtitle
+          >
+        </v-list-item-content>
+        <v-list-item-content v-else>
+          <v-list-item-title>読み込み失敗</v-list-item-title>
+          <v-list-item-subtitle>
+            {{ getTypeName(item.targetType) }} ―
+            {{ item.targetId }}</v-list-item-subtitle
+          >
+        </v-list-item-content>
+        <v-list-item-action>
+          <v-btn icon @click="remove(item)">
             <v-icon>mdi-close</v-icon>
           </v-btn>
-          <v-toolbar-title>ミュート設定</v-toolbar-title>
-        </v-toolbar>
+        </v-list-item-action>
+      </v-list-item>
 
-        <v-card-title>ミュート対象に追加</v-card-title>
+      <v-list-item v-if="items.length === 0">
+        <v-list-item-content>
+          <v-list-item-subtitle class="text-center"
+            >ミュート対象がありません</v-list-item-subtitle
+          >
+        </v-list-item-content>
+      </v-list-item>
+    </v-list>
 
-        <v-card-text>
-          <v-form ref="addForm">
-            <v-select
-              v-model="targetType"
-              :items="targetTypes"
-              item-text="name"
-              item-value="key"
-              return-object
-              label="アイテム種別"
-            ></v-select>
-            <v-text-field
-              v-model="targetId"
-              label="ミュート対象のアイテムID"
-              placeholder="例: 1234567890"
-              :rules="[(v) => !!v || '必須項目です']"
-              @blur="checkUrl()"
-            ></v-text-field>
-            <v-btn color="success" block @click="add()">追加</v-btn>
-          </v-form>
-        </v-card-text>
-
-        <v-card-title>ミュート対象一覧</v-card-title>
-
-        <v-card-text>
-          <v-pagination
-            v-model="page"
-            :length="pageCount"
-            circle
-          ></v-pagination>
-
-          <v-list>
-            <v-list-item
-              v-for="(item, i) of getItems()"
-              :key="i"
-              @click="open(item)"
-            >
-              <v-list-item-icon>
-                <v-icon>{{ getTypeIcon(item.targetType) }}</v-icon>
-              </v-list-item-icon>
-
-              <v-list-item-content v-if="item.detail">
-                <v-list-item-title v-if="item.targetType !== 'USER'"
-                  >{{ item.detail.title }}
-                </v-list-item-title>
-                <v-list-item-title v-else
-                  >{{ item.detail.name }}
-                </v-list-item-title>
-
-                <v-list-item-subtitle v-if="item.targetType !== 'USER'">
-                  {{ getTypeName(item.targetType) }} ―
-                  {{ item.detail.user.name }}</v-list-item-subtitle
-                >
-                <v-list-item-subtitle v-else>
-                  {{ item.detail.id }}</v-list-item-subtitle
-                >
-              </v-list-item-content>
-              <v-list-item-content v-else-if="item.detail === undefined">
-                <v-list-item-title>読み込み中</v-list-item-title>
-                <v-list-item-subtitle>
-                  {{ getTypeName(item.targetType) }} ―
-                  {{ item.targetId }}</v-list-item-subtitle
-                >
-              </v-list-item-content>
-              <v-list-item-content v-else>
-                <v-list-item-title>読み込み失敗</v-list-item-title>
-                <v-list-item-subtitle>
-                  {{ getTypeName(item.targetType) }} ―
-                  {{ item.targetId }}</v-list-item-subtitle
-                >
-              </v-list-item-content>
-              <v-list-item-action>
-                <v-btn icon @click="remove(item)">
-                  <v-icon>mdi-close</v-icon>
-                </v-btn>
-              </v-list-item-action>
-            </v-list-item>
-          </v-list>
-
-          <v-pagination
-            v-model="page"
-            :length="pageCount"
-            circle
-          ></v-pagination>
-        </v-card-text>
-      </v-card>
-    </v-dialog>
+    <v-pagination v-model="page" :length="pageCount" circle></v-pagination>
   </v-container>
 </template>
 
@@ -126,7 +101,6 @@ type Item = MuteItem & {
 export default Vue.extend({
   name: 'MutedItemSettings',
   data(): {
-    isOpen: boolean
     targetId: string
     targetType: { key: string; name: string }
     targetTypes: { key: string; name: string }[]
@@ -135,7 +109,6 @@ export default Vue.extend({
     items: Item[]
   } {
     return {
-      isOpen: false,
       targetId: '',
       targetType: {
         key: 'ILLUST',

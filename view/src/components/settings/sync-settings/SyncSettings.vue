@@ -1,16 +1,34 @@
 <template>
-  <v-container>
-    <h2>設定の同期</h2>
-    <v-btn color="error" :disabled="isDisabled" @click="toggleConnect()">{{
-      isConnected ? '同期待ち受け停止' : '同期待ち受け開始'
-    }}</v-btn>
-    <v-btn
-      color="error"
-      :disabled="isConnected || isDisabled"
-      @click="startSync()"
-      >同期開始</v-btn
-    >
-  </v-container>
+  <div>
+    <p>
+      他の端末と設定を同期する際は以下の手順で行います。<br />
+      設定を同期した場合、同期<b>される</b>端末にある設定はすべてリセットされることに注意してください。
+    </p>
+
+    <ol>
+      <li>同期<b>される</b>端末で、「同期待ち受け開始」ボタンを押下します。</li>
+      <li>同期<b>する</b>端末で、「同期開始」ボタンを押下します。</li>
+      <li>
+        双方の端末で同期が行われたことを示すアラートが表示されれば成功です。
+      </li>
+    </ol>
+
+    <div class="my-5">
+      <v-btn color="error" :disabled="isDisabled" @click="toggleConnect()">{{
+        isConnected ? '同期待ち受け停止' : '同期待ち受け開始'
+      }}</v-btn>
+      <v-btn
+        color="error"
+        :disabled="isConnected || isDisabled"
+        @click="startSync()"
+        >同期開始</v-btn
+      >
+    </div>
+
+    <p>
+      設定データはWebSocket経由でサーバに送信され、サーバから待ち受けしているすべての端末に送信されます。
+    </p>
+  </div>
 </template>
 
 <script lang="ts">

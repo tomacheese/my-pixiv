@@ -1,19 +1,5 @@
 <template>
-  <v-container>
-    <h2>設定のインポート・エクスポート</h2>
-    <v-textarea v-model="dataText"></v-textarea>
-    <v-btn color="success" @click="copyToClipboard(dataText)"
-      >クリップボードにコピー</v-btn
-    >
-    <v-btn color="success" @click="downloadData(dataText, 'settings.json')"
-      >ダウンロード</v-btn
-    >
-    <v-btn color="warning" @click="importSettings()">インポート</v-btn>
-    <v-btn color="warning" @click="importSettingsFile()"
-      >ファイルからインポート</v-btn
-    >
-
-    <h2 class="mt-5">既読情報</h2>
+  <div>
     <ul>
       <li>イラスト既読数: {{ viewed.illusts }}件</li>
       <li>小説既読数: {{ viewed.novels }}件</li>
@@ -29,7 +15,12 @@
     <v-btn color="success" @click="downloadData(viewedsText, 'vieweds.json')"
       >ダウンロード</v-btn
     >
-    <v-btn color="warning" @click="importVieweds()">インポート</v-btn>
+    <v-btn
+      color="warning"
+      :disabled="isAutoSyncVieweds"
+      @click="importVieweds()"
+      >インポート</v-btn
+    >
     <v-btn
       color="warning"
       :disabled="isAutoSyncVieweds"
@@ -42,13 +33,13 @@
       label="WebSocketを使用したリアルタイム既読更新"
       @change="onAutoSyncViewedsChange"
     />
-  </v-container>
+  </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue'
 export default Vue.extend({
-  name: 'ImportExportSetting',
+  name: 'ViewedSettings',
   data() {
     return {
       dataText: '',
@@ -61,7 +52,6 @@ export default Vue.extend({
     }
   },
   mounted() {
-    this.exportSettings()
     this.exportVieweds()
 
     this.isAutoSyncVieweds = this.$accessor.settings.isAutoSyncVieweds
@@ -78,13 +68,22 @@ export default Vue.extend({
   },
   methods: {
     onAutoSyncViewedsChange(val: boolean) {
+      if (
+        !confirm(
+          `リアルタイム既読更新を${
+            val ? '有効' : '無効'
+          }にしますか？\n「はい」をクリックすると、ページが再読み込みされます。`
+        )
+      ) {
+        this.$nextTick(() => {
+          this.isAutoSyncVieweds = !val
+        })
+        return
+      }
       this.$accessor.settings.setAutoSyncVieweds(val)
       this.$nextTick(() => {
         location.reload()
       })
-    },
-    exportSettings() {
-      this.dataText = JSON.stringify(this.$accessor.settings.settings)
     },
     copyToClipboard(text: string) {
       const textarea = document.createElement('textarea')
@@ -103,38 +102,6 @@ export default Vue.extend({
       a.download = filename
       a.click()
       URL.revokeObjectURL(url)
-    },
-    importSettings() {
-      if (!window) {
-        return
-      }
-      try {
-        this.$accessor.settings.setAllSettings(JSON.parse(this.dataText))
-        alert('設定をインポートしました。リロードします。')
-        window.location.reload()
-      } catch (e) {
-        alert('設定のインポートに失敗しました')
-      }
-    },
-    importSettingsFile() {
-      if (!window) {
-        return
-      }
-      const input = document.createElement('input')
-      input.type = 'file'
-      input.onchange = () => {
-        if (!input.files || !input.files[0]) {
-          return
-        }
-        const file = input.files[0]
-        const reader = new FileReader()
-        reader.onload = () => {
-          this.dataText = reader.result as string
-          this.importSettings()
-        }
-        reader.readAsText(file)
-      }
-      input.click()
     },
     exportVieweds() {
       if (
