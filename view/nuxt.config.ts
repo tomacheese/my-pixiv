@@ -1,7 +1,14 @@
+import fs from 'fs'
+import { execSync } from 'child_process'
 import { NuxtConfig } from '@nuxt/types'
 
 const baseURL =
   process.env.NODE_ENV === 'production' ? '/' : 'http://192.168.0.101:8000/'
+
+execSync(
+  'npx npm-license-crawler --dependencies --production --onlyDirectDependencies --omitVersion --json ./src/licenses.json'
+)
+const licenses = JSON.parse(fs.readFileSync('./src/licenses.json', 'utf8'))
 
 const config: NuxtConfig = {
   srcDir: 'src/',
@@ -102,6 +109,7 @@ const config: NuxtConfig = {
     os: process.platform,
     nodeVersion: process.version,
     environment: process.env.NODE_ENV,
+    licenses,
   },
 
   vuetify: {
