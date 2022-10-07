@@ -1,7 +1,11 @@
 <template>
   <v-app>
     <v-main>
-      <v-tabs v-model="selected" fixed-tabs>
+      <v-tabs
+        v-model="selected"
+        fixed-tabs
+        :class="{ 'sticky-header': isHeaderSticky }"
+      >
         <v-tab v-for="t of types" :key="t.value">{{ t.name }}</v-tab>
         <DarkModeSwitch />
       </v-tabs>
@@ -49,6 +53,11 @@ export default Vue.extend({
       ],
     }
   },
+  computed: {
+    isHeaderSticky(): boolean {
+      return this.$accessor.settings.headerSticky
+    },
+  },
   watch: {
     selected(val) {
       this.$nuxt.$router.push({
@@ -66,3 +75,11 @@ export default Vue.extend({
   },
 })
 </script>
+
+<style>
+.sticky-header {
+  position: sticky;
+  top: 0;
+  z-index: 10000;
+}
+</style>

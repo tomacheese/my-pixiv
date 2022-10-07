@@ -34,6 +34,7 @@ interface Settings {
   paginationLimit: number
   appCheckTimeout: number
   actionPosition: ActionPosition
+  headerSticky: boolean
   targets: Target[]
   filters: Filter[]
   muted: MuteItem[]
@@ -48,6 +49,7 @@ export const state = (): Settings => ({
   paginationLimit: 10,
   appCheckTimeout: 700,
   actionPosition: 'RIGHT',
+  headerSticky: false,
   targets: [],
   filters: [],
   muted: [],
@@ -65,6 +67,7 @@ export const getters = getterTree(state, {
   paginationLimit: (state) => state.paginationLimit,
   appCheckTimeout: (state) => state.appCheckTimeout,
   actionPosition: (state) => state.actionPosition,
+  headerSticky: (state) => state.headerSticky,
   targets: (state) => state.targets,
   specificTargets: (state) => (targetType: TargetType) => {
     return state.targets.filter((target) =>
@@ -91,6 +94,8 @@ export const mutations = mutationTree(state, {
       state.appCheckTimeout = settings.appCheckTimeout
     if (settings.actionPosition !== undefined)
       state.actionPosition = settings.actionPosition
+    if (settings.headerSticky !== undefined)
+      state.headerSticky = settings.headerSticky
     if (settings.targets !== undefined) state.targets = settings.targets
     if (settings.filters !== undefined) state.filters = settings.filters
     if (settings.muted !== undefined) state.muted = settings.muted
@@ -118,6 +123,9 @@ export const mutations = mutationTree(state, {
   },
   setActionPosition(state, actionPosition: ActionPosition) {
     state.actionPosition = actionPosition
+  },
+  setHeaderSticky(state, headerSticky: boolean) {
+    state.headerSticky = headerSticky
   },
   setTargets: (state, targets: Target[]) => {
     state.targets = targets
