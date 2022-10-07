@@ -9,9 +9,9 @@
     "generate": "nuxt generate",
     "lint:js": "eslint --ext \".js,.ts,.vue\" --ignore-path .gitignore .",
     "lint:style": "stylelint \"**/*.{css,scss,sass,html,vue}\" --ignore-path .gitignore",
-    "lint:prettier": "prettier --check .",
+    "lint:prettier": "prettier --check --ignore-path .gitignore .",
     "lint": "yarn lint:js && yarn lint:style && yarn lint:prettier",
-    "lintfix": "prettier --write --list-different . && yarn lint:js --fix && yarn lint:style --fix"
+    "lintfix": "prettier --write --ignore-path .gitignore --list-different . && yarn lint:js --fix && yarn lint:style --fix"
   },
   "dependencies": {
     "@nuxtjs/axios": "5.13.6",
