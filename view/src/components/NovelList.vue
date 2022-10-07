@@ -18,6 +18,7 @@ import Vue from 'vue'
 import { PixivItem } from '@/types/pixivItem'
 import { Fetcher } from '@/plugins/fetcher'
 import { ViewType } from '@/store/settings'
+import { openPixivNovel } from '@/utils/pixiv'
 
 export default Vue.extend({
   name: 'NovelList',
@@ -111,28 +112,10 @@ export default Vue.extend({
       return this.fetcher.isLoadMoreAvailable()
     },
     open(item: PixivItem): void {
-      if (!window) {
-        return
-      }
-
       this.loading = true
-      let change = false
-      setTimeout(() => {
-        if (!change) {
-          window.open(
-            `https://www.pixiv.net/novel/show.php?id=${item.id}`,
-            '_blank'
-          )
-        }
+      openPixivNovel(this.$accessor, item.id).then(() => {
         this.loading = false
-      }, this.$accessor.settings.appCheckTimeout)
-      window.location.href = `pixiv://novels/${item.id}`
-      window.onblur = function () {
-        change = true
-      }
-      window.onfocus = function () {
-        change = false
-      }
+      })
     },
     onItemViewing(item: PixivItem) {
       if (this.recommended) {

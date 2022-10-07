@@ -1,5 +1,5 @@
 <template>
-  <v-card>
+  <v-card :loading="loading">
     <v-card-title v-if="data.error != null" class="text-h5">{{
       data.error
     }}</v-card-title>
@@ -74,6 +74,7 @@
 <script lang="ts">
 import Vue from 'vue'
 import { PixivItem } from '@/types/pixivItem'
+import { openTwitterTweet, openTwitterUser } from '@/utils/twitter'
 
 export interface User {
   id: string
@@ -193,14 +194,15 @@ export default Vue.extend({
       return `${user.name} (@${user.screen_name})`
     },
     open(tweet: Tweet) {
-      if (!window) {
-        return
-      }
-      this.$emit('close-popup')
-      window.open(
-        `https://twitter.com/${tweet.tweet.user.screen_name}/status/${tweet.tweet.id}`,
-        '_blank'
-      )
+      this.loading = true
+      openTwitterTweet(
+        this.$accessor,
+        tweet.tweet.user.screen_name,
+        tweet.tweet.id
+      ).then(() => {
+        this.loading = false
+        this.$emit('close-popup')
+      })
     },
     close() {
       this.$emit('close-popup')
@@ -274,10 +276,11 @@ export default Vue.extend({
       return 'green'
     },
     openTwitter(screenName: string) {
-      if (!window) {
-        return
-      }
-      window.open(`https://twitter.com/${screenName}`, '_blank')
+      this.loading = true
+      openTwitterUser(this.$accessor, screenName).then(() => {
+        this.loading = false
+        this.$emit('close-popup')
+      })
     },
   },
 })

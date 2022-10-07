@@ -52,6 +52,7 @@
 import Vue from 'vue'
 import { TweetPopupProp } from './TweetPopup.vue'
 import { PixivItem } from '@/types/pixivItem'
+import { openPixivIllust } from '@/utils/pixiv'
 
 export type TweetStatus =
   | 'LOADING'
@@ -115,26 +116,11 @@ export default Vue.extend({
   },
   methods: {
     openPage(item: PixivItem) {
-      if (!window) {
-        return
-      }
-
       this.isLoadingOpenPage = true
-      let change = false
-      setTimeout(() => {
+      openPixivIllust(this.$accessor, item.id).then(() => {
         this.$emit('close-popup')
-        if (!change) {
-          window.open(`https://www.pixiv.net/artworks/${item.id}`, '_blank')
-        }
         this.isLoadingOpenPage = false
-      }, this.$accessor.settings.appCheckTimeout)
-      window.location.href = `pixiv://illusts/${item.id}`
-      window.onblur = function () {
-        change = true
-      }
-      window.onfocus = function () {
-        change = false
-      }
+      })
     },
     getTweetFoundColor(): string {
       switch (this.tweetStatus) {
