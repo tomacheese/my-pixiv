@@ -111,7 +111,7 @@ export interface ShadowBanResult {
     id: string
     screen_name: string
   }
-  tests: {
+  tests?: {
     ghost: {
       ban: boolean
     }
@@ -144,10 +144,12 @@ export function isShadowBanned(
     return false
   }
   return (
-    item.tests.ghost.ban ||
-    item.tests.more_replies.ban ||
-    !item.tests.search ||
-    !item.tests.typeahead
+    item.profile.error === null &&
+    item.tests &&
+    (item.tests.ghost.ban ||
+      item.tests.more_replies.ban ||
+      !item.tests.search ||
+      !item.tests.typeahead)
   )
 }
 
@@ -182,7 +184,7 @@ export default Vue.extend({
   },
   data(): TweetPopupData {
     return {
-      loading: true,
+      loading: false,
       liked: {
         main: [],
         sub: [],
