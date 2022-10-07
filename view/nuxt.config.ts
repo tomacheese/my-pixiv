@@ -118,7 +118,6 @@ const config: NuxtConfig = {
   build: {
     parallel: true,
     cache: true,
-    hardSource: true,
   },
 }
 export default config
