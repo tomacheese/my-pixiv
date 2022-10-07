@@ -1,6 +1,11 @@
 <template>
   <div>
-    <v-tabs v-model="selected" fixed-tabs color="orange">
+    <v-tabs
+      v-model="selected"
+      fixed-tabs
+      color="orange"
+      :class="{ 'sticky-recommended-header': isHeaderSticky }"
+    >
       <v-tab v-for="t of types" :key="t.value">{{ t.name }}</v-tab>
     </v-tabs>
     <v-container fluid>
@@ -43,5 +48,18 @@ export default Vue.extend({
       loading: false,
     }
   },
+  computed: {
+    isHeaderSticky(): boolean {
+      return this.$accessor.settings.headerSticky
+    },
+  },
 })
 </script>
+
+<style>
+.sticky-recommended-header {
+  position: sticky;
+  top: 48px;
+  z-index: 10000;
+}
+</style>

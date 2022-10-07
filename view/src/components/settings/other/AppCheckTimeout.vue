@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h2>pixiv アプリがインストールされているかの確認タイムアウト</h2>
+    <h2>Twitter / pixiv アプリがインストールされているかの確認タイムアウト</h2>
     <v-text-field
       v-model="appCheckTimeout"
       type="number"
