@@ -260,6 +260,9 @@ def get_search_tweets(illust_id: str):
     # ツイートを検索
     tweets = get_match_tweets(screen_names, posted_at, path)
     if len(tweets) == 0:
+        tweets = get_match_user_tweets(screen_names, posted_at, path)
+
+    if len(tweets) == 0:
         return {
             "screen_names": screen_names,
             "tweets": []
@@ -311,31 +314,82 @@ def get_match_tweets(screen_names: set[str],
         if tweets is None:
             raise HTTPException(status_code=404, detail="search tweets failed")
         for tweet in tweets:
-            if "media" not in tweet.entities:
+            checked = check_tweet(tweet, image_path, "search")
+            if checked is None:
                 continue
-            for i in range(len(tweet.entities["media"])):
-                media = tweet.entities["media"][i]
-                if media["type"] != "photo":
-                    continue
-
-                media_url = media["media_url"]
-
-                twi_img_path = twi_img_download(media_url, tweet.id_str, i)
-                similarity = calc_image_similarity(image_path, twi_img_path)
-
-                rets.append({"tweet": {
-                    "id": tweet.id_str,
-                    "text": tweet.text,
-                    "media_url": media_url,
-                    "user": {
-                        "id": tweet.user.id_str,
-                        "name": tweet.user.name,
-                        "screen_name": tweet.user.screen_name,
-                        "profile_image_url": tweet.user.profile_image_url
-                    },
-                }, "similarity": similarity})
+            rets.append(checked)
 
     return rets
+
+
+def get_match_user_tweets(screen_names: set[str],
+                          posted_at: datetime,
+                          image_path: str):
+    # 投稿日の3日前
+    posted_at_before_3day_df = posted_at - timedelta(days=3)
+    posted_at_before_3day_snowflake = str(get_snowflake(posted_at_before_3day_df))
+
+    # 投稿日の3日後
+    posted_at_after_3day_df = posted_at + timedelta(days=3)
+    posted_at_after_3day_snowflake = str(get_snowflake(posted_at_after_3day_df))
+
+    api = init_twitter_api()
+    if api is None:
+        return None
+
+    rets = []
+    for screen_name in screen_names:
+        try:
+            for tweet in tweepy.Cursor(api.user_timeline,
+                                       screen_name=screen_name,
+                                       since_id=posted_at_before_3day_snowflake,
+                                       max_id=posted_at_after_3day_snowflake,
+                                       tweet_mode="extended").items():
+                checked = check_tweet(tweet, image_path, "user_timeline")
+                if checked is None:
+                    continue
+                rets.append(checked)
+        except tweepy.errors.NotFound:
+            print("NotFound: " + screen_name)
+            continue
+
+    return rets
+
+
+def check_tweet(tweet, image_path, identity):
+    print("check_tweet", tweet.id, tweet.created_at)
+    if "media" not in tweet.entities:
+        return None
+    for i in range(len(tweet.entities["media"])):
+        media = tweet.entities["media"][i]
+        if media["type"] != "photo":
+            continue
+
+        media_url = media["media_url"]
+
+        twi_img_path = twi_img_download(media_url, tweet.id_str, i)
+        similarity = calc_image_similarity(image_path, twi_img_path)
+
+        return {
+            "tweet": {
+                "id": tweet.id_str,
+                "text": tweet.text if hasattr(tweet, "text") else tweet.full_text,
+                "media_url": media_url,
+                "user": {
+                    "id": tweet.user.id_str,
+                    "name": tweet.user.name,
+                    "screen_name": tweet.user.screen_name,
+                    "profile_image_url": tweet.user.profile_image_url
+                },
+            },
+            "similarity": similarity,
+            "identity": identity
+        }
+
+
+def get_snowflake(timestamp: datetime):
+    print("get_snowflake", timestamp)
+    return (int(round(timestamp.timestamp() * 1000)) - 1288834974657) << 22
 
 
 def calc_image_similarity(image_path: str,
