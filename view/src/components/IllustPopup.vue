@@ -150,6 +150,7 @@ export default Vue.extend({
         return
       }
       this.tweetStatus = 'LOADING'
+      this.tweets = null
       this.$axios
         .get<TweetPopupProp>(`/api/tweet/search/${this.item.id}`)
         .then((response) => {
