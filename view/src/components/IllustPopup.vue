@@ -157,7 +157,11 @@ export default Vue.extend({
           this.tweets = {
             screen_names: response.data.screen_names,
             tweets: response.data.tweets.sort((a, b) => {
-              return a.similarity - b.similarity
+              const similarity = a.similarity - b.similarity
+              if (similarity !== 0) {
+                return similarity
+              }
+              return Number(a.tweet.id) - Number(b.tweet.id)
             }),
             error: null,
           }
