@@ -12,7 +12,7 @@ export interface Target {
 }
 
 export interface Filter {
-  type: 'TITLE' | 'AUTHOR' | 'TAG' | 'ALL'
+  type: 'TITLE' | 'CAPTION' | 'TAG'
   value: string
 }
 

@@ -151,27 +151,13 @@ export class Fetcher {
             return true
           }
           break
-        case 'AUTHOR':
-          if (item.user.name.includes(filter.value)) {
+        case 'CAPTION':
+          if (item.caption.includes(filter.value)) {
             return true
           }
           break
         case 'TAG':
           if (
-            item.tags.some(
-              (tag) =>
-                tag.name.includes(filter.value) ||
-                (tag.translated_name &&
-                  tag.translated_name.includes(filter.value))
-            )
-          ) {
-            return true
-          }
-          break
-        case 'ALL':
-          if (
-            item.title.includes(filter.value) ||
-            item.user.name.includes(filter.value) ||
             item.tags.some(
               (tag) =>
                 tag.name.includes(filter.value) ||
