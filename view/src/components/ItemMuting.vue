@@ -1,6 +1,10 @@
 <template>
   <div>
-    <div v-longclick="() => addMute()" class="item-muting-wrapper">
+    <div
+      v-longclick="() => addMute()"
+      onContextMenu="(e) => { e.preventDefault(); }"
+      class="item-muting-wrapper"
+    >
       <slot />
     </div>
     <v-dialog v-model="isOpen" class="item-muting-selection">
@@ -158,3 +162,9 @@ export default Vue.extend({
   },
 })
 </script>
+
+<style scoped>
+.item-muting-wrapper {
+  user-select: none;
+}
+</style>
