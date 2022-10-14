@@ -61,6 +61,12 @@ export default Vue.extend({
     } else {
       this.vieweds = undefined
     }
+
+    this.$nuxt.$on('update-mutes', () => {
+      this.items = this.items.filter((item) => {
+        return !Fetcher.isMutedItem(this.$accessor.settings.muted, item)
+      })
+    })
   },
   methods: {
     async fetch() {
