@@ -34,7 +34,7 @@
         </v-list-item-icon>
 
         <v-list-item-content v-if="item.detail">
-          <v-list-item-title v-if="item.targetType !== 'USER'"
+          <v-list-item-title v-if="item.targetType !== 'USER'" class="wrap-text"
             >{{ item.detail.title }}
           </v-list-item-title>
           <v-list-item-title v-else>{{ item.detail.name }} </v-list-item-title>
@@ -43,9 +43,9 @@
             {{ getTypeName(item.targetType) }} ―
             {{ item.detail.user.name }}</v-list-item-subtitle
           >
-          <v-list-item-subtitle v-else>
-            {{ item.detail.id }}</v-list-item-subtitle
-          >
+          <v-list-item-subtitle v-else>{{
+            getTypeName(item.targetType)
+          }}</v-list-item-subtitle>
         </v-list-item-content>
         <v-list-item-content v-else-if="item.detail === undefined">
           <v-list-item-title>読み込み中</v-list-item-title>
@@ -128,7 +128,10 @@ export default Vue.extend({
   },
   methods: {
     fetch() {
-      this.items = this.$accessor.settings.muted
+      this.items = this.$accessor.settings.muted.map((item) => ({
+        ...item,
+        detail: undefined,
+      }))
     },
     add() {
       if (
