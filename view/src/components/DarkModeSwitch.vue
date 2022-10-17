@@ -22,9 +22,15 @@ export default Vue.extend({
       this.$vuetify.theme.dark = this.theme
       this.$accessor.settings.setDarkMode(this.theme)
     },
+    '$accessor.settings.isDarkMode': {
+      immediate: true,
+      handler() {
+        this.theme = this.$accessor.settings.isDarkMode
+      },
+    },
   },
   mounted() {
-    this.theme = this.$accessor.settings.darkMode
+    this.theme = this.$accessor.settings.isDarkMode
   },
 })
 </script>

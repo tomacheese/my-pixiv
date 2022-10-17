@@ -15,7 +15,7 @@ from PIL import Image
 
 TOKEN_FILE = os.environ.setdefault('PIXIVPY_TOKEN_FILE', '/data/token.json')
 CONFIG_FILE = os.environ.setdefault('CONFIG_FILE', '/data/config.json')
-VIEWED_FILE = os.environ.setdefault('VIEWED_FILE', '/data/viewed.json')
+GLOBAL_SETTING_FILE = os.environ.setdefault('GLOBAL_SETTING_FILE', '/data/global-settings.json')
 ILLUST_CACHE_DIR = os.environ.setdefault('ILLUST_CACHE_DIR', '/cache/illusts/')
 MANGA_CACHE_DIR = os.environ.setdefault('MANGA_CACHE_DIR', '/cache/manga/')
 NOVEL_CACHE_DIR = os.environ.setdefault('NOVEL_CACHE_DIR', '/cache/novels/')
@@ -24,6 +24,7 @@ IMAGE_CACHE_DIR = os.environ.setdefault('IMAGE_CACHE_DIR', '/cache/images/')
 TWEET_CACHE_DIR = os.environ.setdefault('TWEET_CACHE_DIR', '/cache/tweets/')
 SHADOW_BAN_CACHE_DIR = os.environ.setdefault('SHADOW_BAN_CACHE_DIR', '/cache/shadow-ban/')
 
+TOKEN_SAVE_TIMESTAMP = 0
 
 def init_twitter_api(account: str = None):
     if not os.path.exists(CONFIG_FILE):
@@ -52,6 +53,7 @@ def search_tweet(word: str):
 
 
 def init_pixiv_api():
+    global TOKEN_SAVE_TIMESTAMP
     api = AppPixivAPI()
 
     if not os.path.exists(TOKEN_FILE):
@@ -60,8 +62,11 @@ def init_pixiv_api():
     with open(TOKEN_FILE, 'r') as f:
         prev = json.load(f)
         token = api.auth(None, None, prev["refresh_token"])
-    with open(TOKEN_FILE, "w", encoding="utf-8") as f:
-        f.write(json.dumps(token))
+
+    if (TOKEN_SAVE_TIMESTAMP + 86400) < time.time():
+        with open(TOKEN_FILE, 'w') as f:
+            json.dump(token, f)
+        TOKEN_SAVE_TIMESTAMP = time.time()
 
     return api
 

@@ -4,7 +4,7 @@ import traceback
 from fastapi import APIRouter
 from starlette.websockets import WebSocket
 
-router = APIRouter(prefix="/settings-sync")
+router = APIRouter(prefix="/manual-sync")
 clients: dict[str, WebSocket] = {}
 
 

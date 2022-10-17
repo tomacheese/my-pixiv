@@ -82,7 +82,7 @@ export default Vue.extend({
     },
   },
   mounted() {
-    this.isOnlyNew = this.$accessor.settings.onlyNew
+    this.isOnlyNew = this.$accessor.settings.isOnlyNew
   },
   methods: {
     changePage() {

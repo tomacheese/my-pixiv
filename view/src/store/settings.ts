@@ -25,10 +25,10 @@ export interface MuteItem {
 
 export type ActionPosition = 'LEFT' | 'RIGHT'
 
-interface Settings {
+export interface Settings {
   isDarkMode: boolean
   isOnlyNew: boolean
-  isAutoSyncVieweds: boolean
+  isGlobalSync: boolean
   viewType: ViewType
   novelViewType: ViewType
   paginationLimit: number
@@ -43,7 +43,7 @@ interface Settings {
 export const state = (): Settings => ({
   isDarkMode: false,
   isOnlyNew: false,
-  isAutoSyncVieweds: false,
+  isGlobalSync: false,
   viewType: 'PAGINATION',
   novelViewType: 'PAGINATION',
   paginationLimit: 10,
@@ -59,9 +59,6 @@ export type RootState = ReturnType<typeof state>
 
 export const getters = getterTree(state, {
   settings: (state) => state,
-  darkMode: (state) => state.isDarkMode,
-  onlyNew: (state) => state.isOnlyNew,
-  autoSyncVieweds: (state) => state.isAutoSyncVieweds,
   viewType: (state) => state.viewType,
   novelViewType: (state) => state.novelViewType,
   paginationLimit: (state) => state.paginationLimit,
@@ -79,12 +76,12 @@ export const getters = getterTree(state, {
 })
 
 export const mutations = mutationTree(state, {
-  setAllSettings: (state, settings: Settings) => {
+  setAllSettings: (state, settings: Partial<Settings>) => {
     if (settings.isDarkMode !== undefined)
       state.isDarkMode = settings.isDarkMode
     if (settings.isOnlyNew !== undefined) state.isOnlyNew = settings.isOnlyNew
-    if (settings.isAutoSyncVieweds !== undefined)
-      state.isAutoSyncVieweds = settings.isAutoSyncVieweds
+    if (settings.isGlobalSync !== undefined)
+      state.isGlobalSync = settings.isGlobalSync
     if (settings.viewType !== undefined) state.viewType = settings.viewType
     if (settings.novelViewType !== undefined)
       state.novelViewType = settings.novelViewType
@@ -106,8 +103,8 @@ export const mutations = mutationTree(state, {
   setOnlyNew(state, isOnlyNew: boolean) {
     state.isOnlyNew = isOnlyNew
   },
-  setAutoSyncVieweds(state, isAutoSyncVieweds: boolean) {
-    state.isAutoSyncVieweds = isAutoSyncVieweds
+  setGlobalSync(state, isGlobalSync: boolean) {
+    state.isGlobalSync = isGlobalSync
   },
   setViewType(state, viewType: ViewType) {
     state.viewType = viewType

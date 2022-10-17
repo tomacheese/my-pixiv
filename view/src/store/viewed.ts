@@ -1,5 +1,5 @@
 import { actionTree, getterTree, mutationTree } from 'typed-vuex'
-import { getClient } from '@/plugins/viewedSync'
+import { getClient } from '@/plugins/globalSync'
 import { PixivItem } from '@/types/pixivItem'
 
 interface Viewed {
