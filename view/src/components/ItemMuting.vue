@@ -1,9 +1,15 @@
 <template>
   <div>
     <div
-      v-longclick="() => addMute()"
       onContextMenu="(e) => { e.preventDefault(); }"
       class="item-muting-wrapper"
+      @mousedown="startPress"
+      @touchstart="startPress"
+      @mouseup="endPress"
+      @click="endPress"
+      @touchmove="endPress"
+      @touchend="endPress"
+      @touchcancel="endPress"
     >
       <slot />
     </div>
@@ -105,12 +111,14 @@ export default Vue.extend({
     isLoading: boolean
     isSnackbar: boolean
     snackbarType: SnackBarType | null
+    pressTimer: NodeJS.Timeout | null
   } {
     return {
       isOpen: false,
       isLoading: false,
       isSnackbar: false,
       snackbarType: null,
+      pressTimer: null,
     }
   },
   methods: {
@@ -154,6 +162,18 @@ export default Vue.extend({
 
       this.snackbarType = 'ADDED_AUTHOR'
       this.isSnackbar = true
+    },
+    startPress(): void {
+      console.log('startPress')
+      this.pressTimer = setTimeout(() => {
+        this.isOpen = true
+      }, 500)
+    },
+    endPress(): void {
+      console.log('endPress')
+      if (!this.pressTimer) return
+      clearTimeout(this.pressTimer)
+      this.pressTimer = null
     },
   },
 })
