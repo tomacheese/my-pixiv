@@ -84,7 +84,6 @@ const config: NuxtConfig = {
     { src: '@/plugins/settings', ssr: false },
     { src: '@/plugins/fetcher', ssr: false },
     { src: '@/plugins/viewedSync', ssr: false },
-    { src: '@/plugins/vue-long-click', mode: 'client' },
   ],
 
   components: true,
