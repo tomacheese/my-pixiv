@@ -24,6 +24,8 @@ IMAGE_CACHE_DIR = os.environ.setdefault('IMAGE_CACHE_DIR', '/cache/images/')
 TWEET_CACHE_DIR = os.environ.setdefault('TWEET_CACHE_DIR', '/cache/tweets/')
 SHADOW_BAN_CACHE_DIR = os.environ.setdefault('SHADOW_BAN_CACHE_DIR', '/cache/shadow-ban/')
 
+TOKEN_SAVE_TIMESTAMP = 0
+
 
 def init_twitter_api(account: str = None):
     if not os.path.exists(CONFIG_FILE):
@@ -52,6 +54,7 @@ def search_tweet(word: str):
 
 
 def init_pixiv_api():
+    global TOKEN_SAVE_TIMESTAMP
     api = AppPixivAPI()
 
     if not os.path.exists(TOKEN_FILE):
@@ -60,10 +63,14 @@ def init_pixiv_api():
     with open(TOKEN_FILE, 'r') as f:
         prev = json.load(f)
         token = api.auth(None, None, prev["refresh_token"])
-    with open(TOKEN_FILE, "w", encoding="utf-8") as f:
-        f.write(json.dumps(token))
+
+    if (TOKEN_SAVE_TIMESTAMP + 86400) < time.time():
+        with open(TOKEN_FILE, 'w') as f:
+            json.dump(token, f)
+        TOKEN_SAVE_TIMESTAMP = time.time()
 
     return api
+
 
 
 def pixiv_download(url: str,
