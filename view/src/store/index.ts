@@ -2,6 +2,7 @@ import { getAccessorType } from 'typed-vuex'
 
 import * as settings from '@/store/settings'
 import * as viewed from '@/store/viewed'
+import * as itemMute from '@/store/itemMute'
 
 export const state = () => {
   return {}
@@ -18,5 +19,6 @@ export const accessorType = getAccessorType({
   modules: {
     settings,
     viewed,
+    itemMute,
   },
 })

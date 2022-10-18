@@ -121,20 +121,16 @@ export default Vue.extend({
       this.isLoading = true
 
       const targetType = this.item.type ? 'ILLUST' : 'NOVEL'
-      if (
-        this.$accessor.settings.muted.some(
-          (m) => m.targetId === this.item.id && m.targetType === targetType
-        )
-      ) {
+      if (this.$accessor.itemMute.isMuted(this.item.id, targetType)) {
         this.snackbarType = 'ALREADY_ADDED'
         this.isSnackbar = true
         this.isLoading = false
         return
       }
 
-      this.$accessor.settings.addMuteItem({
-        targetType,
-        targetId: this.item.id,
+      this.$accessor.itemMute.addMute({
+        type: targetType,
+        id: this.item.id,
       })
       this.$nuxt.$emit('update-mutes')
 
@@ -147,9 +143,9 @@ export default Vue.extend({
     addAuthorMute(): void {
       this.isLoading = true
 
-      this.$accessor.settings.addMuteItem({
-        targetType: 'USER',
-        targetId: this.item.user.id,
+      this.$accessor.itemMute.addMute({
+        type: 'USER',
+        id: this.item.user.id,
       })
       this.$nuxt.$emit('update-mutes')
 

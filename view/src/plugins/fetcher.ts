@@ -1,6 +1,7 @@
 import type { NuxtRuntimeConfig } from '@nuxt/types/config/runtime'
 import type { NuxtAxiosInstance } from '@nuxtjs/axios'
-import { Filter, MuteItem, Target, TargetType } from '@/store/settings'
+import { Context } from '@nuxt/types'
+import { Filter, Target, TargetType } from '@/store/settings'
 import {
   PixivItem,
   PixivItemRecommended,
@@ -10,21 +11,20 @@ import {
 export class Fetcher {
   private $config: NuxtRuntimeConfig
   private $axios: NuxtAxiosInstance
+  private $accessor: Context['$accessor']
   private readonly targetType: TargetType
   private readonly globalFilter: Filter[]
-  private readonly mutedItems: MuteItem[]
   private recommendedNextUrl: string | null = null
   public constructor(
     $config: NuxtRuntimeConfig,
     $axios: NuxtAxiosInstance,
-    globalFilter: Filter[],
-    mutedItems: MuteItem[],
+    $accessor: Context['$accessor'],
     targetType: TargetType
   ) {
     this.$axios = $axios
     this.$config = $config
-    this.globalFilter = globalFilter
-    this.mutedItems = mutedItems
+    this.$accessor = $accessor
+    this.globalFilter = $accessor.settings.filters
     this.targetType = targetType
   }
 
@@ -67,7 +67,7 @@ export class Fetcher {
 
     return data
       .filter((item) => !this.isFilterItem(null, item))
-      .filter((item) => !Fetcher.isMutedItem(this.mutedItems, item))
+      .filter((item) => !this.isMutedItem(item))
   }
 
   public isLoadMoreAvailable() {
@@ -91,7 +91,7 @@ export class Fetcher {
           resolve(
             data
               .filter((item) => !this.isFilterItem(target, item))
-              .filter((item) => !Fetcher.isMutedItem(this.mutedItems, item))
+              .filter((item) => !this.isMutedItem(item))
               .filter(
                 (item: PixivItem) => item.total_bookmarks >= target.minLikeCount
               )
@@ -183,17 +183,17 @@ export class Fetcher {
       : false
   }
 
-  public static isMutedItem(mutedItems: MuteItem[], item: PixivItem) {
-    return mutedItems.some((mutedItem) => {
-      switch (mutedItem.targetType) {
+  public isMutedItem(item: PixivItem) {
+    return this.$accessor.itemMute.items.some((mutedItem) => {
+      switch (mutedItem.type) {
         case 'ILLUST':
           // イラストとマンガの場合は item.type が undefined ではない
-          return item.type !== undefined && item.id === mutedItem.targetId
+          return item.type !== undefined && item.id === mutedItem.id
         case 'NOVEL':
           // 小説の場合は item.type が undefined
-          return item.type === undefined && item.id === mutedItem.targetId
+          return item.type === undefined && item.id === mutedItem.id
         case 'USER':
-          return item.user.id === mutedItem.targetId
+          return item.user.id === mutedItem.id
         default:
           return false
       }
