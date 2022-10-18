@@ -1,16 +1,16 @@
 {
-	"folders": [
-		{
-			"name": "view",
-			"path": "view"
-		},
-		{
-			"name": "api",
-			"path": "api"
-		},
-		{
-			"name": "my-pixiv",
-			"path": "."
-		}
-	]
+  "folders": [
+    {
+      "name": "view",
+      "path": "view"
+    },
+    {
+      "name": "api",
+      "path": "api"
+    },
+    {
+      "name": "my-pixiv",
+      "path": "."
+    }
+  ]
 }

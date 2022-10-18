@@ -13,7 +13,7 @@
           label="アイテム種別"
         ></v-select>
         <v-text-field
-          v-model="targetId"
+          v-model="id"
           label="ミュート対象のアイテムID"
           placeholder="例: 1234567890"
           :rules="[(v) => !!v || '必須項目です']"
@@ -30,35 +30,35 @@
     <v-list class="my-3">
       <v-list-item v-for="(item, i) of getItems()" :key="i" @click="open(item)">
         <v-list-item-icon>
-          <v-icon>{{ getTypeIcon(item.targetType) }}</v-icon>
+          <v-icon>{{ getTypeIcon(item.type) }}</v-icon>
         </v-list-item-icon>
 
-        <v-list-item-content v-if="item.detail">
-          <v-list-item-title v-if="item.targetType !== 'USER'" class="wrap-text"
-            >{{ item.detail.title }}
+        <v-list-item-content v-if="getDetails(item)">
+          <v-list-item-title v-if="item.type !== 'USER'" class="wrap-text"
+            >{{ getDetails(item).title }}
           </v-list-item-title>
-          <v-list-item-title v-else>{{ item.detail.name }} </v-list-item-title>
+          <v-list-item-title v-else
+            >{{ getDetails(item).name }}
+          </v-list-item-title>
 
-          <v-list-item-subtitle v-if="item.targetType !== 'USER'">
-            {{ getTypeName(item.targetType) }} ―
-            {{ item.detail.user.name }}</v-list-item-subtitle
+          <v-list-item-subtitle v-if="item.type !== 'USER'">
+            {{ getTypeName(item.type) }} ―
+            {{ getDetails(item).user.name }}</v-list-item-subtitle
           >
           <v-list-item-subtitle v-else>{{
-            getTypeName(item.targetType)
+            getTypeName(item.type)
           }}</v-list-item-subtitle>
         </v-list-item-content>
         <v-list-item-content v-else-if="item.detail === undefined">
           <v-list-item-title>読み込み中</v-list-item-title>
           <v-list-item-subtitle>
-            {{ getTypeName(item.targetType) }} ―
-            {{ item.targetId }}</v-list-item-subtitle
+            {{ getTypeName(item.type) }} ― {{ item.id }}</v-list-item-subtitle
           >
         </v-list-item-content>
         <v-list-item-content v-else>
           <v-list-item-title>読み込み失敗</v-list-item-title>
           <v-list-item-subtitle>
-            {{ getTypeName(item.targetType) }} ―
-            {{ item.targetId }}</v-list-item-subtitle
+            {{ getTypeName(item.type) }} ― {{ item.id }}</v-list-item-subtitle
           >
         </v-list-item-content>
         <v-list-item-action>
@@ -78,13 +78,19 @@
     </v-list>
 
     <v-pagination v-model="page" :length="pageCount" circle></v-pagination>
+
+    <v-switch
+      v-model="isAutoSyncMutes"
+      label="WebSocketを使用したリアルタイムミュート更新"
+      @change="onAutoSyncMutesChange"
+    />
   </v-container>
 </template>
 
 <script lang="ts">
 import Vue from 'vue'
 import { PixivItem } from '@/types/pixivItem'
-import { MuteItem, MuteTargetType } from '@/store/settings'
+import { MuteItem, MuteTargetType } from '@/store/itemMute'
 
 const targetsMap: {
   [key in MuteTargetType]: string
@@ -94,22 +100,20 @@ const targetsMap: {
   USER: 'ユーザー',
 }
 
-type Item = MuteItem & {
-  detail?: PixivItem | null
-}
-
 export default Vue.extend({
   name: 'MutedItemSettings',
   data(): {
-    targetId: string
+    id: string
     targetType: { key: string; name: string }
     targetTypes: { key: string; name: string }[]
     page: number
     pageCount: number
-    items: Item[]
+    items: MuteItem[]
+    details: { [key: string]: PixivItem | null }
+    isAutoSyncMutes: boolean
   } {
     return {
-      targetId: '',
+      id: '',
       targetType: {
         key: 'ILLUST',
         name: 'イラスト・マンガ',
@@ -121,14 +125,25 @@ export default Vue.extend({
       page: 1,
       pageCount: 1,
       items: [],
+      details: {},
+      isAutoSyncMutes: false,
     }
   },
   mounted() {
     this.fetch()
+
+    this.isAutoSyncMutes = this.$accessor.settings.isAutoSyncMutes
+
+    setInterval(() => {
+      if (!this.isAutoSyncMutes || !this.$accessor.settings.isAutoSyncMutes) {
+        return
+      }
+      this.fetch()
+    }, 1000)
   },
   methods: {
     fetch() {
-      this.items = this.$accessor.settings.muted.map((item) => ({
+      this.items = this.$accessor.itemMute.items.map((item) => ({
         ...item,
         detail: undefined,
       }))
@@ -146,8 +161,7 @@ export default Vue.extend({
       if (
         this.items.some(
           (item) =>
-            item.targetId === parseInt(this.targetId) &&
-            item.targetType === this.targetType.key
+            item.id === parseInt(this.id) && item.type === this.targetType.key
         )
       ) {
         this.$nuxt.$emit('snackbar', {
@@ -156,11 +170,11 @@ export default Vue.extend({
         })
         return
       }
-      this.$accessor.settings.addMuteItem({
-        targetType: this.targetType.key as MuteTargetType,
-        targetId: parseInt(this.targetId),
+      this.$accessor.itemMute.addMute({
+        type: this.targetType.key as MuteTargetType,
+        id: parseInt(this.id),
       })
-      this.targetId = ''
+      this.id = ''
       this.targetType = {
         key: 'ILLUST',
         name: 'イラスト・マンガ',
@@ -168,46 +182,45 @@ export default Vue.extend({
 
       this.fetch()
     },
-    remove(item: Item) {
-      this.$accessor.settings.removeMuteItem(item)
+    remove(item: MuteItem) {
+      this.$accessor.itemMute.removeMute(item)
       this.fetch()
     },
-    open(item: Item) {
-      switch (item.targetType) {
+    open(item: MuteItem) {
+      switch (item.type) {
         case 'ILLUST':
-          window.open(
-            `https://www.pixiv.net/artworks/${item.targetId}`,
-            '_blank'
-          )
+          window.open(`https://www.pixiv.net/artworks/${item.id}`, '_blank')
           break
         case 'NOVEL':
           window.open(
-            `https://www.pixiv.net/novel/show.php?id=${item.targetId}`,
+            `https://www.pixiv.net/novel/show.php?id=${item.id}`,
             '_blank'
           )
           break
         case 'USER':
-          window.open(`https://www.pixiv.net/users/${item.targetId}`, '_blank')
+          window.open(`https://www.pixiv.net/users/${item.id}`, '_blank')
           break
       }
     },
-    getItems(): Item[] {
+    getDetails(item: MuteItem) {
+      return this.details[item.id]
+    },
+    getItems(): MuteItem[] {
       const items = this.items.slice((this.page - 1) * 10, this.page * 10)
       for (const item of items) {
-        if (item.detail !== undefined || item.detail === null) {
+        const detail = this.details[item.id]
+        if (detail !== undefined || detail === null) {
           continue
         }
         this.$axios
-          .get(`/api/${item.targetType.toLocaleLowerCase()}/${item.targetId}`)
+          .get(`/api/${item.type.toLocaleLowerCase()}/${item.id}`)
           .then((res) => {
-            this.items = this.items.map((i) =>
-              i.targetId === item.targetId ? { ...i, detail: res.data } : i
-            )
+            this.details[item.id] = res.data
           })
           .catch((err) => {
             this.items = this.items.map((i) => {
-              if (i.targetId === item.targetId) {
-                i.detail = null
+              if (i.id === item.id) {
+                this.details[i.id] = null
               }
               return i
             })
@@ -234,28 +247,46 @@ export default Vue.extend({
       const novelUrlRegex =
         /https:\/\/www\.pixiv\.net\/novel\/show\.php\?id=(\d+)/
       const userUrlRegex = /https:\/\/www\.pixiv\.net\/users\/(\d+)/
-      const illustUrlMatch = illustUrlRegex.exec(this.targetId)
-      const novelUrlMatch = novelUrlRegex.exec(this.targetId)
-      const userUrlMatch = userUrlRegex.exec(this.targetId)
+      const illustUrlMatch = illustUrlRegex.exec(this.id)
+      const novelUrlMatch = novelUrlRegex.exec(this.id)
+      const userUrlMatch = userUrlRegex.exec(this.id)
       if (illustUrlMatch) {
         this.targetType = {
           key: 'ILLUST',
           name: 'イラスト・マンガ',
         }
-        this.targetId = illustUrlMatch[1]
+        this.id = illustUrlMatch[1]
       } else if (novelUrlMatch) {
         this.targetType = {
           key: 'NOVEL',
           name: '小説',
         }
-        this.targetId = novelUrlMatch[1]
+        this.id = novelUrlMatch[1]
       } else if (userUrlMatch) {
         this.targetType = {
           key: 'USER',
           name: 'ユーザー',
         }
-        this.targetId = userUrlMatch[1]
+        this.id = userUrlMatch[1]
       }
+    },
+    onAutoSyncMutesChange(val: boolean) {
+      if (
+        !confirm(
+          `リアルタイム既読更新を${
+            val ? '有効' : '無効'
+          }にしますか？\n「はい」をクリックすると、ページが再読み込みされます。`
+        )
+      ) {
+        this.$nextTick(() => {
+          this.isAutoSyncMutes = !val
+        })
+        return
+      }
+      this.$accessor.settings.setAutoSyncMutes(val)
+      this.$nextTick(() => {
+        location.reload()
+      })
     },
   },
 })

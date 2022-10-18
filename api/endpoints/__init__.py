@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from api.endpoints import illust, manga, novel, search, images, like, recommended, settings_sync, tweet, user, viewed
+from api.endpoints import illust, manga, novel, search, images, like, recommended, settings_sync, tweet, user, viewed, itemMutes
 
 router = APIRouter(prefix="/api")
 
@@ -21,3 +21,4 @@ router.include_router(tweet.router)
 router.include_router(viewed.router)
 router.include_router(settings_sync.router)
 router.include_router(recommended.router)
+router.include_router(itemMutes.router)

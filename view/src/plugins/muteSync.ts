@@ -1,53 +1,54 @@
 import { Context } from '@nuxt/types'
 import { NuxtRuntimeConfig } from '@nuxt/types/config/runtime'
 import { ConstantBackoff, Websocket, WebsocketBuilder } from 'websocket-ts'
+import { MuteItem, MuteTargetType } from '@/store/itemMute'
 
-interface GetAllViewedData {
-  action: 'get-all-viewed'
-  type: 'illust' | 'novel'
-  itemIds: number[]
+interface GetAllMuteData {
+  action: 'get-all-mutes'
+  items: MuteItem[]
 }
 
-interface AddViewedData {
-  action: 'add-viewed'
-  type: 'illust' | 'novel'
-  itemId: number
+interface AddMuteData {
+  action: 'add-mute'
+  item: {
+    type: MuteTargetType
+    id: number
+  }
 }
 
-type IWebSocket = GetAllViewedData | AddViewedData
+interface RemoveMuteData {
+  action: 'remove-mute'
+  item: {
+    type: MuteTargetType
+    id: number
+  }
+}
+
+type IWebSocket = GetAllMuteData | AddMuteData | RemoveMuteData
 
 let client: Websocket | null = null
 let $accessor: Context['$accessor'] | null = null
 let $config: NuxtRuntimeConfig | null = null
 
-function actionGetAllViewed(data: GetAllViewedData) {
-  console.log('actionGetAllViewed', data)
-  switch (data.type) {
-    case 'illust':
-      $accessor?.viewed.setAllVieweds({
-        illusts: data.itemIds,
-        novels: undefined,
-      })
-      break
-    case 'novel':
-      $accessor?.viewed.setAllVieweds({
-        illusts: undefined,
-        novels: data.itemIds,
-      })
-      break
-  }
+function actionGetAllMutes(data: GetAllMuteData) {
+  console.log('actionGetAllMutes', data)
+  $accessor?.itemMute.setAllMutes(data)
 }
 
-function actionAddViewed(data: AddViewedData) {
-  console.log('actionAddViewed', data)
-  switch (data.type) {
-    case 'illust':
-      $accessor?.viewed.addIllustId(data.itemId)
-      break
-    case 'novel':
-      $accessor?.viewed.addNovelId(data.itemId)
-      break
-  }
+function actionAddMute(data: AddMuteData) {
+  console.log('actionAddMute', data)
+  $accessor?.itemMute.addMute({
+    type: data.item.type,
+    id: data.item.id,
+  })
+}
+
+function actionRemoveMute(data: RemoveMuteData) {
+  console.log('actionRemoveMute', data)
+  $accessor?.itemMute.removeMute({
+    type: data.item.type,
+    id: data.item.id,
+  })
 }
 
 function onMessage(_: Websocket, message: MessageEvent<string>) {
@@ -57,11 +58,14 @@ function onMessage(_: Websocket, message: MessageEvent<string>) {
   }
 
   switch (data.action) {
-    case 'get-all-viewed':
-      actionGetAllViewed(data)
+    case 'get-all-mutes':
+      actionGetAllMutes(data)
       break
-    case 'add-viewed':
-      actionAddViewed(data)
+    case 'add-mute':
+      actionAddMute(data)
+      break
+    case 'remove-mute':
+      actionRemoveMute(data)
       break
     default:
       console.warn(
@@ -78,25 +82,18 @@ function onMessage(_: Websocket, message: MessageEvent<string>) {
 }
 
 function onOpen(ws: Websocket) {
-  console.log('WebSocket[ViewedSync]: connected')
+  console.log('WebSocket[MuteSync]: connected')
 
   // 接続時はすべてのデータを更新
   ws.send(
     JSON.stringify({
-      action: 'get-all-viewed',
-      type: 'illust',
-    })
-  )
-  ws.send(
-    JSON.stringify({
-      action: 'get-all-viewed',
-      type: 'novel',
+      action: 'get-all-mutes',
     })
   )
 }
 
 function onClose(_: Websocket, event: CloseEvent) {
-  console.log('WebSocket[ViewedSync]: closed', event)
+  console.log('WebSocket[MuteSync]: closed', event)
 
   if ($accessor && $config && $accessor.settings.autoSyncVieweds) {
     client = createClient($config)
@@ -108,7 +105,7 @@ function onError(_: Websocket, event: Event) {
 }
 
 function onRetry() {
-  console.log('WebSocket[ViewedSync]: retry')
+  console.log('WebSocket[MuteSync]: retry')
 }
 
 export function getClient() {
@@ -121,7 +118,7 @@ function createClient($config: NuxtRuntimeConfig) {
     $config.baseURL === '/'
       ? `${location.host}/`
       : $config.baseURL.replace(/https?:\/\//, '')
-  return new WebsocketBuilder(`${protocol}://${domain}api/viewed`)
+  return new WebsocketBuilder(`${protocol}://${domain}api/itemMutes`)
     .onOpen(onOpen)
     .onClose(onClose)
     .onMessage(onMessage)
@@ -132,7 +129,7 @@ function createClient($config: NuxtRuntimeConfig) {
 }
 
 export default (context: Context) => {
-  if (!context.$accessor.settings.autoSyncVieweds) {
+  if (!context.$accessor.settings.autoSyncMutes) {
     return
   }
   $accessor = context.$accessor

@@ -87,8 +87,11 @@ export default Vue.extend({
     }
 
     this.$nuxt.$on('update-mutes', () => {
+      if (!this.fetcher) {
+        return
+      }
       this.items = this.items.filter((item) => {
-        return !Fetcher.isMutedItem(this.$accessor.settings.muted, item)
+        return !this.fetcher?.isMutedItem(item)
       })
     })
   },
@@ -100,8 +103,7 @@ export default Vue.extend({
         this.fetcher = new Fetcher(
           this.$config,
           this.$axios,
-          this.$accessor.settings.filters,
-          this.$accessor.settings.muted,
+          this.$accessor,
           this.targetType
         )
       }

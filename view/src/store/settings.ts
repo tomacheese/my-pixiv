@@ -16,19 +16,13 @@ export interface Filter {
   value: string
 }
 
-export type MuteTargetType = 'ILLUST' | 'NOVEL' | 'USER'
-
-export interface MuteItem {
-  targetType: MuteTargetType
-  targetId: number
-}
-
 export type ActionPosition = 'LEFT' | 'RIGHT'
 
 interface Settings {
   isDarkMode: boolean
   isOnlyNew: boolean
   isAutoSyncVieweds: boolean
+  isAutoSyncMutes: boolean
   viewType: ViewType
   novelViewType: ViewType
   paginationLimit: number
@@ -37,13 +31,13 @@ interface Settings {
   headerSticky: boolean
   targets: Target[]
   filters: Filter[]
-  muted: MuteItem[]
 }
 
 export const state = (): Settings => ({
   isDarkMode: false,
   isOnlyNew: false,
   isAutoSyncVieweds: false,
+  isAutoSyncMutes: false,
   viewType: 'PAGINATION',
   novelViewType: 'PAGINATION',
   paginationLimit: 10,
@@ -52,7 +46,6 @@ export const state = (): Settings => ({
   headerSticky: false,
   targets: [],
   filters: [],
-  muted: [],
 })
 
 export type RootState = ReturnType<typeof state>
@@ -62,6 +55,7 @@ export const getters = getterTree(state, {
   darkMode: (state) => state.isDarkMode,
   onlyNew: (state) => state.isOnlyNew,
   autoSyncVieweds: (state) => state.isAutoSyncVieweds,
+  autoSyncMutes: (state) => state.isAutoSyncMutes,
   viewType: (state) => state.viewType,
   novelViewType: (state) => state.novelViewType,
   paginationLimit: (state) => state.paginationLimit,
@@ -75,7 +69,6 @@ export const getters = getterTree(state, {
     )
   },
   filters: (state) => state.filters,
-  muted: (state) => state.muted,
 })
 
 export const mutations = mutationTree(state, {
@@ -85,6 +78,8 @@ export const mutations = mutationTree(state, {
     if (settings.isOnlyNew !== undefined) state.isOnlyNew = settings.isOnlyNew
     if (settings.isAutoSyncVieweds !== undefined)
       state.isAutoSyncVieweds = settings.isAutoSyncVieweds
+    if (settings.isAutoSyncMutes !== undefined)
+      state.isAutoSyncMutes = settings.isAutoSyncMutes
     if (settings.viewType !== undefined) state.viewType = settings.viewType
     if (settings.novelViewType !== undefined)
       state.novelViewType = settings.novelViewType
@@ -98,7 +93,6 @@ export const mutations = mutationTree(state, {
       state.headerSticky = settings.headerSticky
     if (settings.targets !== undefined) state.targets = settings.targets
     if (settings.filters !== undefined) state.filters = settings.filters
-    if (settings.muted !== undefined) state.muted = settings.muted
   },
   setDarkMode(state, isDarkMode: boolean) {
     state.isDarkMode = isDarkMode
@@ -108,6 +102,9 @@ export const mutations = mutationTree(state, {
   },
   setAutoSyncVieweds(state, isAutoSyncVieweds: boolean) {
     state.isAutoSyncVieweds = isAutoSyncVieweds
+  },
+  setAutoSyncMutes(state, isAutoSyncMutes: boolean) {
+    state.isAutoSyncMutes = isAutoSyncMutes
   },
   setViewType(state, viewType: ViewType) {
     state.viewType = viewType
@@ -132,9 +129,6 @@ export const mutations = mutationTree(state, {
   },
   setFilters(state, filters: Filter[]) {
     state.filters = filters
-  },
-  setMuted(state, muted: MuteItem[]) {
-    state.muted = muted
   },
 })
 
@@ -177,19 +171,6 @@ export const actions = actionTree(
         'setFilters',
         state.filters.filter(
           (f) => f.type !== filter.type || f.value !== filter.value
-        )
-      )
-    },
-    addMuteItem({ state, commit }, muteItem: MuteItem) {
-      commit('setMuted', [...state.muted, muteItem])
-    },
-    removeMuteItem({ state, commit }, muteItem: MuteItem) {
-      commit(
-        'setMuted',
-        state.muted.filter(
-          (m) =>
-            m.targetType !== muteItem.targetType ||
-            m.targetId !== muteItem.targetId
         )
       )
     },

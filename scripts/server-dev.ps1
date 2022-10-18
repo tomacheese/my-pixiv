@@ -7,6 +7,7 @@ pip install -r requirements.txt
 $env:PIXIVPY_TOKEN_FILE = "data/token.json"
 $env:CONFIG_FILE = "data/config.json"
 $env:VIEWED_FILE = "data/viewed.json"
+$env:ITEM_MUTES_FILE = "data/item_mutes.json"
 $env:IMAGE_CACHE_DIR = "cache/images/"
 $env:ILLUST_CACHE_DIR = "cache/illusts/"
 $env:MANGA_CACHE_DIR = "cache/mangas/"
