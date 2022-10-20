@@ -1,3 +1,4 @@
+import asyncio
 import json
 import os
 import re
@@ -245,7 +246,7 @@ def get_image(url: str,
     return FileResponse(path, media_type="image/png")
 
 
-def get_search_tweets(illust_id: str):
+async def get_search_tweets(illust_id: str):
     pixiv_api = init_pixiv_api()
 
     result = pixiv_api.illust_detail(illust_id)
@@ -266,9 +267,9 @@ def get_search_tweets(illust_id: str):
     posted_at = datetime.fromisoformat(posted_at)
 
     # ツイートを検索
-    tweets = get_match_tweets(screen_names, posted_at, path)
+    tweets = await get_match_tweets(screen_names, posted_at, path)
     if len(tweets) == 0:
-        tweets = get_match_user_tweets(screen_names, posted_at, path)
+        tweets = await get_match_user_tweets(screen_names, posted_at, path)
 
     if len(tweets) == 0:
         return {
@@ -301,7 +302,7 @@ def get_illust_screen_names(pixiv_api: AppPixivAPI,
     return set(filter(lambda x: x != "", list(map(lambda x: x.lower(), screen_names))))
 
 
-def get_match_tweets(screen_names: set[str],
+async def get_match_tweets(screen_names: set[str],
                      posted_at: datetime,
                      image_path: str):
     # 投稿日の3日前
@@ -311,8 +312,7 @@ def get_match_tweets(screen_names: set[str],
     posted_at_after_3day = posted_at + timedelta(days=3)
     posted_at_after_3day = posted_at_after_3day.date().isoformat()
 
-    rets = []
-
+    checks = []
     for screen_name in screen_names:
         word = "from:{0} filter:images since:{1} until:{2} exclude:nativeretweets".format(screen_name,
                                                                                           posted_at_before_3day,
@@ -322,15 +322,12 @@ def get_match_tweets(screen_names: set[str],
         if tweets is None:
             raise HTTPException(status_code=404, detail="search tweets failed")
         for tweet in tweets:
-            checked = check_tweet(tweet, image_path, "search")
-            if checked is None:
-                continue
-            rets.append(checked)
+            checks.append(check_tweet(tweet, image_path, "search"))
 
-    return rets
+    return list(filter(lambda x: x is not None, await asyncio.gather(*checks)))
 
 
-def get_match_user_tweets(screen_names: set[str],
+async def get_match_user_tweets(screen_names: set[str],
                           posted_at: datetime,
                           image_path: str):
     # 投稿日の3日前
@@ -345,7 +342,7 @@ def get_match_user_tweets(screen_names: set[str],
     if api is None:
         return None
 
-    rets = []
+    checks = []
     for screen_name in screen_names:
         try:
             for tweet in tweepy.Cursor(api.user_timeline,
@@ -353,20 +350,20 @@ def get_match_user_tweets(screen_names: set[str],
                                        since_id=posted_at_before_3day_snowflake,
                                        max_id=posted_at_after_3day_snowflake,
                                        tweet_mode="extended").items():
-                checked = check_tweet(tweet, image_path, "user_timeline")
-                if checked is None:
-                    continue
-                rets.append(checked)
+                checks.append(check_tweet(tweet, image_path, "user_timeline"))
         except tweepy.errors.NotFound:
             print("NotFound: " + screen_name)
             continue
 
-    return rets
+    return list(filter(lambda x: x is not None, await asyncio.gather(*checks)))
 
 
-def check_tweet(tweet, image_path, identity):
+async def check_tweet(tweet, image_path, identity):
     print("check_tweet", tweet.id, tweet.created_at)
     if "media" not in tweet.entities:
+        return None
+    text = tweet.text if hasattr(tweet, "text") else tweet.full_text
+    if text.startswith("RT @"):
         return None
     for i in range(len(tweet.entities["media"])):
         media = tweet.entities["media"][i]
@@ -381,7 +378,7 @@ def check_tweet(tweet, image_path, identity):
         return {
             "tweet": {
                 "id": tweet.id_str,
-                "text": tweet.text if hasattr(tweet, "text") else tweet.full_text,
+                "text": text,
                 "media_url": media_url,
                 "user": {
                     "id": tweet.user.id_str,

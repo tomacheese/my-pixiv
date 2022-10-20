@@ -107,7 +107,10 @@ export default Vue.extend({
       this.isLiked = this.item.is_bookmarked
       this.page = 1
 
-      this.getTweets()
+      this.tweetStatus = 'LOADING'
+      setTimeout(() => {
+        this.getTweets()
+      }, 1000)
     },
   },
   mounted() {
@@ -166,7 +169,7 @@ export default Vue.extend({
             error: null,
           }
           this.checkShadowBan()
-          if (this.tweets.tweets.some((t) => t.similarity === 0)) {
+          if (this.tweets.tweets.some((t) => t.similarity >= 5)) {
             this.tweetStatus = 'EXACT_TWEET_FOUND'
             return
           }
