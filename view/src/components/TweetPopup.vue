@@ -228,7 +228,7 @@ export default Vue.extend({
         return 'green'
       }
       if (tweet.similarity <= 10) {
-        return 'yellow'
+        return 'blue'
       }
       return 'red'
     },
@@ -272,7 +272,9 @@ export default Vue.extend({
     getAccountColor(screenName: string) {
       if (
         !this.shadowBans.some(
-          (result) => result.profile.screen_name === screenName
+          (result) =>
+            result.profile.screen_name.toLowerCase() ===
+            screenName.toLowerCase()
         )
       ) {
         return 'grey'
