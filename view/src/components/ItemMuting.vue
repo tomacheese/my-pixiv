@@ -1,18 +1,8 @@
 <template>
   <div>
-    <div
-      onContextMenu="(e) => { e.preventDefault(); }"
-      class="item-muting-wrapper"
-      @mousedown="startPress"
-      @touchstart="startPress"
-      @mouseup="endPress"
-      @click="endPress"
-      @touchmove="endPress"
-      @touchend="endPress"
-      @touchcancel="endPress"
-    >
+    <VLongPress :on-long-press="onLongPress">
       <slot />
-    </div>
+    </VLongPress>
     <v-dialog v-model="isOpen" class="item-muting-selection">
       <v-card :loading="isLoading">
         <v-card-title>ミュート種別選択</v-card-title>
@@ -163,17 +153,8 @@ export default Vue.extend({
       this.snackbarType = 'ADDED_AUTHOR'
       this.isSnackbar = true
     },
-    startPress(): void {
-      console.log('startPress')
-      this.pressTimer = setTimeout(() => {
-        this.isOpen = true
-      }, 500)
-    },
-    endPress(): void {
-      console.log('endPress')
-      if (!this.pressTimer) return
-      clearTimeout(this.pressTimer)
-      this.pressTimer = null
+    onLongPress() {
+      this.isOpen = true
     },
   },
 })
