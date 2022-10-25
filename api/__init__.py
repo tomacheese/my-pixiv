@@ -171,7 +171,7 @@ def search_pixiv(item_type: str,
 
 
 def get_pixiv_item(item_type: str,
-                   item_id: str):
+                   item_id: Union[str, int]):
     api = init_pixiv_api()
     if item_type == "illust":
         func = api.illust_detail
@@ -193,7 +193,7 @@ def get_pixiv_item(item_type: str,
         raise Exception("item_type is invalid")
 
     # キャッシュ
-    path = os.path.join(cache_dir, "items", item_id + ".json")
+    path = os.path.join(cache_dir, "items", str(item_id) + ".json")
     os.makedirs(os.path.dirname(path), exist_ok=True)
 
     if os.path.exists(path):

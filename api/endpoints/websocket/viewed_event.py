@@ -45,6 +45,7 @@ class GetViewedApi:
         if item_type is None:
             await client.send_json({
                 "status": False,
+                "rid": data["rid"],
                 "type": data["type"],
                 "message": "type is required"
             })
@@ -52,6 +53,7 @@ class GetViewedApi:
         viewed = get_viewed(item_type)
         await client.send_json({
             "status": True,
+            "rid": data["rid"],
             "type": data["type"],
             "item_ids": viewed
         })
@@ -64,6 +66,7 @@ class AddViewedApi:
         if item is None:
             await client.send_json({
                 "status": False,
+                "rid": data["rid"],
                 "type": data["type"],
                 "message": "item is required"
             })
@@ -74,6 +77,7 @@ class AddViewedApi:
         if item_type is None or item_id is None:
             await client.send_json({
                 "status": False,
+                "rid": data["rid"],
                 "type": data["type"],
                 "message": "item.type and item.id is required"
             })
@@ -83,15 +87,19 @@ class AddViewedApi:
 
         await client.send_json({
             "status": True,
+            "rid": data["rid"],
             "type": data["type"]
         })
 
         for index, c in clients.items():
             if index == client.headers.get('sec-websocket-key'):
                 continue
-
-            await c.send_json({
-                "status": True,
-                "type": "shareAddViewed",
-                "item": item
-            })
+            try:
+                await c.send_json({
+                    "status": True,
+                    "rid": data["rid"],
+                    "type": "shareAddViewed",
+                    "item": item
+                })
+            except RuntimeError:
+                pass

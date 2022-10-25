@@ -10,6 +10,7 @@ class SearchTweetApi:
         if illust_id is None:
             await client.send_json({
                 "status": False,
+                "rid": data["rid"],
                 "type": data["type"],
                 "message": "illust_id is required"
             })
@@ -19,6 +20,7 @@ class SearchTweetApi:
         if result is None:
             await client.send_json({
                 "status": False,
+                "rid": data["rid"],
                 "type": data["type"],
                 "message": "failed to search tweet"
             })
@@ -26,6 +28,7 @@ class SearchTweetApi:
 
         await client.send_json({
             "status": True,
+            "rid": data["rid"],
             "type": data["type"],
             "screen_names": list(result["screen_names"]),
             "tweets": result["tweets"]
@@ -39,6 +42,7 @@ class CheckShadowBanApi:
         if screen_name is None:
             await client.send_json({
                 "status": False,
+                "rid": data["rid"],
                 "type": data["type"],
                 "message": "screen_name is required"
             })
@@ -48,6 +52,7 @@ class CheckShadowBanApi:
         if result is None:
             await client.send_json({
                 "status": False,
+                "rid": data["rid"],
                 "type": data["type"],
                 "message": "failed to check shadow ban"
             })
@@ -55,6 +60,7 @@ class CheckShadowBanApi:
 
         await client.send_json({
             "status": True,
+            "rid": data["rid"],
             "type": data["type"],
             "result": result
         })
@@ -67,6 +73,7 @@ class GetTweetLikeApi:
         if account is None:
             await client.send_json({
                 "status": False,
+                "rid": data["rid"],
                 "type": data["type"],
                 "message": "account is required"
             })
@@ -75,6 +82,7 @@ class GetTweetLikeApi:
         if tweet_id is None:
             await client.send_json({
                 "status": False,
+                "rid": data["rid"],
                 "type": data["type"],
                 "message": "tweet_id is required"
             })
@@ -84,6 +92,7 @@ class GetTweetLikeApi:
         if api is None:
             await client.send_json({
                 "status": False,
+                "rid": data["rid"],
                 "type": data["type"],
                 "message": "failed to init twitter api"
             })
@@ -93,6 +102,7 @@ class GetTweetLikeApi:
         if tweet is None:
             await client.send_json({
                 "status": False,
+                "rid": data["rid"],
                 "type": data["type"],
                 "message": "failed to get tweet"
             })
@@ -100,6 +110,7 @@ class GetTweetLikeApi:
 
         await client.send_json({
             "status": True,
+            "rid": data["rid"],
             "type": data["type"],
             "is_liked": tweet.favorited
         })
@@ -112,6 +123,7 @@ class AddTweetLikeApi:
         if account is None:
             await client.send_json({
                 "status": False,
+                "rid": data["rid"],
                 "type": data["type"],
                 "message": "account is required"
             })
@@ -120,6 +132,7 @@ class AddTweetLikeApi:
         if tweet_id is None:
             await client.send_json({
                 "status": False,
+                "rid": data["rid"],
                 "type": data["type"],
                 "message": "tweet_id is required"
             })
@@ -129,6 +142,7 @@ class AddTweetLikeApi:
         if api is None:
             await client.send_json({
                 "status": False,
+                "rid": data["rid"],
                 "type": data["type"],
                 "message": "failed to init twitter api"
             })
@@ -139,11 +153,13 @@ class AddTweetLikeApi:
 
             await client.send_json({
                 "status": True,
+                "rid": data["rid"],
                 "type": data["type"]
             })
         except Exception as e:
             await client.send_json({
                 "status": False,
+                "rid": data["rid"],
                 "type": data["type"],
                 "message": str(e)
             })
@@ -156,6 +172,7 @@ class RemoveTweetLikeApi:
         if account is None:
             await client.send_json({
                 "status": False,
+                "rid": data["rid"],
                 "type": data["type"],
                 "message": "account is required"
             })
@@ -164,6 +181,7 @@ class RemoveTweetLikeApi:
         if tweet_id is None:
             await client.send_json({
                 "status": False,
+                "rid": data["rid"],
                 "type": data["type"],
                 "message": "tweet_id is required"
             })
@@ -173,6 +191,7 @@ class RemoveTweetLikeApi:
         if api is None:
             await client.send_json({
                 "status": False,
+                "rid": data["rid"],
                 "type": data["type"],
                 "message": "failed to init twitter api"
             })
@@ -183,11 +202,13 @@ class RemoveTweetLikeApi:
 
             await client.send_json({
                 "status": True,
+                "rid": data["rid"],
                 "type": data["type"]
             })
         except Exception as e:
             await client.send_json({
                 "status": False,
+                "rid": data["rid"],
                 "type": data["type"],
                 "message": str(e)
             })

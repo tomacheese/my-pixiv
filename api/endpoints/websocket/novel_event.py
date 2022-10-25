@@ -10,6 +10,7 @@ class GetNovelApi:
         if novel_id is None:
             await client.send_json({
                 "status": False,
+                "rid": data["rid"],
                 "type": data["type"],
                 "message": "illust_id is required"
             })
@@ -19,6 +20,7 @@ class GetNovelApi:
         if item is None:
             await client.send_json({
                 "status": False,
+                "rid": data["rid"],
                 "type": data["type"],
                 "message": "novel not found"
             })
@@ -26,6 +28,7 @@ class GetNovelApi:
 
         await client.send_json({
             "status": True,
+            "rid": data["rid"],
             "type": data["type"],
             "item": item
         })
@@ -38,6 +41,7 @@ class SearchNovelApi:
         if word is None:
             await client.send_json({
                 "status": False,
+                "rid": data["rid"],
                 "type": data["type"],
                 "message": "word is required"
             })
@@ -47,6 +51,7 @@ class SearchNovelApi:
         if items is None:
             await client.send_json({
                 "status": False,
+                "rid": data["rid"],
                 "type": data["type"],
                 "message": "novel not found"
             })
@@ -54,6 +59,7 @@ class SearchNovelApi:
 
         await client.send_json({
             "status": True,
+            "rid": data["rid"],
             "type": data["type"],
             "items": items
         })
@@ -68,6 +74,7 @@ class RecommendedNovelApi:
         if "novels" not in result:
             await client.send_json({
                 "status": False,
+                "rid": data["rid"],
                 "type": data["type"],
                 "message": "novels not found"
             })
@@ -75,6 +82,7 @@ class RecommendedNovelApi:
 
         await client.send_json({
             "status": True,
+            "rid": data["rid"],
             "type": data["type"],
             "items": result["novels"],
             "next_url": result["next_url"]

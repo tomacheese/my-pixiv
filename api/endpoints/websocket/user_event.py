@@ -10,6 +10,7 @@ class GetUserApi:
         if user_id is None:
             await client.send_json({
                 "status": False,
+                "rid": data["rid"],
                 "type": data["type"],
                 "message": "user_id is required"
             })
@@ -19,6 +20,7 @@ class GetUserApi:
         if item is None:
             await client.send_json({
                 "status": False,
+                "rid": data["rid"],
                 "type": data["type"],
                 "message": "illust not found"
             })
@@ -26,6 +28,7 @@ class GetUserApi:
 
         await client.send_json({
             "status": True,
+            "rid": data["rid"],
             "type": data["type"],
             "item": item
         })

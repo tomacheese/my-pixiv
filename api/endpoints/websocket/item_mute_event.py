@@ -23,6 +23,7 @@ class GetItemMuteApi:
         mutes = get_mutes()
         await client.send_json({
             "status": True,
+            "rid": data["rid"],
             "type": data["type"],
             "items": mutes
         })
@@ -35,6 +36,7 @@ class AddItemMuteApi:
         if item is None:
             await client.send_json({
                 "status": False,
+                "rid": data["rid"],
                 "type": data["type"],
                 "message": "item is required"
             })
@@ -45,6 +47,7 @@ class AddItemMuteApi:
         if item_type is None or item_id is None:
             await client.send_json({
                 "status": False,
+                "rid": data["rid"],
                 "type": data["type"],
                 "message": "item.type and item.id is required"
             })
@@ -65,6 +68,7 @@ class AddItemMuteApi:
 
         await client.send_json({
             "status": True,
+            "rid": data["rid"],
             "type": data["type"]
         })
 
@@ -72,11 +76,15 @@ class AddItemMuteApi:
             if index == client.headers.get('sec-websocket-key'):
                 continue
 
-            await c.send_json({
-                "status": True,
-                "type": "shareAddItemMute",
-                "item": item
-            })
+            try:
+                await c.send_json({
+                    "status": True,
+                    "rid": data["rid"],
+                    "type": "shareAddItemMute",
+                    "item": item
+                })
+            except RuntimeError:
+                pass
 
 
 class RemoveItemMuteApi:
@@ -86,6 +94,7 @@ class RemoveItemMuteApi:
         if item is None:
             await client.send_json({
                 "status": False,
+                "rid": data["rid"],
                 "type": data["type"],
                 "message": "item is required"
             })
@@ -96,6 +105,7 @@ class RemoveItemMuteApi:
         if item_type is None or item_id is None:
             await client.send_json({
                 "status": False,
+                "rid": data["rid"],
                 "type": data["type"],
                 "message": "item.type and item.id is required"
             })
@@ -109,6 +119,7 @@ class RemoveItemMuteApi:
 
         await client.send_json({
             "status": True,
+            "rid": data["rid"],
             "type": data["type"]
         })
 
@@ -116,8 +127,12 @@ class RemoveItemMuteApi:
             if index == client.headers.get('sec-websocket-key'):
                 continue
 
-            await c.send_json({
-                "status": True,
-                "type": "shareRemoveItemMute",
-                "item": item
-            })
+            try:
+                await c.send_json({
+                    "status": True,
+                    "rid": data["rid"],
+                    "type": "shareRemoveItemMute",
+                    "item": item
+                })
+            except RuntimeError:
+                pass

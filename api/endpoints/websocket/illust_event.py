@@ -10,6 +10,7 @@ class GetIllustApi:
         if illust_id is None:
             await client.send_json({
                 "status": False,
+                "rid": data["rid"],
                 "type": data["type"],
                 "message": "illust_id is required"
             })
@@ -19,6 +20,7 @@ class GetIllustApi:
         if item is None:
             await client.send_json({
                 "status": False,
+                "rid": data["rid"],
                 "type": data["type"],
                 "message": "illust not found"
             })
@@ -26,6 +28,7 @@ class GetIllustApi:
 
         await client.send_json({
             "status": True,
+            "rid": data["rid"],
             "type": data["type"],
             "item": item
         })
@@ -38,6 +41,7 @@ class SearchIllustApi:
         if word is None:
             await client.send_json({
                 "status": False,
+                "rid": data["rid"],
                 "type": data["type"],
                 "message": "word is required"
             })
@@ -47,6 +51,7 @@ class SearchIllustApi:
         if items is None:
             await client.send_json({
                 "status": False,
+                "rid": data["rid"],
                 "type": data["type"],
                 "message": "illust not found"
             })
@@ -54,6 +59,7 @@ class SearchIllustApi:
 
         await client.send_json({
             "status": True,
+            "rid": data["rid"],
             "type": data["type"],
             "items": items
         })
@@ -68,6 +74,7 @@ class RecommendedIllustApi:
         if "illusts" not in result:
             await client.send_json({
                 "status": False,
+                "rid": data["rid"],
                 "type": data["type"],
                 "message": "illusts not found"
             })
@@ -75,6 +82,7 @@ class RecommendedIllustApi:
 
         await client.send_json({
             "status": True,
+            "rid": data["rid"],
             "type": data["type"],
             "items": result["illusts"],
             "next_url": result["next_url"]
@@ -88,6 +96,7 @@ class AddIllustLikeApi:
         if illust_id is None:
             await client.send_json({
                 "status": False,
+                "rid": data["rid"],
                 "type": data["type"],
                 "message": "item_id is required"
             })
@@ -98,6 +107,7 @@ class AddIllustLikeApi:
         if "error" in result:
             await client.send_json({
                 "status": False,
+                "rid": data["rid"],
                 "type": data["type"],
                 "message": result["error"]["user_message"]
             })
@@ -105,5 +115,6 @@ class AddIllustLikeApi:
 
         await client.send_json({
             "status": True,
+            "rid": data["rid"],
             "type": data["type"]
         })

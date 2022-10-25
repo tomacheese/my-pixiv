@@ -43,6 +43,7 @@ webSocketEndPoints = {
 
 
 async def execute(ws: WebSocket, text: str):
+    data = None
     data_type = None
     try:
         data = json.loads(text)
@@ -56,12 +57,14 @@ async def execute(ws: WebSocket, text: str):
             print(f"Unknown type: {data_type}")
             await ws.send_json({
                 "type": "error",
+                "rid": data["rid"],
                 "status": False,
                 "message": f"Unknown type: {data_type}"
             })
     except HTTPException as e:
         await ws.send_json({
             "status": False,
+            "rid": data["rid"] if data is not None and "rid" in data else None,
             "type": data_type,
             "code": e.status_code,
             "message": e.detail
@@ -70,6 +73,7 @@ async def execute(ws: WebSocket, text: str):
         traceback.print_exc()
         await ws.send_json({
             "status": False,
+            "rid": data["rid"] if data is not None and "rid" in data else None,
             "type": data_type,
             "message": str(e)
         })

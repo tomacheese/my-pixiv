@@ -70,13 +70,15 @@ export interface BaseRequest {
 }
 
 export interface BaseResponse {
-  type: string
   status: boolean
+  rid: number
+  type: string
 }
 
 interface BaseErrorResponse {
-  type: string
   status: false
+  rid: number
+  type: string
   code?: number
   message: string
 }
@@ -154,10 +156,11 @@ export class WSUtils {
     if (!this.ws) {
       throw new Error('WebSocket is not initialized')
     }
+    const rid = Date.now() / Math.random()
     return new Promise<Res>((resolve, reject) => {
       const event = (data: MessageEvent) => {
         const response = JSON.parse(data.data) as BaseResponseWithError
-        if (response.type !== type) {
+        if (response.type !== type || response.rid !== rid) {
           return
         }
         if (!response.status) {
@@ -176,14 +179,14 @@ export class WSUtils {
       setTimeout(() => {
         reject(new Error('timeout'))
         this.ws.removeEventListener('message', event)
-      }, 10000)
+      }, 15000)
 
       if (this.ws.readyState === WebSocket.CONNECTING) {
         this.ws.addEventListener('open', () => {
-          this.ws.send(JSON.stringify({ type, ...params }))
+          this.ws.send(JSON.stringify({ rid, type, ...params }))
         })
       } else {
-        this.ws.send(JSON.stringify({ type, ...params }))
+        this.ws.send(JSON.stringify({ rid, type, ...params }))
       }
     })
   }
