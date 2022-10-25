@@ -64,6 +64,7 @@ import TweetPopup, {
 import IllustPopupActions, { TweetStatus } from './IllustPopupActions.vue'
 import { PixivItem } from '@/types/pixivItem'
 import { ShadowBanResult } from '@/plugins/websocket/twitter'
+import { WebSocketAPIError } from '@/plugins/websocket'
 
 export default Vue.extend({
   components: {
@@ -169,7 +170,7 @@ export default Vue.extend({
             error: null,
           }
           this.checkShadowBan()
-          if (this.tweets.tweets.some((t) => t.similarity >= 5)) {
+          if (this.tweets.tweets.some((t) => t.similarity <= 5)) {
             this.tweetStatus = 'EXACT_TWEET_FOUND'
             return
           }
@@ -185,14 +186,12 @@ export default Vue.extend({
         })
         .catch((error) => {
           this.tweetStatus = 'FAILED'
-          if (error.response.status === 404) {
+          if (error instanceof WebSocketAPIError && error.data.code === 404) {
             this.tweets = {
               screen_names: [],
               tweets: [],
               error:
-                'ツイートが見つかりませんでした (' +
-                error.response.data.detail +
-                ')',
+                'ツイートが見つかりませんでした (' + error.data.message + ')',
             }
           } else {
             this.tweetStatus = 'FAILED'

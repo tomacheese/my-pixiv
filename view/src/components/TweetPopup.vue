@@ -222,10 +222,10 @@ export default Vue.extend({
       )
     },
     requestLike(tweet: Tweet, account: TwitterAccountType, isAdd: boolean) {
-      const func = isAdd
-        ? this.$api.twitter.addLike
-        : this.$api.twitter.removeLike
-      func(account, tweet.tweet.id)
+      const promise = isAdd
+        ? this.$api.twitter.addLike(account, tweet.tweet.id)
+        : this.$api.twitter.removeLike(account, tweet.tweet.id)
+      promise
         .then(() => {
           if (isAdd) {
             this.liked[account] = [...this.liked[account], tweet.tweet.id]

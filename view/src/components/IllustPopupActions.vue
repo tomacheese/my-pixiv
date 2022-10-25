@@ -124,9 +124,9 @@ export default Vue.extend({
     getTweetFoundColor(): string {
       switch (this.tweetStatus) {
         case 'EXACT_TWEET_FOUND':
-          return 'primary'
+          return '#1da1f2'
         case 'TWEET_FOUND':
-          return 'secondary'
+          return 'teal'
         case 'ACCOUNT_FOUND':
           if (this.isShadowBanned) {
             return 'orange'
