@@ -81,8 +81,8 @@ const config: NuxtConfig = {
   css: ['@/assets/scroll.css'],
 
   plugins: [
-    { src: '@/plugins/websocket.ts', ssr: false },
     { src: '@/plugins/settings.ts', ssr: false },
+    { src: '@/plugins/websocket.ts', ssr: false },
     { src: '@/plugins/fetcher.ts', ssr: false },
   ],
 

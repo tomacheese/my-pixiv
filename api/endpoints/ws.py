@@ -66,6 +66,13 @@ async def execute(ws: WebSocket, text: str):
             "code": e.status_code,
             "message": e.detail
         })
+    except Exception as e:
+        traceback.print_exc()
+        await ws.send_json({
+            "status": False,
+            "type": data_type,
+            "message": str(e)
+        })
 
 
 @router.websocket("")

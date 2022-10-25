@@ -69,7 +69,8 @@ export class ItemMuteAPI {
    */
   public get(): Promise<GetItemMuteResponse> {
     return this.utils.request<GetItemMuteRequest, GetItemMuteResponse>(
-      'getItemMute'
+      'getItemMute',
+      {}
     )
   }
 

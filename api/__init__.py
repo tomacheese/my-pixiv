@@ -5,6 +5,7 @@ import re
 import time
 from datetime import datetime, timedelta
 from pprint import pprint
+from typing import Union
 
 import imagehash
 import requests
@@ -76,14 +77,14 @@ def init_pixiv_api():
 
 def pixiv_download(url: str,
                    item_type: str,
-                   item_id: str):
+                   item_id: Union[str, int]):
     size_regex = re.compile(r"\d+x\d+")
     page_regex = re.compile(r"p\d+")
     size = size_regex.search(url).group(0)
     extension = url.split(".")[-1]
     page = None if page_regex.search(url) is None else page_regex.search(url).group(0)
     filename = size + ("" if page is None else "-" + page) + "." + extension
-    path = os.path.join(IMAGE_CACHE_DIR, item_type, item_id, filename)
+    path = os.path.join(IMAGE_CACHE_DIR, item_type, str(item_id), filename)
     os.makedirs(os.path.dirname(path), exist_ok=True)
 
     if os.path.exists(path):

@@ -51,8 +51,13 @@ export class ViewedAPI {
    *
    * @returns 既読追加レスポンス
    */
-  public get(): Promise<GetViewedResponse> {
-    return this.utils.request<GetViewedRequest, GetViewedResponse>('getViewed')
+  public get(itemType: ViewedItemType): Promise<GetViewedResponse> {
+    return this.utils.request<GetViewedRequest, GetViewedResponse>(
+      'getViewed',
+      {
+        item_type: itemType,
+      }
+    )
   }
 
   /**

@@ -77,6 +77,7 @@ export interface BaseResponse {
 interface BaseErrorResponse {
   type: string
   status: false
+  code?: number
   message: string
 }
 
@@ -148,7 +149,7 @@ export class WSUtils {
 
   public request<Req extends Request, Res extends Response>(
     type: Req['type'],
-    params?: Omit<Req, 'type'>
+    params: Omit<Req, 'type'>
   ): Promise<Res> {
     if (!this.ws) {
       throw new Error('WebSocket is not initialized')
@@ -160,7 +161,12 @@ export class WSUtils {
           return
         }
         if (!response.status) {
-          reject(new WebSocketAPIError('Request failed', response))
+          reject(
+            new WebSocketAPIError(
+              'Request failed',
+              response as BaseErrorResponse
+            )
+          )
           return
         }
         resolve(response as Res)
@@ -188,6 +194,7 @@ export class WSUtils {
  */
 export class WebSocketAPI {
   private ws!: WebSocket
+  private $accessor!: Context['$accessor']
 
   public illust!: IllustAPI
   public manga!: MangaAPI
@@ -197,15 +204,13 @@ export class WebSocketAPI {
   public itemMute!: ItemMuteAPI
   public viewed!: ViewedAPI
 
-  constructor(
-    $config: NuxtRuntimeConfig,
-    private $accessor: Context['$accessor']
-  ) {
+  constructor($config: NuxtRuntimeConfig, $accessor: Context['$accessor']) {
     const protocol = location.protocol === 'https:' ? 'wss' : 'ws'
     const domain =
       $config.baseURL === '/'
         ? `${location.host}/`
         : $config.baseURL.replace(/https?:\/\//, '')
+    this.$accessor = $accessor
 
     this.connect(`${protocol}://${domain}api/ws`)
   }
@@ -216,9 +221,9 @@ export class WebSocketAPI {
     }
 
     this.ws = new WebSocket(url ?? this.ws.url)
-    this.ws.addEventListener('open', this.onOpen)
-    this.ws.addEventListener('close', this.onClose)
-    this.ws.addEventListener('message', this.onMessage)
+    this.ws.addEventListener('open', this.onOpen.bind(this))
+    this.ws.addEventListener('close', this.onClose.bind(this))
+    this.ws.addEventListener('message', this.onMessage.bind(this))
 
     this.illust = new IllustAPI(this.ws)
     this.manga = new MangaAPI(this.ws)
@@ -231,6 +236,32 @@ export class WebSocketAPI {
 
   private onOpen() {
     console.log('[WebSocket] connected')
+
+    // ViewedとItemMuteの同期
+    if (this.$accessor.settings.isAutoSyncVieweds) {
+      Promise.all([this.viewed.get('illust'), this.viewed.get('novel')])
+        .then(([illust, novel]) => {
+          this.$accessor.viewed.setAllVieweds({
+            illusts: illust.item_ids,
+            novels: novel.item_ids,
+          })
+          console.log('[WebSocket] Viewed synced')
+        })
+        .catch((e) => {
+          console.error('[WebSocket] Viewed sync failed', e)
+        })
+    }
+    if (this.$accessor.settings.isAutoSyncMutes) {
+      this.itemMute
+        .get()
+        .then((mutes) => {
+          this.$accessor.itemMute.setAllMutes(mutes)
+          console.log('[WebSocket] ItemMute synced')
+        })
+        .catch((e) => {
+          console.error('[WebSocket] ItemMute sync failed', e)
+        })
+    }
   }
 
   private onClose(event: CloseEvent) {
@@ -270,7 +301,7 @@ export class WebSocketAPI {
 }
 
 export class WebSocketAPIError extends Error {
-  constructor(e: string, public data: any) {
+  constructor(e: string, public data: BaseErrorResponse) {
     super(e)
     this.name = new.target.name
 
