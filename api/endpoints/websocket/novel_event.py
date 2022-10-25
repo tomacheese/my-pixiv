@@ -12,7 +12,7 @@ class GetNovelApi:
                 "status": False,
                 "rid": data["rid"],
                 "type": data["type"],
-                "message": "illust_id is required"
+                "message": "novel_id is required"
             })
             return
 

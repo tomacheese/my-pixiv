@@ -49,7 +49,7 @@
             getTypeName(item.type)
           }}</v-list-item-subtitle>
         </v-list-item-content>
-        <v-list-item-content v-else-if="getDetails(item) === null">
+        <v-list-item-content v-else-if="getDetails(item) === undefined">
           <v-list-item-title>読み込み中</v-list-item-title>
           <v-list-item-subtitle>
             {{ getTypeName(item.type) }} ― {{ item.id }}</v-list-item-subtitle
