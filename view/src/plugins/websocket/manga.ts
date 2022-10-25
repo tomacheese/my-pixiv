@@ -1,4 +1,4 @@
-import { BaseRequest, BaseResponse, IWebSocket } from '../websocket'
+import { BaseRequest, BaseResponse, WSUtils } from '../websocket'
 import { PixivItem } from '@/types/pixivItem'
 
 /** マンガ取得リクエストモデル */
@@ -52,7 +52,12 @@ export interface AddMangaLikeResponse extends BaseResponse {
 /**
  * my-pixiv WebSocket Manga API
  */
-export class MangaAPI extends IWebSocket {
+export class MangaAPI {
+  private utils: WSUtils
+  constructor(ws: WebSocket) {
+    this.utils = new WSUtils(ws)
+  }
+
   /**
    * マンガを取得する
    *
@@ -60,7 +65,7 @@ export class MangaAPI extends IWebSocket {
    * @returns マンガ取得レスポンス
    */
   public get(mangaId: number): Promise<GetMangaResponse> {
-    return this.request<GetMangaRequest, GetMangaResponse>('getManga', {
+    return this.utils.request<GetMangaRequest, GetMangaResponse>('getManga', {
       manga_id: mangaId,
     })
   }
@@ -72,7 +77,7 @@ export class MangaAPI extends IWebSocket {
    * @returns 検索結果レスポンス
    */
   public searchByTag(word: string): Promise<SearchMangaResponse> {
-    return this.request<SearchMangaRequest, SearchMangaResponse>(
+    return this.utils.request<SearchMangaRequest, SearchMangaResponse>(
       'searchManga',
       {
         word,
@@ -89,12 +94,12 @@ export class MangaAPI extends IWebSocket {
   public recommended(
     nextUrl: string | null
   ): Promise<RecommendedMangaResponse> {
-    return this.request<RecommendedMangaRequest, RecommendedMangaResponse>(
-      'recommendedManga',
-      {
-        next_url: nextUrl,
-      }
-    )
+    return this.utils.request<
+      RecommendedMangaRequest,
+      RecommendedMangaResponse
+    >('recommendedManga', {
+      next_url: nextUrl,
+    })
   }
 
   /**
@@ -104,7 +109,7 @@ export class MangaAPI extends IWebSocket {
    * @returns 結果レスポンス
    */
   public addLike(mangaId: number): Promise<AddMangaLikeResponse> {
-    return this.request<AddMangaLikeRequest, AddMangaLikeResponse>(
+    return this.utils.request<AddMangaLikeRequest, AddMangaLikeResponse>(
       'addMangaLike',
       {
         manga_id: mangaId,

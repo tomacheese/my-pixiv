@@ -86,7 +86,7 @@ class AddViewedApi:
             "type": data["type"]
         })
 
-        for index, c in clients:
+        for index, c in clients.items():
             if index == client.headers.get('sec-websocket-key'):
                 continue
 

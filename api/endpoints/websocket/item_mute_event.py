@@ -63,7 +63,7 @@ class AddItemMuteApi:
         with open(ITEM_MUTES_FILE, "w") as f:
             json.dump(mutes, f)
 
-        for index, c in clients:
+        for index, c in clients.items():
             if index == client.headers.get('sec-websocket-key'):
                 continue
 
@@ -102,7 +102,7 @@ class RemoveItemMuteApi:
         with open(ITEM_MUTES_FILE, "w") as f:
             json.dump(mutes, f)
 
-        for index, c in clients:
+        for index, c in clients.items():
             if index == client.headers.get('sec-websocket-key'):
                 continue
 

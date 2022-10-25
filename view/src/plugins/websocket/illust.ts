@@ -1,4 +1,4 @@
-import { BaseRequest, BaseResponse, IWebSocket } from '../websocket'
+import { BaseRequest, BaseResponse, WSUtils } from '../websocket'
 import { PixivItem } from '@/types/pixivItem'
 
 /** イラスト取得リクエストモデル */
@@ -52,7 +52,12 @@ export interface AddIllustLikeResponse extends BaseResponse {
 /**
  * my-pixiv WebSocket Illust API
  */
-export class IllustAPI extends IWebSocket {
+export class IllustAPI {
+  private utils: WSUtils
+  constructor(ws: WebSocket) {
+    this.utils = new WSUtils(ws)
+  }
+
   /**
    * イラストを取得する
    *
@@ -60,9 +65,12 @@ export class IllustAPI extends IWebSocket {
    * @returns イラスト取得レスポンス
    */
   public get(illustId: number): Promise<GetIllustResponse> {
-    return this.request<GetIllustRequest, GetIllustResponse>('getIllust', {
-      illust_id: illustId,
-    })
+    return this.utils.request<GetIllustRequest, GetIllustResponse>(
+      'getIllust',
+      {
+        illust_id: illustId,
+      }
+    )
   }
 
   /**
@@ -72,7 +80,7 @@ export class IllustAPI extends IWebSocket {
    * @returns 検索結果レスポンス
    */
   public searchByTag(word: string): Promise<SearchIllustResponse> {
-    return this.request<SearchIllustRequest, SearchIllustResponse>(
+    return this.utils.request<SearchIllustRequest, SearchIllustResponse>(
       'searchIllust',
       {
         word,
@@ -89,12 +97,12 @@ export class IllustAPI extends IWebSocket {
   public recommended(
     nextUrl: string | null
   ): Promise<RecommendedIllustResponse> {
-    return this.request<RecommendedIllustRequest, RecommendedIllustResponse>(
-      'recommendedIllust',
-      {
-        next_url: nextUrl,
-      }
-    )
+    return this.utils.request<
+      RecommendedIllustRequest,
+      RecommendedIllustResponse
+    >('recommendedIllust', {
+      next_url: nextUrl,
+    })
   }
 
   /**
@@ -104,7 +112,7 @@ export class IllustAPI extends IWebSocket {
    * @returns 結果レスポンス
    */
   public addLike(illustId: number): Promise<AddIllustLikeResponse> {
-    return this.request<AddIllustLikeRequest, AddIllustLikeResponse>(
+    return this.utils.request<AddIllustLikeRequest, AddIllustLikeResponse>(
       'addIllustLike',
       {
         illust_id: illustId,

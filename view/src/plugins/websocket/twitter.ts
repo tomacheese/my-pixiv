@@ -1,4 +1,4 @@
-import { BaseRequest, BaseResponse, IWebSocket } from '../websocket'
+import { BaseRequest, BaseResponse, WSUtils } from '../websocket'
 import { Tweet } from '@/components/TweetPopup.vue'
 
 /** ツイート検索リクエストモデル */
@@ -91,7 +91,12 @@ export interface RemoveTweetLikeResponse extends BaseResponse {
 /**
  * my-pixiv WebSocket Twitter API
  */
-export class TwitterAPI extends IWebSocket {
+export class TwitterAPI {
+  private utils: WSUtils
+  constructor(ws: WebSocket) {
+    this.utils = new WSUtils(ws)
+  }
+
   /**
    * イラストをもとにツイートを検索する
    *
@@ -99,7 +104,7 @@ export class TwitterAPI extends IWebSocket {
    * @returns 検索結果
    */
   public searchByIllust(illustId: number): Promise<SearchTweetResponse> {
-    return this.request<SearchTweetRequest, SearchTweetResponse>(
+    return this.utils.request<SearchTweetRequest, SearchTweetResponse>(
       'searchTweet',
       {
         illust_id: illustId,
@@ -114,7 +119,7 @@ export class TwitterAPI extends IWebSocket {
    * @returns シャドウバンの確認結果
    */
   public checkShadowBan(screenName: string): Promise<CheckShadowBanResponse> {
-    return this.request<CheckShadowBanRequest, CheckShadowBanResponse>(
+    return this.utils.request<CheckShadowBanRequest, CheckShadowBanResponse>(
       'checkShadowBan',
       {
         screen_name: screenName,
@@ -126,7 +131,7 @@ export class TwitterAPI extends IWebSocket {
     account: TwitterAccountType,
     tweetId: string
   ): Promise<GetTweetLikeResponse> {
-    return this.request<GetTweetLikeRequest, GetTweetLikeResponse>(
+    return this.utils.request<GetTweetLikeRequest, GetTweetLikeResponse>(
       'getTweetLike',
       {
         account,
@@ -139,7 +144,7 @@ export class TwitterAPI extends IWebSocket {
     account: TwitterAccountType,
     tweetId: string
   ): Promise<AddTweetLikeResponse> {
-    return this.request<AddTweetLikeRequest, AddTweetLikeResponse>(
+    return this.utils.request<AddTweetLikeRequest, AddTweetLikeResponse>(
       'addTweetLike',
       {
         account,
@@ -152,7 +157,7 @@ export class TwitterAPI extends IWebSocket {
     account: TwitterAccountType,
     tweetId: string
   ): Promise<RemoveTweetLikeResponse> {
-    return this.request<RemoveTweetLikeRequest, RemoveTweetLikeResponse>(
+    return this.utils.request<RemoveTweetLikeRequest, RemoveTweetLikeResponse>(
       'removeTweetLike',
       {
         account,

@@ -1,5 +1,5 @@
 import { Context } from '@nuxt/types'
-import { BaseRequest, BaseResponse, IWebSocket } from '../websocket'
+import { BaseRequest, BaseResponse, WSUtils } from '../websocket'
 
 type ViewedItemType = 'illust' | 'novel'
 
@@ -40,14 +40,19 @@ export interface ShareAddViewedResponse extends BaseResponse {
 /**
  * my-pixiv WebSocket Viewed Sharing API
  */
-export class ViewedAPI extends IWebSocket {
+export class ViewedAPI {
+  private utils: WSUtils
+  constructor(ws: WebSocket) {
+    this.utils = new WSUtils(ws)
+  }
+
   /**
    * 既読のアイテムID一覧を取得する
    *
    * @returns 既読追加レスポンス
    */
   public get(): Promise<GetViewedResponse> {
-    return this.request<GetViewedRequest, GetViewedResponse>('getViewed')
+    return this.utils.request<GetViewedRequest, GetViewedResponse>('getViewed')
   }
 
   /**
@@ -57,9 +62,12 @@ export class ViewedAPI extends IWebSocket {
    * @returns 既読追加レスポンス
    */
   public add(item: ViewedItem): Promise<AddViewedResponse> {
-    return this.request<AddViewedRequest, AddViewedResponse>('addViewed', {
-      item,
-    })
+    return this.utils.request<AddViewedRequest, AddViewedResponse>(
+      'addViewed',
+      {
+        item,
+      }
+    )
   }
 
   /**

@@ -6,11 +6,13 @@ from starlette.websockets import WebSocket
 
 from api.endpoints.websocket import clients
 from api.endpoints.websocket.illust_event import AddIllustLikeApi, GetIllustApi, RecommendedIllustApi, SearchIllustApi
+from api.endpoints.websocket.item_mute_event import AddItemMuteApi, GetItemMuteApi, RemoveItemMuteApi
 from api.endpoints.websocket.manga_event import AddMangaLikeApi, GetMangaApi, RecommendedMangaApi, SearchMangaApi
 from api.endpoints.websocket.novel_event import GetNovelApi, RecommendedNovelApi, SearchNovelApi
 from api.endpoints.websocket.twitter_event import AddTweetLikeApi, CheckShadowBanApi, GetTweetLikeApi, \
     RemoveTweetLikeApi, SearchTweetApi
 from api.endpoints.websocket.user_event import GetUserApi
+from api.endpoints.websocket.viewed_event import AddViewedApi, GetViewedApi
 
 router = APIRouter(prefix="/ws")
 
@@ -32,6 +34,11 @@ webSocketEndPoints = {
     "getTweetLike": GetTweetLikeApi(),
     "addTweetLike": AddTweetLikeApi(),
     "removeTweetLike": RemoveTweetLikeApi(),
+    "getViewed": GetViewedApi(),
+    "addViewed": AddViewedApi(),
+    "getItemMute": GetItemMuteApi(),
+    "addItemMute": AddItemMuteApi(),
+    "removeItemMute": RemoveItemMuteApi(),
 }
 
 

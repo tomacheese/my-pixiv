@@ -1,4 +1,4 @@
-import { BaseRequest, BaseResponse, IWebSocket } from '../websocket'
+import { BaseRequest, BaseResponse, WSUtils } from '../websocket'
 import { PixivItem } from '@/types/pixivItem'
 
 /** 小説取得リクエストモデル */
@@ -41,7 +41,12 @@ export interface RecommendedNovelResponse extends BaseResponse {
 /**
  * my-pixiv WebSocket Novel API
  */
-export class NovelAPI extends IWebSocket {
+export class NovelAPI {
+  private utils: WSUtils
+  constructor(ws: WebSocket) {
+    this.utils = new WSUtils(ws)
+  }
+
   /**
    * 小説を取得する
    *
@@ -49,7 +54,7 @@ export class NovelAPI extends IWebSocket {
    * @returns 小説取得レスポンス
    */
   public get(novelId: number): Promise<GetNovelResponse> {
-    return this.request<GetNovelRequest, GetNovelResponse>('getNovel', {
+    return this.utils.request<GetNovelRequest, GetNovelResponse>('getNovel', {
       novel_id: novelId,
     })
   }
@@ -61,7 +66,7 @@ export class NovelAPI extends IWebSocket {
    * @returns 検索結果レスポンス
    */
   public searchByTag(word: string): Promise<SearchNovelResponse> {
-    return this.request<SearchNovelRequest, SearchNovelResponse>(
+    return this.utils.request<SearchNovelRequest, SearchNovelResponse>(
       'searchNovel',
       {
         word,
@@ -78,11 +83,11 @@ export class NovelAPI extends IWebSocket {
   public recommended(
     nextUrl: string | null
   ): Promise<RecommendedNovelResponse> {
-    return this.request<RecommendedNovelRequest, RecommendedNovelResponse>(
-      'recommendedNovel',
-      {
-        next_url: nextUrl,
-      }
-    )
+    return this.utils.request<
+      RecommendedNovelRequest,
+      RecommendedNovelResponse
+    >('recommendedNovel', {
+      next_url: nextUrl,
+    })
   }
 }

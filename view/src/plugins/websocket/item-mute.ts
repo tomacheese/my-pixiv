@@ -1,5 +1,5 @@
 import { Context } from '@nuxt/types'
-import { BaseRequest, BaseResponse, IWebSocket } from '../websocket'
+import { BaseRequest, BaseResponse, WSUtils } from '../websocket'
 
 export type MuteTargetType = 'ILLUST' | 'NOVEL' | 'USER'
 
@@ -56,14 +56,21 @@ export interface ShareRemoveItemMuteResponse extends BaseResponse {
 /**
  * my-pixiv WebSocket Item-Mute Sharing API
  */
-export class ItemMuteAPI extends IWebSocket {
+export class ItemMuteAPI {
+  private utils: WSUtils
+  constructor(ws: WebSocket) {
+    this.utils = new WSUtils(ws)
+  }
+
   /**
    * ミュートしているアイテムを取得する
    *
    * @returns アイテムミュート取得レスポンス
    */
   public get(): Promise<GetItemMuteResponse> {
-    return this.request<GetItemMuteRequest, GetItemMuteResponse>('getItemMute')
+    return this.utils.request<GetItemMuteRequest, GetItemMuteResponse>(
+      'getItemMute'
+    )
   }
 
   /**
@@ -73,7 +80,7 @@ export class ItemMuteAPI extends IWebSocket {
    * @returns アイテムミュート追加レスポンス
    */
   public add(item: ItemMute): Promise<AddItemMuteResponse> {
-    return this.request<AddItemMuteRequest, AddItemMuteResponse>(
+    return this.utils.request<AddItemMuteRequest, AddItemMuteResponse>(
       'addItemMute',
       {
         item,
@@ -88,7 +95,7 @@ export class ItemMuteAPI extends IWebSocket {
    * @returns アイテムミュート削除レスポンス
    */
   public remove(item: ItemMute): Promise<RemoveItemMuteResponse> {
-    return this.request<RemoveItemMuteRequest, RemoveItemMuteResponse>(
+    return this.utils.request<RemoveItemMuteRequest, RemoveItemMuteResponse>(
       'removeItemMute',
       {
         item,

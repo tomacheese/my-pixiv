@@ -1,4 +1,4 @@
-import { BaseRequest, BaseResponse, IWebSocket } from '../websocket'
+import { BaseRequest, BaseResponse, WSUtils } from '../websocket'
 import { PixivItem } from '@/types/pixivItem'
 
 /** ユーザー取得リクエストモデル */
@@ -16,7 +16,12 @@ export interface GetUserResponse extends BaseResponse {
 /**
  * my-pixiv WebSocket User API
  */
-export class UserAPI extends IWebSocket {
+export class UserAPI {
+  private utils: WSUtils
+  constructor(ws: WebSocket) {
+    this.utils = new WSUtils(ws)
+  }
+
   /**
    * ユーザーを取得する
    *
@@ -24,7 +29,7 @@ export class UserAPI extends IWebSocket {
    * @returns ユーザー取得レスポンス
    */
   public get(userId: number): Promise<GetUserResponse> {
-    return this.request<GetUserRequest, GetUserResponse>('getUser', {
+    return this.utils.request<GetUserRequest, GetUserResponse>('getUser', {
       user_id: userId,
     })
   }

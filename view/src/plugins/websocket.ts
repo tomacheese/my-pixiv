@@ -1,5 +1,4 @@
 import { NuxtRuntimeConfig } from '@nuxt/types/config/runtime'
-import WebSocket from 'ws'
 import { Context, Plugin } from '@nuxt/types'
 import {
   AddIllustLikeRequest,
@@ -131,7 +130,7 @@ export type Response =
   | AddViewedResponse
   | ShareAddViewedResponse
 
-export class IWebSocket {
+export class WSUtils {
   protected ws!: WebSocket
 
   constructor(ws: WebSocket | null) {
@@ -140,20 +139,23 @@ export class IWebSocket {
     }
   }
 
-  protected send(data: Request) {
+  public send(data: Request) {
     if (!this.ws) {
       throw new Error('WebSocket is not initialized')
     }
     this.ws.send(JSON.stringify(data))
   }
 
-  protected request<Req extends Request, Res extends Response>(
+  public request<Req extends Request, Res extends Response>(
     type: Req['type'],
     params?: Omit<Req, 'type'>
   ): Promise<Res> {
+    if (!this.ws) {
+      throw new Error('WebSocket is not initialized')
+    }
     return new Promise<Res>((resolve, reject) => {
-      const event = (data: WebSocket.RawData) => {
-        const response = JSON.parse(data.toString()) as BaseResponseWithError
+      const event = (data: MessageEvent) => {
+        const response = JSON.parse(data.data) as BaseResponseWithError
         if (response.type !== type) {
           return
         }
@@ -163,14 +165,20 @@ export class IWebSocket {
         }
         resolve(response as Res)
       }
-      this.ws.on('message', event)
+      this.ws.addEventListener('message', event)
 
       setTimeout(() => {
         reject(new Error('timeout'))
-        this.ws.off('message', event)
+        this.ws.removeEventListener('message', event)
       }, 10000)
 
-      this.send({ type, ...params } as Req)
+      if (this.ws.readyState === WebSocket.CONNECTING) {
+        this.ws.addEventListener('open', () => {
+          this.ws.send(JSON.stringify({ type, ...params }))
+        })
+      } else {
+        this.ws.send(JSON.stringify({ type, ...params }))
+      }
     })
   }
 }
@@ -178,7 +186,9 @@ export class IWebSocket {
 /**
  * my-pixiv WebSocket API
  */
-export class WebSocketAPI extends IWebSocket {
+export class WebSocketAPI {
+  private ws!: WebSocket
+
   public illust!: IllustAPI
   public manga!: MangaAPI
   public novel!: NovelAPI
@@ -191,7 +201,6 @@ export class WebSocketAPI extends IWebSocket {
     $config: NuxtRuntimeConfig,
     private $accessor: Context['$accessor']
   ) {
-    super(null)
     const protocol = location.protocol === 'https:' ? 'wss' : 'ws'
     const domain =
       $config.baseURL === '/'
@@ -207,9 +216,9 @@ export class WebSocketAPI extends IWebSocket {
     }
 
     this.ws = new WebSocket(url ?? this.ws.url)
-    this.ws.onopen = this.onOpen
-    this.ws.onclose = this.onClose
-    this.ws.onmessage = this.onMessage
+    this.ws.addEventListener('open', this.onOpen)
+    this.ws.addEventListener('close', this.onClose)
+    this.ws.addEventListener('message', this.onMessage)
 
     this.illust = new IllustAPI(this.ws)
     this.manga = new MangaAPI(this.ws)
@@ -217,13 +226,14 @@ export class WebSocketAPI extends IWebSocket {
     this.user = new UserAPI(this.ws)
     this.twitter = new TwitterAPI(this.ws)
     this.itemMute = new ItemMuteAPI(this.ws)
+    this.viewed = new ViewedAPI(this.ws)
   }
 
   private onOpen() {
     console.log('[WebSocket] connected')
   }
 
-  private onClose(event: WebSocket.CloseEvent) {
+  private onClose(event: CloseEvent) {
     console.log('[WebSocket] closed', event.code, event.reason)
 
     setTimeout(() => {
@@ -232,7 +242,7 @@ export class WebSocketAPI extends IWebSocket {
     })
   }
 
-  private onMessage(event: WebSocket.MessageEvent) {
+  private onMessage(event: MessageEvent) {
     const data = JSON.parse(event.data.toString()) as BaseResponseWithError
     if (!data.status) {
       return

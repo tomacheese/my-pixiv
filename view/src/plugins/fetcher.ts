@@ -33,6 +33,7 @@ export class Fetcher {
       )
     )
       .flat()
+      .filter((item) => item)
       .filter((item, index, self) => {
         return self.map((item) => item.id).indexOf(item.id) === index
       })
@@ -47,7 +48,10 @@ export class Fetcher {
     const apiMethod = this.getApiMethod(this.targetType)
     const response = await apiMethod
       .recommended(more ? this.recommendedNextUrl : null)
-      .catch(() => null)
+      .catch((e) => {
+        console.error(e)
+        return null
+      })
     if (response === null) {
       throw new Error('Failed to fetch recommended')
     }
@@ -69,7 +73,7 @@ export class Fetcher {
   }
 
   public getFetchItemPromise(target: Target) {
-    return new Promise<PixivItemWithSearchTag[]>((resolve, reject) => {
+    return new Promise<PixivItemWithSearchTag[]>((resolve) => {
       const apiMethod = this.getApiMethod(this.targetType)
       apiMethod
         .searchByTag(target.tag.join(' '))
@@ -102,7 +106,7 @@ export class Fetcher {
             )
           }
         )
-        .catch(reject)
+        .catch(null)
     })
   }
 

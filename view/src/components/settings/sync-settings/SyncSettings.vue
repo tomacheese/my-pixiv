@@ -33,7 +33,6 @@
 
 <script lang="ts">
 import Vue from 'vue'
-import WebSocket from 'ws'
 export default Vue.extend({
   data(): {
     client: WebSocket | null
