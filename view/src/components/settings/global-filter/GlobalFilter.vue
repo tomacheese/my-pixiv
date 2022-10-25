@@ -1,9 +1,9 @@
 <template>
   <div>
     <TitleFilter />
-    <v-divider class="mb-3" />
+    <v-divider class="my-3" />
     <CaptionFilter />
-    <v-divider class="mb-3" />
+    <v-divider class="my-3" />
     <TagFilter />
   </div>
 </template>
