@@ -15,7 +15,7 @@ export interface GetItemMuteRequest extends BaseRequest {
 
 /** アイテムミュート取得レスポンスモデル */
 export interface GetItemMuteResponse extends BaseResponse {
-  type: 'addItemMute'
+  type: 'getItemMute'
   items: ItemMute[]
 }
 
