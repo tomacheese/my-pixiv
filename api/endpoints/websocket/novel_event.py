@@ -1,6 +1,6 @@
 from starlette.websockets import WebSocket
 
-from api import get_pixiv_item, get_pixiv_recommended, like_pixiv, search_pixiv
+from api import get_pixiv_item, get_pixiv_recommended, search_pixiv
 
 
 class GetNovelApi:

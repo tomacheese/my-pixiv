@@ -74,7 +74,6 @@ def init_pixiv_api():
     return api
 
 
-
 def pixiv_download(url: str,
                    item_type: str,
                    item_id: str):
@@ -216,7 +215,8 @@ def get_pixiv_item(item_type: str,
     return item[key]
 
 
-def get_pixiv_recommended(item_type: str, next_url: str = None):
+def get_pixiv_recommended(item_type: str,
+                          next_url: str = None):
     api = init_pixiv_api()
     if next_url is not None:
         next_qs = api.parse_qs(next_url)
@@ -308,8 +308,8 @@ def get_illust_screen_names(pixiv_api: AppPixivAPI,
 
 
 async def get_match_tweets(screen_names: set[str],
-                     posted_at: datetime,
-                     image_path: str):
+                           posted_at: datetime,
+                           image_path: str):
     # 投稿日の3日前
     posted_at_before_3day = posted_at - timedelta(days=3)
     posted_at_before_3day = posted_at_before_3day.date().isoformat()
@@ -333,8 +333,8 @@ async def get_match_tweets(screen_names: set[str],
 
 
 async def get_match_user_tweets(screen_names: set[str],
-                          posted_at: datetime,
-                          image_path: str):
+                                posted_at: datetime,
+                                image_path: str):
     # 投稿日の3日前
     posted_at_before_3day_df = posted_at - timedelta(days=3)
     posted_at_before_3day_snowflake = str(get_snowflake(posted_at_before_3day_df))
@@ -363,7 +363,9 @@ async def get_match_user_tweets(screen_names: set[str],
     return list(filter(lambda x: x is not None, await asyncio.gather(*checks)))
 
 
-async def check_tweet(tweet, image_path, identity):
+async def check_tweet(tweet,
+                      image_path,
+                      identity):
     print("check_tweet", tweet.id, tweet.created_at)
     if "media" not in tweet.entities:
         return None
