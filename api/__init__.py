@@ -216,14 +216,19 @@ def get_pixiv_item(item_type: str,
     return item[key]
 
 
-def get_pixiv_recommended(item_type: str):
+def get_pixiv_recommended(item_type: str, next_url: str = None):
     api = init_pixiv_api()
+    if next_url is not None:
+        next_qs = api.parse_qs(next_url)
+        del next_qs["content_type"]
+    else:
+        next_qs = {}
     if item_type == "illusts":
-        return api.illust_recommended(content_type="illust")
+        return api.illust_recommended(content_type="illust", **next_qs)
     elif item_type == "manga":
-        return api.illust_recommended(content_type="manga")
+        return api.illust_recommended(content_type="manga", **next_qs)
     elif item_type == "novels":
-        return api.novel_recommended()
+        return api.novel_recommended(**next_qs)
 
 
 def like_pixiv(item_type: str,
@@ -236,7 +241,7 @@ def like_pixiv(item_type: str,
     else:
         raise Exception("item_type is invalid")
 
-    func(item_id, restrict="private")
+    return func(item_id, restrict="private")
 
 
 def get_image(url: str,

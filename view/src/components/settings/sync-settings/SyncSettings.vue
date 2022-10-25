@@ -33,10 +33,10 @@
 
 <script lang="ts">
 import Vue from 'vue'
-import { Websocket, WebsocketBuilder } from 'websocket-ts'
+import WebSocket from 'ws'
 export default Vue.extend({
   data(): {
-    client: Websocket | null
+    client: WebSocket | null
     isDisabled: boolean
     isConnected: boolean
   } {
@@ -60,35 +60,35 @@ export default Vue.extend({
         this.$config.baseURL === '/'
           ? `${location.host}/`
           : this.$config.baseURL.replace(/https?:\/\//, '')
-      this.client = new WebsocketBuilder(
-        `${protocol}://${domain}api/settings-sync`
-      )
-        .onOpen(() => {
-          this.isConnected = true
-        })
-        .onClose(() => {
-          this.isConnected = false
-        })
-        .onMessage((_: Websocket, message: MessageEvent<string>) => {
-          const data = JSON.parse(message.data)
-          if (data.action === undefined) {
-            return // actionがない場合は無視
-          }
-          if (data.action !== 'sync') {
-            return
-          }
-          this.$accessor.settings.setAllSettings(data.data)
-          this.$nextTick(() => {
-            this.$nuxt.$emit('snackbar', {
-              message: `他の端末から設定データを受信しました。3秒後にリロードします。`,
-              color: 'success',
-            })
-            setTimeout(() => {
-              location.reload()
-            }, 3000)
+      this.client = new WebSocket(`${protocol}://${domain}api/settings-sync`)
+      this.client.onopen = () => {
+        this.isConnected = true
+      }
+      this.client.onclose = () => {
+        this.isConnected = false
+      }
+      this.client.onerror = () => {
+        this.isConnected = false
+      }
+      this.client.onmessage = (e) => {
+        const data = JSON.parse(e.data.toString())
+        if (data.action === undefined) {
+          return // actionがない場合は無視
+        }
+        if (data.action !== 'sync') {
+          return
+        }
+        this.$accessor.settings.setAllSettings(data.data)
+        this.$nextTick(() => {
+          this.$nuxt.$emit('snackbar', {
+            message: `他の端末から設定データを受信しました。3秒後にリロードします。`,
+            color: 'success',
           })
+          setTimeout(() => {
+            location.reload()
+          }, 3000)
         })
-        .build()
+      }
     },
     startSync() {
       const protocol = location.protocol === 'https:' ? 'wss' : 'ws'
@@ -97,35 +97,35 @@ export default Vue.extend({
           ? `${location.host}/`
           : this.$config.baseURL.replace(/https?:\/\//, '')
       this.isDisabled = true
-      this.client = new WebsocketBuilder(
-        `${protocol}://${domain}api/settings-sync`
-      )
-        .onOpen(() => {
-          this.client?.send(
-            JSON.stringify({
-              action: 'sync',
-              data: this.$accessor.settings.settings,
-            })
-          )
-        })
-        .onMessage((_: Websocket, message: MessageEvent<string>) => {
-          const data = JSON.parse(message.data)
-          if (data.action === undefined) {
-            return // actionがない場合は無視
-          }
-          if (data.action !== 'synced') {
-            return
-          }
-          this.$nuxt.$emit('snackbar', {
-            message: `設定データを送信し、${data.data} 件の端末に同期しました。`,
-            color: 'success',
+      this.client = new WebSocket(`${protocol}://${domain}api/settings-sync`)
+      this.client.onopen = () => {
+        this.client?.send(
+          JSON.stringify({
+            action: 'sync',
+            data: this.$accessor.settings.settings,
           })
-          this.client?.close(1000)
+        )
+      }
+      this.client.onclose = () => {
+        this.isDisabled = false
+      }
+      this.client.onerror = () => {
+        this.isDisabled = false
+      }
+      this.client.onmessage = (e) => {
+        const data = JSON.parse(e.data.toString())
+        if (data.action === undefined) {
+          return // actionがない場合は無視
+        }
+        if (data.action !== 'synced') {
+          return
+        }
+        this.$nuxt.$emit('snackbar', {
+          message: `設定データを送信し、${data.data} 件の端末に同期しました。`,
+          color: 'success',
         })
-        .onClose(() => {
-          this.isDisabled = false
-        })
-        .build()
+        this.client?.close(1000)
+      }
     },
   },
 })

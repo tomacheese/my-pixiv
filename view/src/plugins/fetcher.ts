@@ -1,27 +1,25 @@
 import type { NuxtRuntimeConfig } from '@nuxt/types/config/runtime'
-import type { NuxtAxiosInstance } from '@nuxtjs/axios'
 import { Context } from '@nuxt/types'
+import { SearchIllustResponse } from './websocket/illust'
+import { SearchMangaResponse } from './websocket/manga'
+import { SearchNovelResponse } from './websocket/novel'
+import { PixivItem, PixivItemWithSearchTag } from '@/types/pixivItem'
 import { Filter, Target, TargetType } from '@/store/settings'
-import {
-  PixivItem,
-  PixivItemRecommended,
-  PixivItemWithSearchTag,
-} from '@/types/pixivItem'
 
 export class Fetcher {
   private $config: NuxtRuntimeConfig
-  private $axios: NuxtAxiosInstance
+  private $api: Context['$api']
   private $accessor: Context['$accessor']
   private readonly targetType: TargetType
   private readonly globalFilter: Filter[]
   private recommendedNextUrl: string | null = null
   public constructor(
     $config: NuxtRuntimeConfig,
-    $axios: NuxtAxiosInstance,
+    $api: Context['$api'],
     $accessor: Context['$accessor'],
     targetType: TargetType
   ) {
-    this.$axios = $axios
+    this.$api = $api
     this.$config = $config
     this.$accessor = $accessor
     this.globalFilter = $accessor.settings.filters
@@ -46,24 +44,20 @@ export class Fetcher {
   }
 
   public async getFetchRecommended(more: boolean = false) {
-    const response = await this.$axios.get<PixivItemRecommended>(
-      `/api/recommended/${this.targetType.toLocaleLowerCase()}`,
-      {
-        params: {
-          next_url: more ? this.recommendedNextUrl : null,
-        },
-      }
-    )
-    if (response.status !== 200) {
+    const apiMethod = this.getApiMethod(this.targetType)
+    const response = await apiMethod
+      .recommended(more ? this.recommendedNextUrl : null)
+      .catch(() => null)
+    if (response === null) {
       throw new Error('Failed to fetch recommended')
     }
 
-    const data = response.data.data
+    const data = response.items
     for (const item of data) {
       this.itemProcessor(item)
     }
 
-    this.recommendedNextUrl = response.data.next_url
+    this.recommendedNextUrl = response.next_url
 
     return data
       .filter((item) => !this.isFilterItem(null, item))
@@ -76,35 +70,51 @@ export class Fetcher {
 
   public getFetchItemPromise(target: Target) {
     return new Promise<PixivItemWithSearchTag[]>((resolve, reject) => {
-      // /api/search/illust/XXXXX or /api/search/manga/XXXXX or /api/search/novel/XXXXX
-      this.$axios
-        .get<PixivItem[]>(
-          `/api/search/${this.targetType.toLocaleLowerCase()}/` +
-            target.tag.join(' ')
-        )
-        .then((result) => {
-          const data = result.data
-          for (const item of data) {
-            this.itemProcessor(item)
+      const apiMethod = this.getApiMethod(this.targetType)
+      apiMethod
+        .searchByTag(target.tag.join(' '))
+        .then(
+          (
+            result:
+              | SearchNovelResponse
+              | SearchMangaResponse
+              | SearchIllustResponse
+          ) => {
+            const items = result.items
+            for (const item of items) {
+              this.itemProcessor(item)
+            }
+            // フィルタリングを行う
+            resolve(
+              items
+                .filter((item: PixivItem) => !this.isFilterItem(target, item))
+                .filter((item: PixivItem) => !this.isMutedItem(item))
+                .filter(
+                  (item: PixivItem) =>
+                    item.total_bookmarks >= target.minLikeCount
+                )
+                .map((item: PixivItem) => {
+                  return {
+                    ...item,
+                    searchTags: target.tag,
+                  }
+                })
+            )
           }
-          // フィルタリングを行う
-          resolve(
-            data
-              .filter((item) => !this.isFilterItem(target, item))
-              .filter((item) => !this.isMutedItem(item))
-              .filter(
-                (item: PixivItem) => item.total_bookmarks >= target.minLikeCount
-              )
-              .map((item) => {
-                return {
-                  ...item,
-                  searchTags: target.tag,
-                }
-              })
-          )
-        })
+        )
         .catch(reject)
     })
+  }
+
+  private getApiMethod(targetType: TargetType) {
+    switch (targetType) {
+      case 'ILLUST':
+        return this.$api.illust
+      case 'MANGA':
+        return this.$api.manga
+      case 'NOVEL':
+        return this.$api.novel
+    }
   }
 
   private itemProcessor(item: PixivItem) {

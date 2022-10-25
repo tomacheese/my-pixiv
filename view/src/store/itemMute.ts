@@ -1,5 +1,5 @@
 import { actionTree, getterTree, mutationTree } from 'typed-vuex'
-import { getClient } from '@/plugins/muteSync'
+import { getAPI } from '@/plugins/websocket'
 
 export type MuteTargetType = 'ILLUST' | 'NOVEL' | 'USER'
 
@@ -40,22 +40,18 @@ export const actions = actionTree(
   {
     addMute: (
       { commit, state },
-      item: { type: MuteTargetType; id: number }
+      param: {
+        item: { type: MuteTargetType; id: number }
+        isSync: boolean
+      }
     ) => {
+      const item = param.item
       if (state.items.some((m) => m.id === item.id && m.type === item.type)) {
         return
       }
-      const client = getClient()
-      if (client !== null) {
-        client.send(
-          JSON.stringify({
-            action: 'add-mute',
-            item: {
-              type: item.type,
-              id: item.id,
-            },
-          })
-        )
+      const api = getAPI()
+      if (param.isSync && api !== null) {
+        api.itemMute.add(item)
       }
       commit('setItems', [
         ...state.items,
@@ -67,22 +63,18 @@ export const actions = actionTree(
     },
     removeMute: (
       { commit, state },
-      item: { type: MuteTargetType; id: number }
+      param: {
+        item: { type: MuteTargetType; id: number }
+        isSync: boolean
+      }
     ) => {
+      const item = param.item
       if (!state.items.some((m) => m.id === item.id && m.type === item.type)) {
         return
       }
-      const client = getClient()
-      if (client !== null) {
-        client.send(
-          JSON.stringify({
-            action: 'remove-mute',
-            item: {
-              type: item.type,
-              id: item.id,
-            },
-          })
-        )
+      const api = getAPI()
+      if (param.isSync && api !== null) {
+        api.itemMute.remove(item)
       }
       const items = state.items.filter(
         (m) => !(m.id === item.id && m.type === item.type)

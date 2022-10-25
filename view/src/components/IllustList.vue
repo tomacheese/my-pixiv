@@ -102,7 +102,7 @@ export default Vue.extend({
       if (!this.fetcher) {
         this.fetcher = new Fetcher(
           this.$config,
-          this.$axios,
+          this.$api,
           this.$accessor,
           this.targetType
         )
@@ -155,7 +155,10 @@ export default Vue.extend({
       if (this.recommended) {
         return
       }
-      this.$accessor.viewed.addIllust(item)
+      this.$accessor.viewed.addIllust({
+        itemId: item.id,
+        isSync: true,
+      })
     },
   },
 })
