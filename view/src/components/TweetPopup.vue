@@ -44,7 +44,20 @@
                 </div>
 
                 <v-avatar class="ma-3" size="125" tile>
-                  <v-img :src="tweet.tweet.media_url" />
+                  <v-img :src="tweet.tweet.media_url">
+                    <template #placeholder>
+                      <v-row
+                        class="fill-height ma-0"
+                        align="center"
+                        justify="center"
+                      >
+                        <v-progress-circular
+                          indeterminate
+                          color="grey lighten-5"
+                        ></v-progress-circular>
+                      </v-row>
+                    </template>
+                  </v-img>
                 </v-avatar>
               </div>
 

@@ -26,7 +26,17 @@
           max-height="100vh"
           :src="getImage(item)"
           @click="clickImage"
-        />
+          @load="loadedImage()"
+        >
+          <template #placeholder>
+            <v-row class="fill-height ma-0" align="center" justify="center">
+              <v-progress-circular
+                indeterminate
+                color="grey lighten-5"
+              ></v-progress-circular>
+            </v-row>
+          </template>
+        </v-img>
       </div>
     </v-card-text>
 
@@ -121,7 +131,9 @@ export default Vue.extend({
     this.isLiked = this.item.is_bookmarked
     this.page = 1
 
-    this.getTweets()
+    if (this.$accessor.settings.getTweetTiming === 'POPUP_OPEN') {
+      this.getTweets()
+    }
   },
   methods: {
     openTwitter() {
@@ -148,6 +160,12 @@ export default Vue.extend({
       } else if (!isRight && this.page > 1) {
         this.page--
       }
+    },
+    loadedImage() {
+      if (this.$accessor.settings.getTweetTiming !== 'IMAGE_LOADED') {
+        return
+      }
+      this.getTweets()
     },
     getTweets() {
       if (this.item == null) {
