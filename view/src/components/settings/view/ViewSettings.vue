@@ -3,12 +3,14 @@
     <ViewTypeSelector />
     <PaginationSettings v-if="isActivePagination()" />
     <ActionsPosition />
+    <GetTweetTiming />
     <HeaderSticky />
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue'
+import GetTweetTiming from './GetTweetTiming.vue'
 import ViewTypeSelector from '@/components/settings/view/ViewTypeSelector.vue'
 import PaginationSettings from '@/components/settings/view/PaginationSettings.vue'
 import ActionsPosition from '@/components/settings/view/ActionsPosition.vue'
@@ -21,6 +23,7 @@ export default Vue.extend({
     PaginationSettings,
     ActionsPosition,
     HeaderSticky,
+    GetTweetTiming,
   },
   methods: {
     isActivePagination(): boolean {

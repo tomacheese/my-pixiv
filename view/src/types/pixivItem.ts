@@ -25,6 +25,10 @@ export interface MetaSinglePage {
   original_image_url: string
 }
 
+export interface MetaPage {
+  image_urls: ImageUrls
+}
+
 export interface PixivItem {
   id: number
   title: string
@@ -44,7 +48,7 @@ export interface PixivItem {
   x_restrict: number
   series?: any
   meta_single_page: MetaSinglePage
-  meta_pages: any[]
+  meta_pages: MetaPage[]
   total_view: number
   total_bookmarks: number
   is_bookmarked: boolean

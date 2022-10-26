@@ -18,6 +18,8 @@ export interface Filter {
 
 export type ActionPosition = 'LEFT' | 'RIGHT'
 
+export type GetTweetTiming = 'POPUP_OPEN' | 'IMAGE_LOADED'
+
 interface Settings {
   isDarkMode: boolean
   isOnlyNew: boolean
@@ -29,6 +31,7 @@ interface Settings {
   appCheckTimeout: number
   actionPosition: ActionPosition
   headerSticky: boolean
+  getTweetTiming: GetTweetTiming
   targets: Target[]
   filters: Filter[]
 }
@@ -44,6 +47,7 @@ export const state = (): Settings => ({
   appCheckTimeout: 700,
   actionPosition: 'RIGHT',
   headerSticky: false,
+  getTweetTiming: 'POPUP_OPEN',
   targets: [],
   filters: [],
 })
@@ -62,6 +66,7 @@ export const getters = getterTree(state, {
   appCheckTimeout: (state) => state.appCheckTimeout,
   actionPosition: (state) => state.actionPosition,
   headerSticky: (state) => state.headerSticky,
+  getTweetTiming: (state) => state.getTweetTiming,
   targets: (state) => state.targets,
   specificTargets: (state) => (targetType: TargetType) => {
     return state.targets.filter((target) =>
@@ -91,6 +96,8 @@ export const mutations = mutationTree(state, {
       state.actionPosition = settings.actionPosition
     if (settings.headerSticky !== undefined)
       state.headerSticky = settings.headerSticky
+    if (settings.getTweetTiming !== undefined)
+      state.getTweetTiming = settings.getTweetTiming
     if (settings.targets !== undefined) state.targets = settings.targets
     if (settings.filters !== undefined) state.filters = settings.filters
   },
@@ -123,6 +130,9 @@ export const mutations = mutationTree(state, {
   },
   setHeaderSticky(state, headerSticky: boolean) {
     state.headerSticky = headerSticky
+  },
+  setGetTweetTiming(state, getTweetTiming: GetTweetTiming) {
+    state.getTweetTiming = getTweetTiming
   },
   setTargets: (state, targets: Target[]) => {
     state.targets = targets

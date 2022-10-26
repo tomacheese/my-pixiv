@@ -26,14 +26,6 @@ export default Vue.extend({
       ],
     }
   },
-  computed: {
-    isActivePagination(): boolean {
-      return (
-        this.$accessor.settings.viewType === 'PAGINATION' ||
-        this.$accessor.settings.novelViewType === 'PAGINATION'
-      )
-    },
-  },
   watch: {
     actionsPosition() {
       this.$accessor.settings.setActionPosition(this.actionsPosition)
