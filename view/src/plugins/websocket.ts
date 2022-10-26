@@ -290,7 +290,6 @@ export class WebSocketAPI {
         )
         break
       case 'shareRemoveItemMute':
-        if (!this.$accessor.settings.isAutoSyncMutes) return
         this.itemMute.onRemoveItemMute(
           this.$accessor,
           data as ShareRemoveItemMuteResponse
