@@ -78,7 +78,7 @@ export default Vue.extend({
       if (!this.fetcher) {
         this.fetcher = new Fetcher(
           this.$config,
-          this.$axios,
+          this.$api,
           this.$accessor,
           'NOVEL'
         )
@@ -129,7 +129,10 @@ export default Vue.extend({
       if (this.recommended) {
         return
       }
-      this.$accessor.viewed.addNovel(item)
+      this.$accessor.viewed.addNovel({
+        itemId: item.id,
+        isSync: true,
+      })
     },
   },
 })

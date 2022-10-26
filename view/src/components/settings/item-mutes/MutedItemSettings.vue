@@ -35,21 +35,21 @@
 
         <v-list-item-content v-if="getDetails(item)">
           <v-list-item-title v-if="item.type !== 'USER'" class="wrap-text"
-            >{{ getDetails(item).title }}
+            >{{ getDetails(item, 'title') }}
           </v-list-item-title>
           <v-list-item-title v-else
-            >{{ getDetails(item).name }}
+            >{{ getDetails(item, 'name') }}
           </v-list-item-title>
 
           <v-list-item-subtitle v-if="item.type !== 'USER'">
             {{ getTypeName(item.type) }} ―
-            {{ getDetails(item).user.name }}</v-list-item-subtitle
+            {{ getDetails(item, 'user').name }}</v-list-item-subtitle
           >
           <v-list-item-subtitle v-else>{{
             getTypeName(item.type)
           }}</v-list-item-subtitle>
         </v-list-item-content>
-        <v-list-item-content v-else-if="item.detail === undefined">
+        <v-list-item-content v-else-if="getDetails(item) === undefined">
           <v-list-item-title>読み込み中</v-list-item-title>
           <v-list-item-subtitle>
             {{ getTypeName(item.type) }} ― {{ item.id }}</v-list-item-subtitle
@@ -91,6 +91,9 @@
 import Vue from 'vue'
 import { PixivItem } from '@/types/pixivItem'
 import { MuteItem, MuteTargetType } from '@/store/itemMute'
+import { GetIllustResponse } from '@/plugins/websocket/illust'
+import { GetNovelResponse } from '@/plugins/websocket/novel'
+import { GetUserResponse } from '@/plugins/websocket/user'
 
 const targetsMap: {
   [key in MuteTargetType]: string
@@ -171,8 +174,11 @@ export default Vue.extend({
         return
       }
       this.$accessor.itemMute.addMute({
-        type: this.targetType.key as MuteTargetType,
-        id: parseInt(this.id),
+        item: {
+          type: this.targetType.key as MuteTargetType,
+          id: parseInt(this.id),
+        },
+        isSync: this.$accessor.settings.isAutoSyncMutes,
       })
       this.id = ''
       this.targetType = {
@@ -183,7 +189,10 @@ export default Vue.extend({
       this.fetch()
     },
     remove(item: MuteItem) {
-      this.$accessor.itemMute.removeMute(item)
+      this.$accessor.itemMute.removeMute({
+        item,
+        isSync: this.$accessor.settings.isAutoSyncMutes,
+      })
       this.fetch()
     },
     open(item: MuteItem) {
@@ -202,8 +211,15 @@ export default Vue.extend({
           break
       }
     },
-    getDetails(item: MuteItem) {
-      return this.details[item.id]
+    getDetails(item: MuteItem, key?: keyof PixivItem) {
+      const detail = this.details[item.id]
+      if (!key) {
+        return detail
+      }
+      if (!detail) {
+        return undefined
+      }
+      return detail[key]
     },
     getItems(): MuteItem[] {
       const items = this.items.slice((this.page - 1) * 10, this.page * 10)
@@ -212,11 +228,14 @@ export default Vue.extend({
         if (detail !== undefined || detail === null) {
           continue
         }
-        this.$axios
-          .get(`/api/${item.type.toLocaleLowerCase()}/${item.id}`)
-          .then((res) => {
-            this.details[item.id] = res.data
-          })
+        const apiMethod = this.getApiMethod(item.type)
+        apiMethod
+          .get(item.id)
+          .then(
+            (res: GetIllustResponse | GetNovelResponse | GetUserResponse) => {
+              this.details[item.id] = res.item
+            }
+          )
           .catch((err) => {
             this.items = this.items.map((i) => {
               if (i.id === item.id) {
@@ -228,6 +247,16 @@ export default Vue.extend({
           })
       }
       return items
+    },
+    getApiMethod(type: MuteTargetType) {
+      switch (type) {
+        case 'ILLUST':
+          return this.$api.illust
+        case 'NOVEL':
+          return this.$api.novel
+        case 'USER':
+          return this.$api.user
+      }
     },
     getTypeName(type: MuteTargetType): string {
       return targetsMap[type]
@@ -273,7 +302,7 @@ export default Vue.extend({
     onAutoSyncMutesChange(val: boolean) {
       if (
         !confirm(
-          `リアルタイム既読更新を${
+          `リアルタイムミュート更新を${
             val ? '有効' : '無効'
           }にしますか？\n「はい」をクリックすると、ページが再読み込みされます。`
         )

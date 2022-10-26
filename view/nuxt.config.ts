@@ -81,10 +81,9 @@ const config: NuxtConfig = {
   css: ['@/assets/scroll.css'],
 
   plugins: [
-    { src: '@/plugins/settings', ssr: false },
-    { src: '@/plugins/fetcher', ssr: false },
-    { src: '@/plugins/viewedSync', ssr: false },
-    { src: '@/plugins/muteSync', ssr: false },
+    { src: '@/plugins/settings.ts', ssr: false },
+    { src: '@/plugins/websocket.ts', ssr: false },
+    { src: '@/plugins/fetcher.ts', ssr: false },
   ],
 
   components: true,

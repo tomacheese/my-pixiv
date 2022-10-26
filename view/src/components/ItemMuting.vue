@@ -127,8 +127,11 @@ export default Vue.extend({
       }
 
       this.$accessor.itemMute.addMute({
-        type: targetType,
-        id: this.item.id,
+        item: {
+          type: targetType,
+          id: this.item.id,
+        },
+        isSync: true,
       })
       this.$nuxt.$emit('update-mutes')
 
@@ -142,8 +145,11 @@ export default Vue.extend({
       this.isLoading = true
 
       this.$accessor.itemMute.addMute({
-        type: 'USER',
-        id: this.item.user.id,
+        item: {
+          type: 'USER',
+          id: this.item.user.id,
+        },
+        isSync: true,
       })
       this.$nuxt.$emit('update-mutes')
 

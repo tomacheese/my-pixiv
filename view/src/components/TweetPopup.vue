@@ -79,6 +79,10 @@
 import Vue from 'vue'
 import { PixivItem } from '@/types/pixivItem'
 import { openTwitterTweet, openTwitterUser } from '@/utils/twitter'
+import {
+  ShadowBanResult,
+  TwitterAccountType,
+} from '@/plugins/websocket/twitter'
 
 export interface User {
   id: string
@@ -106,34 +110,9 @@ export interface TweetPopupProp {
   error: string | null
 }
 
-type Accounts = 'main' | 'sub'
-
-export interface ShadowBanResult {
-  profile: {
-    error?: any
-    exists: boolean
-    has_tweets: boolean
-    id: string
-    screen_name: string
-  }
-  tests?: {
-    ghost: {
-      ban: boolean
-    }
-    more_replies: {
-      ban: boolean
-      in_reply_to: string
-      tweet: string
-    }
-    search: boolean
-    typeahead: boolean
-  }
-  timestamp: number
-}
-
 export interface TweetPopupData {
   loading: boolean
-  liked: { [key in Accounts]: string[] }
+  liked: { [key in TwitterAccountType]: string[] }
 }
 
 export function isShadowBanned(
@@ -214,7 +193,7 @@ export default Vue.extend({
     close() {
       this.$emit('close-popup')
     },
-    getHeartColor(tweet: Tweet, account: Accounts): string {
+    getHeartColor(tweet: Tweet, account: TwitterAccountType): string {
       if (!this.item) {
         return 'grey'
       }
@@ -232,7 +211,7 @@ export default Vue.extend({
       }
       return 'red'
     },
-    toggleLike(tweet: Tweet, account: Accounts) {
+    toggleLike(tweet: Tweet, account: TwitterAccountType) {
       if (!this.item) {
         return
       }
@@ -242,9 +221,11 @@ export default Vue.extend({
         !this.liked[account].includes(tweet.tweet.id)
       )
     },
-    requestLike(tweet: Tweet, account: Accounts, isAdd: boolean) {
-      const func = isAdd ? this.$axios.post : this.$axios.delete
-      func(`/api/like/${account}/${tweet.tweet.id}`)
+    requestLike(tweet: Tweet, account: TwitterAccountType, isAdd: boolean) {
+      const promise = isAdd
+        ? this.$api.twitter.addLike(account, tweet.tweet.id)
+        : this.$api.twitter.removeLike(account, tweet.tweet.id)
+      promise
         .then(() => {
           if (isAdd) {
             this.liked[account] = [...this.liked[account], tweet.tweet.id]

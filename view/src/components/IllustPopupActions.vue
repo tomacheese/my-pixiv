@@ -50,7 +50,6 @@
 
 <script lang="ts">
 import Vue from 'vue'
-import { TweetPopupProp } from './TweetPopup.vue'
 import { PixivItem } from '@/types/pixivItem'
 import { openPixivIllust } from '@/utils/pixiv'
 
@@ -125,9 +124,9 @@ export default Vue.extend({
     getTweetFoundColor(): string {
       switch (this.tweetStatus) {
         case 'EXACT_TWEET_FOUND':
-          return 'primary'
+          return '#1da1f2'
         case 'TWEET_FOUND':
-          return 'secondary'
+          return 'teal'
         case 'ACCOUNT_FOUND':
           if (this.isShadowBanned) {
             return 'orange'
@@ -146,8 +145,9 @@ export default Vue.extend({
       if (this.item == null) {
         return
       }
-      this.$axios
-        .get<TweetPopupProp>(`/api/like/illust/${this.item.id}`)
+
+      this.$api.illust
+        .addLike(this.item.id)
         .then(() => {
           this.$emit('like', true)
         })

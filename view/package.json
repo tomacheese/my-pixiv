@@ -34,6 +34,7 @@
     "@nuxtjs/pwa": "3.3.5",
     "@nuxtjs/stylelint-module": "4.1.0",
     "@nuxtjs/vuetify": "1.12.3",
+    "@vue/runtime-dom": "^3.2.41",
     "eslint": "8.26.0",
     "eslint-config-prettier": "8.5.0",
     "eslint-plugin-nuxt": "4.0.0",
@@ -49,7 +50,6 @@
     "stylelint-config-standard": "29.0.0",
     "typed-vuex": "0.3.1",
     "vuex": "4.0.2",
-    "vuex-persistedstate": "4.1.0",
-    "websocket-ts": "1.1.1"
+    "vuex-persistedstate": "4.1.0"
   }
 }

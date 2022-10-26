@@ -28,6 +28,7 @@ export interface MetaSinglePage {
 export interface PixivItem {
   id: number
   title: string
+  name?: string
   type?: string
   image_urls: ImageUrls
   caption: string
@@ -50,11 +51,6 @@ export interface PixivItem {
   visible: boolean
   is_muted: boolean
   text_length?: number
-}
-
-export interface PixivItemRecommended {
-  data: PixivItem[]
-  next_url: string
 }
 
 export type PixivItemWithSearchTag = PixivItem & {

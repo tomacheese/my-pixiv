@@ -1,6 +1,5 @@
 import { actionTree, getterTree, mutationTree } from 'typed-vuex'
-import { getClient } from '@/plugins/viewedSync'
-import { PixivItem } from '@/types/pixivItem'
+import { getAPI } from '@/plugins/websocket'
 
 interface Viewed {
   illusts: number[]
@@ -42,67 +41,47 @@ export const mutations = mutationTree(state, {
 export const actions = actionTree(
   { state, getters, mutations },
   {
-    addIllust: ({ commit, state }, item: PixivItem) => {
-      if (state.illusts.includes(item.id)) {
-        return
+    addIllust: (
+      { commit, state },
+      param: {
+        itemId: number
+        isSync: boolean
       }
-      const client = getClient()
-      if (client !== null) {
-        client.send(
-          JSON.stringify({
-            action: 'add-viewed',
-            type: 'illust',
-            itemId: item.id,
-          })
-        )
-      }
-      commit('setIllusts', [...state.illusts, item.id])
-    },
-    addIllustId: ({ commit, state }, itemId: number) => {
+    ) => {
+      const itemId = param.itemId
       if (state.illusts.includes(itemId)) {
         return
       }
-      const client = getClient()
-      if (client !== null) {
-        client.send(
-          JSON.stringify({
-            action: 'add-viewed',
+      if (param.isSync) {
+        const api = getAPI()
+        if (param.isSync && api !== null) {
+          api.viewed.add({
             type: 'illust',
-            itemId,
+            id: itemId,
           })
-        )
+        }
       }
       commit('setIllusts', [...state.illusts, itemId])
     },
-    addNovel: ({ commit, state }, item: PixivItem) => {
-      if (state.novels.includes(item.id)) {
-        return
+    addNovel: (
+      { commit, state },
+      param: {
+        itemId: number
+        isSync: boolean
       }
-      const client = getClient()
-      if (client !== null) {
-        client.send(
-          JSON.stringify({
-            action: 'add-viewed',
-            type: 'novel',
-            itemId: item.id,
-          })
-        )
-      }
-      commit('setNovels', [...state.novels, item.id])
-    },
-    addNovelId: ({ commit, state }, itemId: number) => {
+    ) => {
+      const itemId = param.itemId
       if (state.novels.includes(itemId)) {
         return
       }
-      const client = getClient()
-      if (client !== null) {
-        client.send(
-          JSON.stringify({
-            action: 'add-viewed',
+      if (param.isSync) {
+        const api = getAPI()
+        if (param.isSync && api !== null) {
+          api.viewed.add({
             type: 'novel',
-            itemId,
+            id: itemId,
           })
-        )
+        }
       }
       commit('setNovels', [...state.novels, itemId])
     },

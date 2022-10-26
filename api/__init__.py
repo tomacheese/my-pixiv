@@ -5,6 +5,7 @@ import re
 import time
 from datetime import datetime, timedelta
 from pprint import pprint
+from typing import Union
 
 import imagehash
 import requests
@@ -74,17 +75,16 @@ def init_pixiv_api():
     return api
 
 
-
 def pixiv_download(url: str,
                    item_type: str,
-                   item_id: str):
+                   item_id: Union[str, int]):
     size_regex = re.compile(r"\d+x\d+")
     page_regex = re.compile(r"p\d+")
     size = size_regex.search(url).group(0)
     extension = url.split(".")[-1]
     page = None if page_regex.search(url) is None else page_regex.search(url).group(0)
     filename = size + ("" if page is None else "-" + page) + "." + extension
-    path = os.path.join(IMAGE_CACHE_DIR, item_type, item_id, filename)
+    path = os.path.join(IMAGE_CACHE_DIR, item_type, str(item_id), filename)
     os.makedirs(os.path.dirname(path), exist_ok=True)
 
     if os.path.exists(path):
@@ -171,7 +171,7 @@ def search_pixiv(item_type: str,
 
 
 def get_pixiv_item(item_type: str,
-                   item_id: str):
+                   item_id: Union[str, int]):
     api = init_pixiv_api()
     if item_type == "illust":
         func = api.illust_detail
@@ -193,7 +193,7 @@ def get_pixiv_item(item_type: str,
         raise Exception("item_type is invalid")
 
     # キャッシュ
-    path = os.path.join(cache_dir, "items", item_id + ".json")
+    path = os.path.join(cache_dir, "items", str(item_id) + ".json")
     os.makedirs(os.path.dirname(path), exist_ok=True)
 
     if os.path.exists(path):
@@ -216,14 +216,20 @@ def get_pixiv_item(item_type: str,
     return item[key]
 
 
-def get_pixiv_recommended(item_type: str):
+def get_pixiv_recommended(item_type: str,
+                          next_url: str = None):
     api = init_pixiv_api()
+    if next_url is not None:
+        next_qs = api.parse_qs(next_url)
+        del next_qs["content_type"]
+    else:
+        next_qs = {}
     if item_type == "illusts":
-        return api.illust_recommended(content_type="illust")
+        return api.illust_recommended(content_type="illust", **next_qs)
     elif item_type == "manga":
-        return api.illust_recommended(content_type="manga")
+        return api.illust_recommended(content_type="manga", **next_qs)
     elif item_type == "novels":
-        return api.novel_recommended()
+        return api.novel_recommended(**next_qs)
 
 
 def like_pixiv(item_type: str,
@@ -236,7 +242,7 @@ def like_pixiv(item_type: str,
     else:
         raise Exception("item_type is invalid")
 
-    func(item_id, restrict="private")
+    return func(item_id, restrict="private")
 
 
 def get_image(url: str,
@@ -303,8 +309,8 @@ def get_illust_screen_names(pixiv_api: AppPixivAPI,
 
 
 async def get_match_tweets(screen_names: set[str],
-                     posted_at: datetime,
-                     image_path: str):
+                           posted_at: datetime,
+                           image_path: str):
     # 投稿日の3日前
     posted_at_before_3day = posted_at - timedelta(days=3)
     posted_at_before_3day = posted_at_before_3day.date().isoformat()
@@ -328,8 +334,8 @@ async def get_match_tweets(screen_names: set[str],
 
 
 async def get_match_user_tweets(screen_names: set[str],
-                          posted_at: datetime,
-                          image_path: str):
+                                posted_at: datetime,
+                                image_path: str):
     # 投稿日の3日前
     posted_at_before_3day_df = posted_at - timedelta(days=3)
     posted_at_before_3day_snowflake = str(get_snowflake(posted_at_before_3day_df))
@@ -358,7 +364,9 @@ async def get_match_user_tweets(screen_names: set[str],
     return list(filter(lambda x: x is not None, await asyncio.gather(*checks)))
 
 
-async def check_tweet(tweet, image_path, identity):
+async def check_tweet(tweet,
+                      image_path,
+                      identity):
     print("check_tweet", tweet.id, tweet.created_at)
     if "media" not in tweet.entities:
         return None

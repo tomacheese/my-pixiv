@@ -59,11 +59,12 @@ import Vue from 'vue'
 import TweetPopup, {
   isCheckingShadowBan,
   isShadowBanned,
-  ShadowBanResult,
   TweetPopupProp,
 } from './TweetPopup.vue'
 import IllustPopupActions, { TweetStatus } from './IllustPopupActions.vue'
 import { PixivItem } from '@/types/pixivItem'
+import { ShadowBanResult } from '@/plugins/websocket/twitter'
+import { WebSocketAPIError } from '@/plugins/websocket'
 
 export default Vue.extend({
   components: {
@@ -154,12 +155,12 @@ export default Vue.extend({
       }
       this.tweetStatus = 'LOADING'
       this.tweets = null
-      this.$axios
-        .get<TweetPopupProp>(`/api/tweet/search/${this.item.id}`)
+      this.$api.twitter
+        .searchByIllust(this.item.id)
         .then((response) => {
           this.tweets = {
-            screen_names: response.data.screen_names,
-            tweets: response.data.tweets.sort((a, b) => {
+            screen_names: response.screen_names,
+            tweets: response.tweets.sort((a, b) => {
               const similarity = a.similarity - b.similarity
               if (similarity !== 0) {
                 return similarity
@@ -169,7 +170,7 @@ export default Vue.extend({
             error: null,
           }
           this.checkShadowBan()
-          if (this.tweets.tweets.some((t) => t.similarity >= 5)) {
+          if (this.tweets.tweets.some((t) => t.similarity <= 5)) {
             this.tweetStatus = 'EXACT_TWEET_FOUND'
             return
           }
@@ -185,14 +186,12 @@ export default Vue.extend({
         })
         .catch((error) => {
           this.tweetStatus = 'FAILED'
-          if (error.response.status === 404) {
+          if (error instanceof WebSocketAPIError && error.data.code === 404) {
             this.tweets = {
               screen_names: [],
               tweets: [],
               error:
-                'ツイートが見つかりませんでした (' +
-                error.response.data.detail +
-                ')',
+                'ツイートが見つかりませんでした (' + error.data.message + ')',
             }
           } else {
             this.tweetStatus = 'FAILED'
@@ -216,10 +215,10 @@ export default Vue.extend({
         ) {
           continue
         }
-        this.$axios
-          .get<ShadowBanResult>(`/api/tweet/shadow-ban/${screenName}`)
+        this.$api.twitter
+          .checkShadowBan(screenName)
           .then((response) => {
-            this.shadowBans.push(response.data)
+            this.shadowBans.push(response.result)
           })
           .catch((error) => {
             console.error(error)
