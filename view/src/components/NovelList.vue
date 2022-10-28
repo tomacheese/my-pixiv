@@ -21,7 +21,7 @@
 
 <script lang="ts">
 import Vue from 'vue'
-import { PixivItem } from '@/types/pixivItem'
+import { PixivItem, PixivItemWithSearchTag } from '@/types/pixivItem'
 import { Fetcher } from '@/plugins/fetcher'
 import { ViewType } from '@/store/settings'
 import { openPixivNovel } from '@/utils/pixiv'
@@ -37,7 +37,7 @@ export default Vue.extend({
   },
   data(): {
     fetcher: Fetcher | null
-    items: PixivItem[]
+    items: PixivItem[] | PixivItemWithSearchTag[]
     vieweds: number[] | undefined
     selectType: ViewType
     page: number
@@ -105,7 +105,10 @@ export default Vue.extend({
               this.count.failed++
               return
             }
-            this.items = [...this.items, ...items]
+            this.items = this.fetcher?.sortItems([
+              ...(this.items as PixivItemWithSearchTag[]),
+              ...items,
+            ]) as PixivItemWithSearchTag[]
             this.count.loaded++
           })
         )
