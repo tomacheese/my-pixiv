@@ -146,6 +146,9 @@ export default Vue.extend({
         return
       }
 
+      if (this.$api.getReadyState() !== WebSocket.OPEN) {
+        this.$api.reconnect()
+      }
       this.$api.illust
         .addLike(this.item.id)
         .then(() => {

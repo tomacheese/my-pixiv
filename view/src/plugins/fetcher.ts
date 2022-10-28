@@ -39,6 +39,9 @@ export class Fetcher {
   }
 
   public async getFetchRecommended(more: boolean = false) {
+    if (this.$api.getReadyState() !== WebSocket.OPEN) {
+      this.$api.reconnect()
+    }
     const apiMethod = this.getApiMethod(this.targetType)
     const response = await apiMethod
       .recommended(more ? this.recommendedNextUrl : null)
@@ -68,6 +71,9 @@ export class Fetcher {
 
   public getFetchItemPromise(target: Target) {
     return new Promise<PixivItemWithSearchTag[]>((resolve) => {
+      if (this.$api.getReadyState() !== WebSocket.OPEN) {
+        this.$api.reconnect()
+      }
       const apiMethod = this.getApiMethod(this.targetType)
       apiMethod
         .searchByTag(target.tag.join(' '))

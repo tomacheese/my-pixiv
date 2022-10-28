@@ -228,6 +228,9 @@ export default Vue.extend({
         if (detail !== undefined || detail === null) {
           continue
         }
+        if (this.$api.getReadyState() !== WebSocket.OPEN) {
+          this.$api.reconnect()
+        }
         const apiMethod = this.getApiMethod(item.type)
         apiMethod
           .get(item.id)

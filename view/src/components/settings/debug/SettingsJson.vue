@@ -23,7 +23,7 @@
 <script lang="ts">
 import Vue from 'vue'
 export default Vue.extend({
-  name: 'ImportExportSetting',
+  name: 'SettingsJson',
   data() {
     return {
       dataText: '',
