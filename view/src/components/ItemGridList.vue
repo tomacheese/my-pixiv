@@ -1,6 +1,5 @@
 <template>
   <div>
-    <v-progress-linear v-if="loading" indeterminate></v-progress-linear>
     <v-switch
       v-if="vieweds !== undefined"
       v-model="isOnlyNew"

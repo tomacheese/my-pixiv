@@ -1,5 +1,11 @@
 <template>
   <v-container fluid>
+    <VLoadProgress
+      :loading="loading"
+      :loaded="count.loaded"
+      :failed="count.failed"
+      :total="count.total"
+    ></VLoadProgress>
     <ItemList
       :items="items"
       :loading="loading"
@@ -35,6 +41,11 @@ export default Vue.extend({
     vieweds: number[] | undefined
     selectType: ViewType
     page: number
+    count: {
+      loaded: number
+      failed: number
+      total: number
+    }
     loading: boolean
   } {
     return {
@@ -43,6 +54,11 @@ export default Vue.extend({
       vieweds: [],
       selectType: 'PAGINATION',
       page: 1,
+      count: {
+        loaded: 0,
+        failed: 0,
+        total: 0,
+      },
       loading: false,
     }
   },
@@ -53,15 +69,12 @@ export default Vue.extend({
   },
   async created() {
     await this.fetch()
-
     this.selectType = this.$accessor.settings.novelViewType
-
     if (!this.recommended) {
       this.vieweds = this.$accessor.viewed.novels
     } else {
       this.vieweds = undefined
     }
-
     this.$nuxt.$on('update-mutes', () => {
       if (!this.fetcher) {
         return
@@ -74,7 +87,6 @@ export default Vue.extend({
   methods: {
     async fetch() {
       this.loading = true
-
       if (!this.fetcher) {
         this.fetcher = new Fetcher(
           this.$config,
@@ -84,13 +96,22 @@ export default Vue.extend({
         )
       }
       if (!this.recommended) {
-        this.items = await this.fetcher.getItems(
-          this.$accessor.settings.specificTargets('NOVEL')
+        const targets = this.$accessor.settings.specificTargets('NOVEL')
+        this.count.total = targets.length
+        await Promise.all(
+          targets.map(async (target) => {
+            const items = await this.fetcher?.getFetchItemPromise(target)
+            if (!items) {
+              this.count.failed++
+              return
+            }
+            this.items = [...this.items, ...items]
+            this.count.loaded++
+          })
         )
       } else {
         this.items = await this.fetcher.getFetchRecommended()
       }
-
       this.loading = false
     },
     loadMore() {
@@ -101,7 +122,6 @@ export default Vue.extend({
         return
       }
       this.loading = true
-
       this.fetcher
         .getFetchRecommended(true)
         .then((items) => {

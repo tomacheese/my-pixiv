@@ -26,13 +26,8 @@ export class Fetcher {
     this.targetType = targetType
   }
 
-  public async getItems(targets: Target[]): Promise<PixivItemWithSearchTag[]> {
-    const results = (
-      await Promise.all(
-        targets.map((target) => this.getFetchItemPromise(target))
-      )
-    )
-      .flat()
+  public sortItems(items: PixivItemWithSearchTag[]) {
+    return items
       .filter((item) => item)
       .filter((item, index, self) => {
         return self.map((item) => item.id).indexOf(item.id) === index
@@ -41,7 +36,6 @@ export class Fetcher {
         (a, b) =>
           new Date(b.create_date).getTime() - new Date(a.create_date).getTime()
       )
-    return results
   }
 
   public async getFetchRecommended(more: boolean = false) {

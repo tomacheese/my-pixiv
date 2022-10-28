@@ -1,6 +1,5 @@
 <template>
   <v-container>
-    <v-progress-linear v-if="loading" indeterminate></v-progress-linear>
     <v-pagination
       v-model="page"
       :length="

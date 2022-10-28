@@ -1,5 +1,11 @@
 <template>
   <v-container fluid>
+    <VLoadProgress
+      :loading="loading"
+      :loaded="count.loaded"
+      :failed="count.failed"
+      :total="count.total"
+    ></VLoadProgress>
     <ItemList
       :items="items"
       :loading="loading"
@@ -49,6 +55,11 @@ export default Vue.extend({
     vieweds: number[] | undefined
     selectType: ViewType
     page: number
+    count: {
+      loaded: number
+      failed: number
+      total: number
+    }
     overlay: {
       isIllustOpened: boolean
       target: PixivItem | null
@@ -62,6 +73,11 @@ export default Vue.extend({
       vieweds: [],
       selectType: 'PAGINATION',
       page: 1,
+      count: {
+        loaded: 0,
+        failed: 0,
+        total: 0,
+      },
       overlay: {
         isIllustOpened: false,
         target: null,
@@ -108,8 +124,19 @@ export default Vue.extend({
         )
       }
       if (!this.recommended) {
-        this.items = await this.fetcher.getItems(
-          this.$accessor.settings.specificTargets(this.targetType)
+        const targets = this.$accessor.settings.specificTargets(this.targetType)
+        this.count.total = targets.length
+
+        await Promise.all(
+          targets.map(async (target) => {
+            const items = await this.fetcher?.getFetchItemPromise(target)
+            if (!items) {
+              this.count.failed++
+              return
+            }
+            this.items = [...this.items, ...items]
+            this.count.loaded++
+          })
         )
       } else {
         this.items = await this.fetcher.getFetchRecommended()
