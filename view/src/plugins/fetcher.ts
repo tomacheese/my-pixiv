@@ -26,7 +26,7 @@ export class Fetcher {
     this.targetType = targetType
   }
 
-  public sortItems(items: PixivItemWithSearchTag[]) {
+  public sortItems(items: PixivItemWithSearchTag[]): PixivItemWithSearchTag[] {
     return items
       .filter((item) => item)
       .filter((item, index, self) => {
