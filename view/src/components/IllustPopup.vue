@@ -173,6 +173,9 @@ export default Vue.extend({
       }
       this.tweetStatus = 'LOADING'
       this.tweets = null
+      if (this.$api.getReadyState() !== WebSocket.OPEN) {
+        this.$api.reconnect()
+      }
       this.$api.twitter
         .searchByIllust(this.item.id)
         .then((response) => {
@@ -232,6 +235,9 @@ export default Vue.extend({
           )
         ) {
           continue
+        }
+        if (this.$api.getReadyState() !== WebSocket.OPEN) {
+          this.$api.reconnect()
         }
         this.$api.twitter
           .checkShadowBan(screenName)

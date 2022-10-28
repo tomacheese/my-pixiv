@@ -218,6 +218,25 @@ export class WebSocketAPI {
     this.connect(`${protocol}://${domain}api/ws`)
   }
 
+  public getReadyState():
+    | WebSocket['OPEN']
+    | WebSocket['CONNECTING']
+    | WebSocket['CLOSED']
+    | WebSocket['CLOSING'] {
+    return this.ws.readyState
+  }
+
+  public getWS(): WebSocket {
+    return this.ws
+  }
+
+  public reconnect() {
+    if (this.ws.readyState === WebSocket.OPEN) {
+      this.ws.close()
+    }
+    this.connect()
+  }
+
   private connect(url?: string) {
     if (!url && !this.ws) {
       throw new Error('url is required')

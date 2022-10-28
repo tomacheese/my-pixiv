@@ -235,6 +235,9 @@ export default Vue.extend({
       )
     },
     requestLike(tweet: Tweet, account: TwitterAccountType, isAdd: boolean) {
+      if (this.$api.getReadyState() !== WebSocket.OPEN) {
+        this.$api.reconnect()
+      }
       const promise = isAdd
         ? this.$api.twitter.addLike(account, tweet.tweet.id)
         : this.$api.twitter.removeLike(account, tweet.tweet.id)
