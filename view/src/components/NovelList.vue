@@ -70,13 +70,14 @@ export default Vue.extend({
   async created() {
     this.selectType = this.$accessor.settings.novelViewType
 
-    await this.fetch()
-
     if (!this.recommended) {
       this.vieweds = this.$accessor.viewed.novels
     } else {
       this.vieweds = undefined
     }
+
+    await this.fetch()
+
     this.$nuxt.$on('update-mutes', () => {
       if (!this.fetcher) {
         return
