@@ -92,9 +92,9 @@ export default Vue.extend({
     },
   },
   async created() {
-    await this.fetch()
-
     this.selectType = this.$accessor.settings.viewType
+
+    await this.fetch()
 
     if (!this.recommended) {
       this.vieweds = this.$accessor.viewed.illusts
@@ -182,6 +182,9 @@ export default Vue.extend({
       this.overlay.target = null
     },
     onItemViewing(item: PixivItem) {
+      if (this.loading) {
+        return
+      }
       if (this.recommended) {
         return
       }

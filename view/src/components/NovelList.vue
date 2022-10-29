@@ -68,8 +68,10 @@ export default Vue.extend({
     },
   },
   async created() {
-    await this.fetch()
     this.selectType = this.$accessor.settings.novelViewType
+
+    await this.fetch()
+
     if (!this.recommended) {
       this.vieweds = this.$accessor.viewed.novels
     } else {
@@ -149,6 +151,9 @@ export default Vue.extend({
       })
     },
     onItemViewing(item: PixivItem) {
+      if (this.loading) {
+        return
+      }
       if (this.recommended) {
         return
       }
