@@ -94,13 +94,13 @@ export default Vue.extend({
   async created() {
     this.selectType = this.$accessor.settings.viewType
 
-    await this.fetch()
-
     if (!this.recommended) {
       this.vieweds = this.$accessor.viewed.illusts
     } else {
       this.vieweds = undefined
     }
+
+    await this.fetch()
 
     this.$nuxt.$on('update-mutes', () => {
       if (!this.fetcher) {
