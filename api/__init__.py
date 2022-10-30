@@ -221,7 +221,8 @@ def get_pixiv_recommended(item_type: str,
     api = init_pixiv_api()
     if next_url is not None:
         next_qs = api.parse_qs(next_url)
-        del next_qs["content_type"]
+        if "content_type" in next_qs:
+            del next_qs["content_type"]
     else:
         next_qs = {}
     if item_type == "illusts":
