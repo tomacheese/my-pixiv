@@ -13,6 +13,7 @@
         v-for="item of getItems"
         :key="item.id"
         :item="item"
+        :loading="loading"
         @intersect="onItemViewing"
       >
         <ItemMuting :item="item">
@@ -78,7 +79,7 @@ export default Vue.extend({
     },
     loading: {
       type: Boolean,
-      required: true,
+      required: false,
     },
     isLoadMoreAvailable: {
       type: Boolean,
@@ -109,6 +110,14 @@ export default Vue.extend({
       })
     },
     items() {
+      this.$nextTick(() => {
+        ;(this.$refs['magic-grid'] as any).update()
+      })
+    },
+    loading(value: boolean) {
+      if (value) {
+        return
+      }
       this.$nextTick(() => {
         ;(this.$refs['magic-grid'] as any).update()
       })
