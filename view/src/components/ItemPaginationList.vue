@@ -23,7 +23,7 @@
         </v-card>
       </v-col>
       <v-col v-for="(item, i) in getItems()" :key="i" cols="12">
-        <ItemWrapper :item="item" @intersect="onItemViewing">
+        <ItemWrapper :item="item" :loading="loading" @intersect="onItemViewing">
           <ItemCard
             :item="item"
             :is-viewed="vieweds !== undefined && !isViewed(item)"

@@ -13,6 +13,10 @@ export default Vue.extend({
       type: Object as () => PixivItem,
       required: true,
     },
+    loading: {
+      type: Boolean,
+      required: true,
+    },
   },
   data(): {
     observName: string
@@ -38,30 +42,43 @@ export default Vue.extend({
         this.$emit('intersect', this.item)
       }
     },
+    loading(value: boolean) {
+      if (value) {
+        return
+      }
+      const element = document.getElementById(this.observName)
+      if (!element) {
+        return
+      }
+      if (!this.isViewing(element)) {
+        return
+      }
+      this.$emit('intersect', this.item)
+    },
   },
   created() {
     this.observName = this.item.id.toString()
   },
   mounted() {
-    if (!window) {
-      return
-    }
-    const element = document.getElementById(this.observName)
-    if (!element) {
-      return
-    }
-    if (this.isViewing(element)) {
-      this.$emit('intersect', this.item)
-    }
-    const handler = (entries: { isIntersecting: boolean }[]) => {
-      this.isIntersecting = entries[0].isIntersecting
-    }
-    const observer = new window.IntersectionObserver(handler, {
-      threshold: 1.0,
-    })
-    observer.observe(element)
+    this.register()
   },
   methods: {
+    register() {
+      if (!window) {
+        return
+      }
+      const element = document.getElementById(this.observName)
+      if (!element) {
+        return
+      }
+      const handler = (entries: { isIntersecting: boolean }[]) => {
+        this.isIntersecting = entries[0].isIntersecting
+      }
+      const observer = new window.IntersectionObserver(handler, {
+        threshold: 1.0,
+      })
+      observer.observe(element)
+    },
     isViewing(element: Element) {
       const rect = element.getBoundingClientRect()
       return (

@@ -20,7 +20,11 @@
       >
         <template #default="{ item }">
           <v-col cols="12">
-            <ItemWrapper :item="item" @intersect="onItemViewing">
+            <ItemWrapper
+              :item="item"
+              :loading="loading"
+              @intersect="onItemViewing"
+            >
               <ItemCard
                 :item="item"
                 :is-viewed="vieweds !== undefined && !isViewed(item)"
