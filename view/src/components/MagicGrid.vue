@@ -109,6 +109,10 @@ export default Vue.extend({
       if (!this.items) {
         return 0 // ほんとに？
       }
+      console.log(
+        '[DEBUG] colWidth::getBoundingClientRect().width: ',
+        this.items[0].getBoundingClientRect().width
+      )
       return this.items[0].getBoundingClientRect().width + this.gap
     },
 
@@ -116,6 +120,10 @@ export default Vue.extend({
       cols: Column[]
       wSpace: number
     } {
+      console.log(
+        '[DEBUG] setup::this.$el.getBoundingClientRect().width: ',
+        this.$el.getBoundingClientRect().width
+      )
       const width = this.$el.getBoundingClientRect().width
       let numCols = Math.floor(width / this.colWidth()) || 1
       const cols = []
