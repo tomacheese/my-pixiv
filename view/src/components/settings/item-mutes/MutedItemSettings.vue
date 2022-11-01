@@ -256,6 +256,9 @@ export default Vue.extend({
         case 'USER':
           window.open(`https://www.pixiv.net/users/${item.id}`, '_blank')
           break
+        case 'NOVEL_SERIES':
+          window.open(`https://www.pixiv.net/novel/series/${item.id}`, '_blank')
+          break
       }
     },
     getTitleOrName(item: MuteItemWithDetails) {
