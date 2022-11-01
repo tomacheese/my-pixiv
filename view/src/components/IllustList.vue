@@ -190,7 +190,7 @@ export default Vue.extend({
       }
       this.$accessor.viewed.addIllust({
         itemId: item.id,
-        isSync: true,
+        isSync: this.$accessor.settings.isAutoSyncVieweds,
       })
     },
   },

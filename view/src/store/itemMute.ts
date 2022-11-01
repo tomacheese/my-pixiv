@@ -1,7 +1,6 @@
 import { actionTree, getterTree, mutationTree } from 'typed-vuex'
 import { getAPI } from '@/plugins/websocket'
-
-export type MuteTargetType = 'ILLUST' | 'NOVEL' | 'USER'
+import { MuteTargetType } from '@/plugins/websocket/item-mute'
 
 export interface MuteItem {
   type: MuteTargetType

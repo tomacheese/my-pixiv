@@ -16,7 +16,7 @@
               <v-list-item-title>{{ item.text }}</v-list-item-title>
 
               <v-list-item-subtitle>
-                <b>{{ getViewType(item.key).text }}</b>
+                <b>{{ getViewType(item.key)?.text }}</b>
                 を選択しています。ここをクリックして変更
               </v-list-item-subtitle>
             </v-list-item-content>

@@ -160,7 +160,7 @@ export default Vue.extend({
       }
       this.$accessor.viewed.addNovel({
         itemId: item.id,
-        isSync: true,
+        isSync: this.$accessor.settings.isAutoSyncVieweds,
       })
     },
   },

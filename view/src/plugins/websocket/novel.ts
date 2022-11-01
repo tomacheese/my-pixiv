@@ -1,5 +1,5 @@
 import { BaseRequest, BaseResponse, WSUtils } from '../websocket'
-import { PixivItem } from '@/types/pixivItem'
+import { PixivNovelItem } from '@/types/pixivNovel'
 
 /** 小説取得リクエストモデル */
 export interface GetNovelRequest extends BaseRequest {
@@ -10,7 +10,7 @@ export interface GetNovelRequest extends BaseRequest {
 /** 小説取得レスポンスモデル */
 export interface GetNovelResponse extends BaseResponse {
   type: 'getNovel'
-  item: PixivItem
+  item: PixivNovelItem
 }
 
 /** 小説検索リクエストモデル */
@@ -22,7 +22,7 @@ export interface SearchNovelRequest extends BaseRequest {
 /** 小説検索レスポンスモデル */
 export interface SearchNovelResponse extends BaseResponse {
   type: 'searchNovel'
-  items: PixivItem[]
+  items: PixivNovelItem[]
 }
 
 /** おすすめ小説取得リクエストモデル */
@@ -34,7 +34,7 @@ export interface RecommendedNovelRequest extends BaseRequest {
 /** おすすめ小説取得レスポンスモデル */
 export interface RecommendedNovelResponse extends BaseResponse {
   type: 'recommendedNovel'
-  items: PixivItem[]
+  items: PixivNovelItem[]
   next_url: string
 }
 

@@ -1,5 +1,6 @@
 import { BaseRequest, BaseResponse, WSUtils } from '../websocket'
 import { PixivItem } from '@/types/pixivItem'
+import { PixivIllustItem } from '@/types/pixivIllust'
 
 /** マンガ取得リクエストモデル */
 export interface GetMangaRequest extends BaseRequest {
@@ -10,7 +11,7 @@ export interface GetMangaRequest extends BaseRequest {
 /** マンガ取得レスポンスモデル */
 export interface GetMangaResponse extends BaseResponse {
   type: 'getManga'
-  item: PixivItem
+  item: PixivIllustItem
 }
 
 /** マンガ検索リクエストモデル */
@@ -22,7 +23,7 @@ export interface SearchMangaRequest extends BaseRequest {
 /** マンガ検索レスポンスモデル */
 export interface SearchMangaResponse extends BaseResponse {
   type: 'searchManga'
-  items: PixivItem[]
+  items: PixivIllustItem[]
 }
 
 /** おすすめマンガ取得リクエストモデル */

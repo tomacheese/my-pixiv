@@ -1,62 +1,85 @@
-export interface ImageUrls {
-  square_medium: string
-  medium: string
-  large: string
-}
+import { PixivIllustItem } from './pixivIllust'
+import { PixivNovelItem, Series } from './pixivNovel'
+import { NovelSeriesDetail, PixivNovelSeriesItem } from './pixivNovelSeries'
+import { PixivUserItem } from './pixivUser'
 
-export interface ProfileImageUrls {
-  medium: string
-}
-
-export interface User {
-  id: number
-  name: string
-  account: string
-  profile_image_urls: ProfileImageUrls
-  is_followed: boolean
-}
-
-export interface Tag {
-  name: string
-  translated_name: string | null
-}
-
-export interface MetaSinglePage {
-  original_image_url: string
-}
-
-export interface MetaPage {
-  image_urls: ImageUrls
-}
-
-export interface PixivItem {
-  id: number
-  title: string
-  name?: string
-  type?: string
-  image_urls: ImageUrls
-  caption: string
-  restrict: number
-  user: User
-  tags: Tag[]
-  tools: any[]
-  create_date: Date
-  page_count: number
-  width: number
-  height: number
-  sanity_level: number
-  x_restrict: number
-  series?: any
-  meta_single_page: MetaSinglePage
-  meta_pages: MetaPage[]
-  total_view: number
-  total_bookmarks: number
-  is_bookmarked: boolean
-  visible: boolean
-  is_muted: boolean
-  text_length?: number
-}
+export type PixivItem = PixivIllustItem | PixivNovelItem
 
 export type PixivItemWithSearchTag = PixivItem & {
   searchTags: string[]
+}
+
+export const isPixivItem = (item: any): item is PixivItem => {
+  return (
+    (item as PixivItem).id !== undefined &&
+    (item as PixivItem).title !== undefined &&
+    (item as PixivItem).user !== undefined &&
+    (item as PixivItem).tags !== undefined
+  )
+}
+
+/**
+ * アイテムがイラストかどうかを判定する
+ *
+ * イラストの場合、type は "illust" または "manga" になる。
+ *
+ * @param item アイテム
+ * @returns イラストの場合は true
+ */
+export const isPixivIllustItem = (item: PixivItem): item is PixivIllustItem => {
+  return (item as PixivIllustItem).type !== undefined
+}
+
+/**
+ * アイテムが小説かどうかを判定する
+ *
+ * 小説の場合、type は undefined になる。
+ *
+ * @param item アイテム
+ * @returns 小説の場合は true
+ */
+export const isPixivNovelItem = (item: PixivItem): item is PixivNovelItem => {
+  return (item as PixivIllustItem).type === undefined
+}
+
+/**
+ * アイテムがユーザーかどうかを判定する
+ *
+ * @param item アイテム
+ * @returns ユーザーの場合は true
+ */
+export const isPixivUserItem = (item: any): item is PixivUserItem => {
+  return (
+    (item as PixivUserItem).name !== undefined &&
+    (item as PixivUserItem).account !== undefined
+  )
+}
+
+export const isSeriesItem = (
+  series: Series | unknown[] | null
+): series is Series => {
+  return series !== null && (series as Series).id !== undefined
+}
+
+export const isPixivNovelSeriesItem = (
+  item: any
+): item is PixivNovelSeriesItem => {
+  return (
+    (item as PixivNovelSeriesItem).novel_series_detail !== undefined &&
+    (item as PixivNovelSeriesItem).novel_series_first_novel !== undefined &&
+    (item as PixivNovelSeriesItem).novel_series_latest_novel !== undefined &&
+    (item as PixivNovelSeriesItem).novels !== undefined &&
+    (item as PixivNovelSeriesItem).next_url !== undefined
+  )
+}
+
+export const isNovelSeriesDetail = (item: any): item is NovelSeriesDetail => {
+  return (
+    (item as NovelSeriesDetail).id !== undefined &&
+    (item as NovelSeriesDetail).title !== undefined &&
+    (item as NovelSeriesDetail).caption !== undefined &&
+    (item as NovelSeriesDetail).is_original !== undefined &&
+    (item as NovelSeriesDetail).is_concluded !== undefined &&
+    (item as NovelSeriesDetail).content_count !== undefined
+  )
 }

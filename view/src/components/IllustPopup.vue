@@ -72,9 +72,9 @@ import TweetPopup, {
   TweetPopupProp,
 } from './TweetPopup.vue'
 import IllustPopupActions, { TweetStatus } from './IllustPopupActions.vue'
-import { PixivItem } from '@/types/pixivItem'
 import { ShadowBanResult } from '@/plugins/websocket/twitter'
 import { WebSocketAPIError } from '@/plugins/websocket'
+import { PixivIllustItem } from '@/types/pixivIllust'
 
 export default Vue.extend({
   components: {
@@ -83,7 +83,7 @@ export default Vue.extend({
   },
   props: {
     item: {
-      type: Object as () => PixivItem,
+      type: Object as () => PixivIllustItem,
       required: false,
       default: null,
     },
@@ -139,7 +139,7 @@ export default Vue.extend({
     openTwitter() {
       this.isTweetOpened = true
     },
-    getImage(item: PixivItem): string {
+    getImage(item: PixivIllustItem): string {
       if (item.meta_pages.length === 0) {
         return item.image_urls.large
       }

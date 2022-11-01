@@ -27,6 +27,7 @@ IMAGE_CACHE_DIR = os.environ.setdefault('IMAGE_CACHE_DIR', '/cache/images/')
 TWEET_CACHE_DIR = os.environ.setdefault('TWEET_CACHE_DIR', '/cache/tweets/')
 SHADOW_BAN_CACHE_DIR = os.environ.setdefault('SHADOW_BAN_CACHE_DIR', '/cache/shadow-ban/')
 
+PIXIV_API = None
 TOKEN_SAVE_TIMESTAMP = 0
 
 
@@ -57,7 +58,11 @@ def search_tweet(word: str):
 
 
 def init_pixiv_api():
-    global TOKEN_SAVE_TIMESTAMP
+    global PIXIV_API, TOKEN_SAVE_TIMESTAMP
+    # API初期化済み + 10分以内にトークンを保存している場合はそのまま返す
+    if PIXIV_API is not None and TOKEN_SAVE_TIMESTAMP + 600 > time.time():
+        return PIXIV_API
+
     api = AppPixivAPI()
 
     if not os.path.exists(TOKEN_FILE):
@@ -65,12 +70,13 @@ def init_pixiv_api():
 
     with open(TOKEN_FILE, 'r') as f:
         prev = json.load(f)
-        token = api.auth(None, None, prev["refresh_token"])
 
-    if (TOKEN_SAVE_TIMESTAMP + 86400) < time.time():
-        with open(TOKEN_FILE, 'w') as f:
-            json.dump(token, f)
-        TOKEN_SAVE_TIMESTAMP = time.time()
+    token = api.auth(None, None, prev["refresh_token"])
+
+    with open(TOKEN_FILE, 'w') as f:
+        json.dump(token, f)
+    TOKEN_SAVE_TIMESTAMP = time.time()
+    PIXIV_API = api
 
     return api
 
@@ -78,10 +84,15 @@ def init_pixiv_api():
 def pixiv_download(url: str,
                    item_type: str,
                    item_id: Union[str, int]):
-    size_regex = re.compile(r"\d+x\d+")
-    page_regex = re.compile(r"p\d+")
-    size = size_regex.search(url).group(0)
+    if "img-original" not in url:
+        size_regex = re.compile(r"\d+x\d+")
+        size = size_regex.search(url).group(0)
+    else:
+        size = "original"
+
     extension = url.split(".")[-1]
+
+    page_regex = re.compile(r"p\d+")
     page = None if page_regex.search(url) is None else page_regex.search(url).group(0)
     filename = size + ("" if page is None else "-" + page) + "." + extension
     path = os.path.join(IMAGE_CACHE_DIR, item_type, str(item_id), filename)
@@ -176,24 +187,33 @@ def get_pixiv_item(item_type: str,
     if item_type == "illust":
         func = api.illust_detail
         cache_dir = ILLUST_CACHE_DIR
+        cache_type = "items"
         key = "illust"
     elif item_type == "manga":
         func = api.illust_detail
         cache_dir = MANGA_CACHE_DIR
+        cache_type = "items"
         key = "illust"
     elif item_type == "novel":
         func = api.novel_detail
         cache_dir = NOVEL_CACHE_DIR
+        cache_type = "items"
         key = "novel"
     elif item_type == "user":
         func = api.user_detail
         cache_dir = USER_CACHE_DIR
+        cache_type = "items"
         key = "user"
+    elif item_type == "novel_series":
+        func = api.novel_series
+        cache_dir = NOVEL_CACHE_DIR
+        cache_type = "series"
+        key = "novel_series_detail"
     else:
         raise Exception("item_type is invalid")
 
     # キャッシュ
-    path = os.path.join(cache_dir, "items", str(item_id) + ".json")
+    path = os.path.join(cache_dir, cache_type, str(item_id) + ".json")
     os.makedirs(os.path.dirname(path), exist_ok=True)
 
     if os.path.exists(path):
@@ -208,6 +228,7 @@ def get_pixiv_item(item_type: str,
         raise HTTPException(status_code=404, detail=item_type + " not found")
 
     if key not in item:
+        pprint(item)
         raise HTTPException(status_code=404, detail=item_type + " not found (key not found)")
 
     with open(path, "w", encoding="utf-8") as f:

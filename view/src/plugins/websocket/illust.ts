@@ -1,5 +1,5 @@
 import { BaseRequest, BaseResponse, WSUtils } from '../websocket'
-import { PixivItem } from '@/types/pixivItem'
+import { PixivIllustItem } from '@/types/pixivIllust'
 
 /** イラスト取得リクエストモデル */
 export interface GetIllustRequest extends BaseRequest {
@@ -10,7 +10,7 @@ export interface GetIllustRequest extends BaseRequest {
 /** イラスト取得レスポンスモデル */
 export interface GetIllustResponse extends BaseResponse {
   type: 'getIllust'
-  item: PixivItem
+  item: PixivIllustItem
 }
 
 /** イラスト検索リクエストモデル */
@@ -22,7 +22,7 @@ export interface SearchIllustRequest extends BaseRequest {
 /** イラスト検索レスポンスモデル */
 export interface SearchIllustResponse extends BaseResponse {
   type: 'searchIllust'
-  items: PixivItem[]
+  items: PixivIllustItem[]
 }
 
 /** おすすめイラスト取得リクエストモデル */
@@ -34,7 +34,7 @@ export interface RecommendedIllustRequest extends BaseRequest {
 /** おすすめイラスト取得レスポンスモデル */
 export interface RecommendedIllustResponse extends BaseResponse {
   type: 'recommendedIllust'
-  items: PixivItem[]
+  items: PixivIllustItem[]
   next_url: string
 }
 

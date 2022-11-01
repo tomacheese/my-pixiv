@@ -3,7 +3,13 @@ import { Context } from '@nuxt/types'
 import { SearchIllustResponse } from './websocket/illust'
 import { SearchMangaResponse } from './websocket/manga'
 import { SearchNovelResponse } from './websocket/novel'
-import { PixivItem, PixivItemWithSearchTag } from '@/types/pixivItem'
+import {
+  isPixivIllustItem,
+  isPixivNovelItem,
+  isSeriesItem,
+  PixivItem,
+  PixivItemWithSearchTag,
+} from '@/types/pixivItem'
 import { Filter, Target, TargetType } from '@/store/settings'
 
 export class Fetcher {
@@ -90,7 +96,7 @@ export class Fetcher {
             }
             // フィルタリングを行う
             resolve(
-              items
+              (items as PixivItem[])
                 .filter((item: PixivItem) => !this.isFilterItem(target, item))
                 .filter((item: PixivItem) => !this.isMutedItem(item))
                 .filter(
@@ -129,7 +135,11 @@ export class Fetcher {
       item.image_urls.square_medium
     )
 
-    if (this.targetType === 'ILLUST' || this.targetType === 'MANGA') {
+    if (
+      (this.targetType === 'ILLUST' || this.targetType === 'MANGA') &&
+      isPixivIllustItem(item) &&
+      item.meta_pages
+    ) {
       for (const metaPage of item.meta_pages) {
         metaPage.image_urls.large = this.convertImageUrl(
           item,
@@ -201,13 +211,17 @@ export class Fetcher {
     return this.$accessor.itemMute.items.some((mutedItem) => {
       switch (mutedItem.type) {
         case 'ILLUST':
-          // イラストとマンガの場合は item.type が undefined ではない
-          return item.type !== undefined && item.id === mutedItem.id
+          return isPixivIllustItem(item) && item.id === mutedItem.id
         case 'NOVEL':
-          // 小説の場合は item.type が undefined
-          return item.type === undefined && item.id === mutedItem.id
+          return isPixivNovelItem(item) && item.id === mutedItem.id
         case 'USER':
           return item.user.id === mutedItem.id
+        case 'NOVEL_SERIES':
+          return (
+            isPixivNovelItem(item) &&
+            isSeriesItem(item.series) &&
+            item.series.id === mutedItem.id
+          )
         default:
           return false
       }
