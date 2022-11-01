@@ -55,6 +55,7 @@
       block
       large
       class="my-5"
+      :loading="loading"
       @click="loadMore()"
       >さらに読み込む</v-btn
     >
