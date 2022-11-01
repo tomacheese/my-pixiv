@@ -31,6 +31,7 @@ const config: NuxtConfig = {
       { name: 'apple-mobile-web-app-capable', content: 'yes' },
       { name: 'apple-mobile-web-app-status-bar-style', content: 'black' },
       { name: 'apple-mobile-web-app-title', content: 'my-pixiv' },
+      { name: 'robots', content: 'noindex, nofollow' },
     ],
     link: [
       {
