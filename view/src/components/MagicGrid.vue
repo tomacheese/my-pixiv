@@ -77,7 +77,12 @@ export default Vue.extend({
     },
 
     isReady() {
-      return this.$el && this.items && this.items.length > 0
+      return (
+        this.$el &&
+        this.items &&
+        this.items.length > 0 &&
+        this.items[0].getBoundingClientRect().width > 0
+      )
     },
 
     getReady() {
@@ -109,10 +114,6 @@ export default Vue.extend({
       if (!this.items) {
         return 0 // ほんとに？
       }
-      console.log(
-        '[DEBUG] colWidth::getBoundingClientRect().width: ',
-        this.items[0].getBoundingClientRect().width
-      )
       return this.items[0].getBoundingClientRect().width + this.gap
     },
 
