@@ -179,7 +179,7 @@ export class WSUtils {
       setTimeout(() => {
         reject(new Error('timeout'))
         this.ws.removeEventListener('message', event)
-      }, 15000)
+      }, 30000)
 
       if (this.ws.readyState === WebSocket.CONNECTING) {
         this.ws.addEventListener('open', () => {
