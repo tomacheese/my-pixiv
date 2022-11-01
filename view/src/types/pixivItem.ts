@@ -1,5 +1,6 @@
 import { PixivIllustItem } from './pixivIllust'
-import { PixivNovelItem } from './pixivNovel'
+import { PixivNovelItem, Series } from './pixivNovel'
+import { NovelSeriesDetail, PixivNovelSeriesItem } from './pixivNovelSeries'
 import { PixivUserItem } from './pixivUser'
 
 export type PixivItem = PixivIllustItem | PixivNovelItem
@@ -51,5 +52,34 @@ export const isPixivUserItem = (item: any): item is PixivUserItem => {
   return (
     (item as PixivUserItem).name !== undefined &&
     (item as PixivUserItem).account !== undefined
+  )
+}
+
+export const isSeriesItem = (
+  series: Series | unknown[] | null
+): series is Series => {
+  return series !== null && (series as Series).id !== undefined
+}
+
+export const isPixivNovelSeriesItem = (
+  item: any
+): item is PixivNovelSeriesItem => {
+  return (
+    (item as PixivNovelSeriesItem).novel_series_detail !== undefined &&
+    (item as PixivNovelSeriesItem).novel_series_first_novel !== undefined &&
+    (item as PixivNovelSeriesItem).novel_series_latest_novel !== undefined &&
+    (item as PixivNovelSeriesItem).novels !== undefined &&
+    (item as PixivNovelSeriesItem).next_url !== undefined
+  )
+}
+
+export const isNovelSeriesDetail = (item: any): item is NovelSeriesDetail => {
+  return (
+    (item as NovelSeriesDetail).id !== undefined &&
+    (item as NovelSeriesDetail).title !== undefined &&
+    (item as NovelSeriesDetail).caption !== undefined &&
+    (item as NovelSeriesDetail).is_original !== undefined &&
+    (item as NovelSeriesDetail).is_concluded !== undefined &&
+    (item as NovelSeriesDetail).content_count !== undefined
   )
 }

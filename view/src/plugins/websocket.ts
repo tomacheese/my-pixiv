@@ -64,6 +64,11 @@ import {
   ShareAddViewedResponse,
   ViewedAPI,
 } from './websocket/viewed'
+import {
+  GetNovelSeriesRequest,
+  GetNovelSeriesResponse,
+  NovelSeriesAPI,
+} from './websocket/novel-series'
 
 export interface BaseRequest {
   type: string
@@ -97,6 +102,7 @@ export type Request =
   | GetNovelRequest
   | SearchNovelRequest
   | RecommendedNovelRequest
+  | GetNovelSeriesRequest
   | GetUserRequest
   | SearchTweetRequest
   | CheckShadowBanRequest
@@ -120,6 +126,7 @@ export type Response =
   | GetNovelResponse
   | SearchNovelResponse
   | RecommendedNovelResponse
+  | GetNovelSeriesResponse
   | GetUserResponse
   | SearchTweetResponse
   | CheckShadowBanResponse
@@ -202,6 +209,7 @@ export class WebSocketAPI {
   public illust!: IllustAPI
   public manga!: MangaAPI
   public novel!: NovelAPI
+  public novelSeries!: NovelSeriesAPI
   public user!: UserAPI
   public twitter!: TwitterAPI
   public itemMute!: ItemMuteAPI
@@ -250,6 +258,7 @@ export class WebSocketAPI {
     this.illust = new IllustAPI(this.ws)
     this.manga = new MangaAPI(this.ws)
     this.novel = new NovelAPI(this.ws)
+    this.novelSeries = new NovelSeriesAPI(this.ws)
     this.user = new UserAPI(this.ws)
     this.twitter = new TwitterAPI(this.ws)
     this.itemMute = new ItemMuteAPI(this.ws)

@@ -28,22 +28,19 @@
     <v-pagination v-model="page" :length="pageCount" circle></v-pagination>
 
     <v-list class="my-3">
-      <v-list-item v-for="(item, i) of getItems()" :key="i" @click="open(item)">
+      <v-list-item v-for="(item, i) of getItems" :key="i" @click="open(item)">
         <v-list-item-icon>
           <v-icon>{{ getTypeIcon(item.type) }}</v-icon>
         </v-list-item-icon>
 
         <v-list-item-content v-if="getDetails(item)">
-          <v-list-item-title v-if="item.type !== 'USER'" class="wrap-text"
-            >{{ getDetails(item, 'title') }}
-          </v-list-item-title>
-          <v-list-item-title v-else
-            >{{ getUserDetails(item, 'name') }}
-          </v-list-item-title>
+          <v-list-item-title class="wrap-text">{{
+            getTitleOrName(item)
+          }}</v-list-item-title>
 
-          <v-list-item-subtitle v-if="item.type !== 'USER'">
-            {{ getTypeName(item.type) }} ―
-            {{ getDetails(item, 'user').name }}</v-list-item-subtitle
+          <v-list-item-subtitle v-if="item.type !== 'USER'"
+            >{{ getTypeName(item.type) }} ―
+            {{ getUserName(item) }}</v-list-item-subtitle
           >
           <v-list-item-subtitle v-else>{{
             getTypeName(item.type)
@@ -89,15 +86,21 @@
 
 <script lang="ts">
 import Vue from 'vue'
-import { isPixivItem, isPixivUserItem, PixivItem } from '@/types/pixivItem'
+import {
+  isNovelSeriesDetail,
+  isPixivItem,
+  isPixivNovelSeriesItem,
+  isPixivUserItem,
+  PixivItem,
+} from '@/types/pixivItem'
 import { MuteItem } from '@/store/itemMute'
 import { GetIllustResponse } from '@/plugins/websocket/illust'
 import { GetNovelResponse } from '@/plugins/websocket/novel'
 import { GetUserResponse } from '@/plugins/websocket/user'
 import { MuteTargetType } from '@/plugins/websocket/item-mute'
 import { PixivUserItem } from '@/types/pixivUser'
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { User } from '@/types/pixivIllust'
+import { GetNovelSeriesResponse } from '@/plugins/websocket/novel-series'
+import { NovelSeriesDetail } from '@/types/pixivNovelSeries'
 
 const targetsMap: {
   [key in MuteTargetType]: string
@@ -105,6 +108,11 @@ const targetsMap: {
   ILLUST: 'イラスト・マンガ',
   NOVEL: '小説',
   USER: 'ユーザー',
+  NOVEL_SERIES: '小説シリーズ',
+}
+
+type MuteItemWithDetails = MuteItem & {
+  details?: PixivItem | PixivUserItem | NovelSeriesDetail | null
 }
 
 export default Vue.extend({
@@ -115,8 +123,7 @@ export default Vue.extend({
     targetTypes: { key: string; name: string }[]
     page: number
     pageCount: number
-    items: MuteItem[]
-    details: { [key: string]: PixivItem | PixivUserItem | null }
+    items: MuteItemWithDetails[]
     isAutoSyncMutes: boolean
   } {
     return {
@@ -132,9 +139,13 @@ export default Vue.extend({
       page: 1,
       pageCount: 1,
       items: [],
-      details: {},
       isAutoSyncMutes: false,
     }
+  },
+  computed: {
+    getItems() {
+      return this.items.slice((this.page - 1) * 10, this.page * 10)
+    },
   },
   mounted() {
     this.fetch()
@@ -146,14 +157,48 @@ export default Vue.extend({
         return
       }
       this.fetch()
-    }, 1000)
+    }, 5000)
   },
   methods: {
     fetch() {
-      this.items = this.$accessor.itemMute.items.map((item) => ({
-        ...item,
-        detail: undefined,
-      }))
+      for (const item of this.$accessor.itemMute.items) {
+        if (this.items.find((i) => i.id === item.id && i.type === item.type)) {
+          continue
+        }
+        if (this.$api.getReadyState() !== WebSocket.OPEN) {
+          this.$api.reconnect()
+        }
+        const apiMethod = this.getApiMethod(item.type)
+        apiMethod
+          .get(item.id)
+          .then(
+            (
+              res:
+                | GetIllustResponse
+                | GetNovelResponse
+                | GetUserResponse
+                | GetNovelSeriesResponse
+            ) => {
+              const details = isPixivNovelSeriesItem(res.item)
+                ? res.item.novel_series_detail
+                : res.item
+
+              this.items.push({
+                id: item.id,
+                type: item.type,
+                details,
+              })
+            }
+          )
+          .catch((err) => {
+            this.items.push({
+              id: item.id,
+              type: item.type,
+              details: null,
+            })
+            console.error(err)
+          })
+      }
     },
     add() {
       if (
@@ -192,14 +237,14 @@ export default Vue.extend({
 
       this.fetch()
     },
-    remove(item: MuteItem) {
+    remove(item: MuteItemWithDetails) {
       this.$accessor.itemMute.removeMute({
         item,
         isSync: this.$accessor.settings.isAutoSyncMutes,
       })
       this.fetch()
     },
-    open(item: MuteItem) {
+    open(item: MuteItemWithDetails) {
       switch (item.type) {
         case 'ILLUST':
           window.open(`https://www.pixiv.net/artworks/${item.id}`, '_blank')
@@ -215,58 +260,38 @@ export default Vue.extend({
           break
       }
     },
-    getDetails(item: MuteItem, key?: keyof PixivItem): any {
-      const detail = this.details[item.id]
-      if (!key) {
-        return detail
+    getTitleOrName(item: MuteItemWithDetails) {
+      if (item.details === null) {
+        return '読み込み失敗'
       }
-      if (!detail) {
-        return undefined
+      if (isPixivItem(item.details)) {
+        return item.details.title
       }
-      if (!isPixivItem(detail)) {
-        return undefined
+      if (isPixivUserItem(item.details)) {
+        return item.details.name
       }
-      return detail[key]
+      if (isNovelSeriesDetail(item.details)) {
+        return item.details.title
+      }
+      return 'NULL'
     },
-    getUserDetails(item: MuteItem, key: keyof PixivUserItem): any {
-      const detail = this.details[item.id]
-      if (!detail) {
-        return undefined
+    getUserName(item: MuteItemWithDetails) {
+      if (item.details === null) {
+        return '読み込み失敗'
       }
-      if (!isPixivUserItem(detail)) {
-        return undefined
+      if (isPixivItem(item.details)) {
+        return item.details.user.name
       }
-      return detail[key]
+      if (isPixivUserItem(item.details)) {
+        return item.details.name
+      }
+      if (isNovelSeriesDetail(item.details)) {
+        return item.details.user.name
+      }
+      return 'NULL'
     },
-    getItems(): MuteItem[] {
-      const items = this.items.slice((this.page - 1) * 10, this.page * 10)
-      for (const item of items) {
-        const detail = this.details[item.id]
-        if (detail !== undefined || detail === null) {
-          continue
-        }
-        if (this.$api.getReadyState() !== WebSocket.OPEN) {
-          this.$api.reconnect()
-        }
-        const apiMethod = this.getApiMethod(item.type)
-        apiMethod
-          .get(item.id)
-          .then(
-            (res: GetIllustResponse | GetNovelResponse | GetUserResponse) => {
-              this.details[item.id] = res.item
-            }
-          )
-          .catch((err) => {
-            this.items = this.items.map((i) => {
-              if (i.id === item.id) {
-                this.details[i.id] = null
-              }
-              return i
-            })
-            console.error(err)
-          })
-      }
-      return items
+    getDetails(item: MuteItemWithDetails): any {
+      return item.details
     },
     getApiMethod(type: MuteTargetType) {
       switch (type) {
@@ -276,6 +301,8 @@ export default Vue.extend({
           return this.$api.novel
         case 'USER':
           return this.$api.user
+        case 'NOVEL_SERIES':
+          return this.$api.novelSeries
       }
     },
     getTypeName(type: MuteTargetType): string {
@@ -289,6 +316,8 @@ export default Vue.extend({
           return 'mdi-book-open-page-variant'
         case 'USER':
           return 'mdi-account'
+        case 'NOVEL_SERIES':
+          return 'mdi-format-list-text'
       }
     },
     checkUrl() {

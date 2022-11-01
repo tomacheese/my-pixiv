@@ -1,7 +1,7 @@
 import { Context } from '@nuxt/types'
 import { BaseRequest, BaseResponse, WSUtils } from '../websocket'
 
-export type MuteTargetType = 'ILLUST' | 'NOVEL' | 'USER'
+export type MuteTargetType = 'ILLUST' | 'NOVEL' | 'USER' | 'NOVEL_SERIES'
 
 export interface ItemMute {
   type: MuteTargetType

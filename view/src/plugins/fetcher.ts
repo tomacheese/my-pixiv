@@ -6,6 +6,7 @@ import { SearchNovelResponse } from './websocket/novel'
 import {
   isPixivIllustItem,
   isPixivNovelItem,
+  isSeriesItem,
   PixivItem,
   PixivItemWithSearchTag,
 } from '@/types/pixivItem'
@@ -95,7 +96,7 @@ export class Fetcher {
             }
             // フィルタリングを行う
             resolve(
-              items
+              (items as PixivItem[])
                 .filter((item: PixivItem) => !this.isFilterItem(target, item))
                 .filter((item: PixivItem) => !this.isMutedItem(item))
                 .filter(
@@ -215,6 +216,12 @@ export class Fetcher {
           return isPixivNovelItem(item) && item.id === mutedItem.id
         case 'USER':
           return item.user.id === mutedItem.id
+        case 'NOVEL_SERIES':
+          return (
+            isPixivNovelItem(item) &&
+            isSeriesItem(item.series) &&
+            item.series.id === mutedItem.id
+          )
         default:
           return false
       }
