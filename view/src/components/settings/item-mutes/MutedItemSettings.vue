@@ -38,12 +38,12 @@
             >{{ getDetails(item, 'title') }}
           </v-list-item-title>
           <v-list-item-title v-else
-            >{{ getDetails(item, 'name') }}
+            >{{ getUserDetails(item, 'name') }}
           </v-list-item-title>
 
           <v-list-item-subtitle v-if="item.type !== 'USER'">
             {{ getTypeName(item.type) }} ―
-            {{ getDetails(item, 'user').name }}</v-list-item-subtitle
+            {{ (getDetails(item, 'user') as User).name }}</v-list-item-subtitle
           >
           <v-list-item-subtitle v-else>{{
             getTypeName(item.type)
@@ -89,11 +89,15 @@
 
 <script lang="ts">
 import Vue from 'vue'
-import { PixivItem } from '@/types/pixivItem'
-import { MuteItem, MuteTargetType } from '@/store/itemMute'
+import { isPixivItem, isPixivUserItem, PixivItem } from '@/types/pixivItem'
+import { MuteItem } from '@/store/itemMute'
 import { GetIllustResponse } from '@/plugins/websocket/illust'
 import { GetNovelResponse } from '@/plugins/websocket/novel'
 import { GetUserResponse } from '@/plugins/websocket/user'
+import { MuteTargetType } from '@/plugins/websocket/item-mute'
+import { PixivUserItem } from '@/types/pixivUser'
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { User } from '@/types/pixivIllust'
 
 const targetsMap: {
   [key in MuteTargetType]: string
@@ -112,7 +116,7 @@ export default Vue.extend({
     page: number
     pageCount: number
     items: MuteItem[]
-    details: { [key: string]: PixivItem | null }
+    details: { [key: string]: PixivItem | PixivUserItem | null }
     isAutoSyncMutes: boolean
   } {
     return {
@@ -217,6 +221,19 @@ export default Vue.extend({
         return detail
       }
       if (!detail) {
+        return undefined
+      }
+      if (!isPixivItem(detail)) {
+        return undefined
+      }
+      return detail[key]
+    },
+    getUserDetails(item: MuteItem, key: keyof PixivUserItem) {
+      const detail = this.details[item.id]
+      if (!detail) {
+        return undefined
+      }
+      if (!isPixivUserItem(detail)) {
         return undefined
       }
       return detail[key]

@@ -14,13 +14,13 @@
           <v-list>
             <v-list-item two-line @click="addItemMute()">
               <v-list-item-icon>
-                <v-icon v-if="item.type">mdi-image</v-icon>
+                <v-icon v-if="isPixivIllustItem(item)">mdi-image</v-icon>
                 <v-icon v-else>mdi-text</v-icon>
               </v-list-item-icon>
 
               <v-list-item-content>
                 <v-list-item-title>{{
-                  item.type ? 'イラスト・マンガ' : '小説'
+                  isPixivIllustItem(item) ? 'イラスト・マンガ' : '小説'
                 }}</v-list-item-title>
 
                 <v-list-item-subtitle>
@@ -84,7 +84,7 @@
 
 <script lang="ts">
 import Vue from 'vue'
-import { PixivItem } from '@/types/pixivItem'
+import { isPixivIllustItem, PixivItem } from '@/types/pixivItem'
 
 type SnackBarType = 'ADDED_ITEM' | 'ADDED_AUTHOR' | 'ALREADY_ADDED' | 'FAILED'
 
@@ -118,7 +118,7 @@ export default Vue.extend({
     addItemMute(): void {
       this.isLoading = true
 
-      const targetType = this.item.type ? 'ILLUST' : 'NOVEL'
+      const targetType = isPixivIllustItem(this.item) ? 'ILLUST' : 'NOVEL'
       if (this.$accessor.itemMute.isMuted(this.item.id, targetType)) {
         this.snackbarType = 'ALREADY_ADDED'
         this.isSnackbar = true
@@ -161,6 +161,9 @@ export default Vue.extend({
     },
     onLongPress() {
       this.isOpen = true
+    },
+    isPixivIllustItem(item: PixivItem): boolean {
+      return isPixivIllustItem(item)
     },
   },
 })

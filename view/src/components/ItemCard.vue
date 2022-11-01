@@ -16,9 +16,9 @@
                 <v-icon>mdi-heart</v-icon>
                 {{ item.total_bookmarks }}
               </v-chip>
-              <v-chip v-if="item.text_length">
+              <v-chip v-if="isPixivNovelItem(item)">
                 <v-icon>mdi-format-text</v-icon>
-                {{ item.text_length }}
+                {{ (item as PixivNovelItem).text_length }}
               </v-chip>
               <v-chip
                 v-for="tag of tags"
@@ -43,7 +43,7 @@
             class="ma-3"
             size="125"
             tile
-            :class="{ 'hidden-md-and-down': !item.type }"
+            :class="{ 'hidden-md-and-down': isPixivIllustItem(item) }"
           >
             <v-img :src="item.image_urls.square_medium">
               <template #placeholder>
@@ -65,7 +65,15 @@
 <script lang="ts">
 import Vue from 'vue'
 import ItemMuting from './ItemMuting.vue'
-import { PixivItem, PixivItemWithSearchTag } from '@/types/pixivItem'
+import {
+  isPixivIllustItem,
+  isPixivNovelItem,
+  PixivItem,
+  PixivItemWithSearchTag,
+} from '@/types/pixivItem'
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { PixivNovelItem } from '@/types/pixivNovel'
+
 export default Vue.extend({
   components: { ItemMuting },
   props: {
@@ -109,6 +117,12 @@ export default Vue.extend({
         message: `コピーしました。`,
         color: 'success',
       })
+    },
+    isPixivIllustItem(item: PixivItem): boolean {
+      return isPixivIllustItem(item)
+    },
+    isPixivNovelItem(item: PixivItem): boolean {
+      return isPixivNovelItem(item)
     },
   },
 })

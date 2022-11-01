@@ -64,7 +64,7 @@
 <script lang="ts">
 import Vue from 'vue'
 import MagicGrid from './MagicGrid.vue'
-import { PixivItem } from '@/types/pixivItem'
+import { isPixivNovelItem, PixivItem } from '@/types/pixivItem'
 export default Vue.extend({
   components: { MagicGrid },
   props: {
@@ -140,7 +140,7 @@ export default Vue.extend({
       return this.vieweds.includes(item.id)
     },
     calcHeight(item: PixivItem): string {
-      if (item.height === undefined) return '338px'
+      if (isPixivNovelItem(item)) return '338px'
       return `${(item.height / item.width) * 240}px`
     },
     loadMore(): void {

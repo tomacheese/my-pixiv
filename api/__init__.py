@@ -78,10 +78,15 @@ def init_pixiv_api():
 def pixiv_download(url: str,
                    item_type: str,
                    item_id: Union[str, int]):
-    size_regex = re.compile(r"\d+x\d+")
-    page_regex = re.compile(r"p\d+")
-    size = size_regex.search(url).group(0)
+    if "img-original" not in url:
+        size_regex = re.compile(r"\d+x\d+")
+        size = size_regex.search(url).group(0)
+    else:
+        size = "original"
+
     extension = url.split(".")[-1]
+
+    page_regex = re.compile(r"p\d+")
     page = None if page_regex.search(url) is None else page_regex.search(url).group(0)
     filename = size + ("" if page is None else "-" + page) + "." + extension
     path = os.path.join(IMAGE_CACHE_DIR, item_type, str(item_id), filename)

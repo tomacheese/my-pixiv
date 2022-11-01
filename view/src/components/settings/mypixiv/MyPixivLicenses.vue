@@ -43,7 +43,7 @@ import Vue from 'vue'
 
 interface Item {
   name: string
-  license: string
+  licenses: string
   repository: string
   licenseUrl: string
 }
