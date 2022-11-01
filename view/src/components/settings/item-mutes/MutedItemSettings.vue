@@ -43,7 +43,7 @@
 
           <v-list-item-subtitle v-if="item.type !== 'USER'">
             {{ getTypeName(item.type) }} ―
-            {{ (getDetails(item, 'user') as User).name }}</v-list-item-subtitle
+            {{ getDetails(item, 'user').name }}</v-list-item-subtitle
           >
           <v-list-item-subtitle v-else>{{
             getTypeName(item.type)
@@ -215,7 +215,7 @@ export default Vue.extend({
           break
       }
     },
-    getDetails(item: MuteItem, key?: keyof PixivItem) {
+    getDetails(item: MuteItem, key?: keyof PixivItem): any {
       const detail = this.details[item.id]
       if (!key) {
         return detail
@@ -228,7 +228,7 @@ export default Vue.extend({
       }
       return detail[key]
     },
-    getUserDetails(item: MuteItem, key: keyof PixivUserItem) {
+    getUserDetails(item: MuteItem, key: keyof PixivUserItem): any {
       const detail = this.details[item.id]
       if (!detail) {
         return undefined

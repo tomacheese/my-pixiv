@@ -18,7 +18,7 @@
               </v-chip>
               <v-chip v-if="isPixivNovelItem(item)">
                 <v-icon>mdi-format-text</v-icon>
-                {{ (item as PixivNovelItem).text_length }}
+                {{ getTextLength(item) }}
               </v-chip>
               <v-chip
                 v-for="tag of tags"
@@ -43,7 +43,7 @@
             class="ma-3"
             size="125"
             tile
-            :class="{ 'hidden-md-and-down': isPixivIllustItem(item) }"
+            :class="{ 'hidden-md-and-down': isPixivNovelItem(item) }"
           >
             <v-img :src="item.image_urls.square_medium">
               <template #placeholder>
@@ -66,13 +66,10 @@
 import Vue from 'vue'
 import ItemMuting from './ItemMuting.vue'
 import {
-  isPixivIllustItem,
   isPixivNovelItem,
   PixivItem,
   PixivItemWithSearchTag,
 } from '@/types/pixivItem'
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { PixivNovelItem } from '@/types/pixivNovel'
 
 export default Vue.extend({
   components: { ItemMuting },
@@ -118,11 +115,14 @@ export default Vue.extend({
         color: 'success',
       })
     },
-    isPixivIllustItem(item: PixivItem): boolean {
-      return isPixivIllustItem(item)
-    },
     isPixivNovelItem(item: PixivItem): boolean {
       return isPixivNovelItem(item)
+    },
+    getTextLength(item: PixivItem): number {
+      if (!isPixivNovelItem(item)) {
+        return 0
+      }
+      return item.text_length
     },
   },
 })
