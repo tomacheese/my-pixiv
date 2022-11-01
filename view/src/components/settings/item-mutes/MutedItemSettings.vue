@@ -28,7 +28,7 @@
     <v-pagination v-model="page" :length="pageCount" circle></v-pagination>
 
     <v-list class="my-3">
-      <v-list-item v-for="(item, i) of getItems" :key="i" @click="open(item)">
+      <v-list-item v-for="(item, i) of getItems()" :key="i" @click="open(item)">
         <v-list-item-icon>
           <v-icon>{{ getTypeIcon(item.type) }}</v-icon>
         </v-list-item-icon>
@@ -142,11 +142,6 @@ export default Vue.extend({
       isAutoSyncMutes: false,
     }
   },
-  computed: {
-    getItems() {
-      return this.items.slice((this.page - 1) * 10, this.page * 10)
-    },
-  },
   mounted() {
     this.fetch()
 
@@ -199,6 +194,9 @@ export default Vue.extend({
             console.error(err)
           })
       }
+    },
+    getItems(): MuteItemWithDetails[] {
+      return this.items.slice((this.page - 1) * 10, this.page * 10)
     },
     add() {
       if (
