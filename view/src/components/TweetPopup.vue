@@ -96,6 +96,7 @@ import {
   ShadowBanResult,
   TwitterAccountType,
 } from '@/plugins/websocket/twitter'
+import { WebSocketAPIError } from '@/plugins/websocket'
 
 export interface User {
   id: string
@@ -188,7 +189,37 @@ export default Vue.extend({
       },
     }
   },
+  watch: {
+    data: {
+      handler() {
+        if (this.data == null) {
+          return // loading
+        }
+        this.fetchTweetsLike()
+      },
+      immediate: true,
+    },
+  },
   methods: {
+    fetchTweetsLike() {
+      if (this.data == null) {
+        return
+      }
+      const tweetIds = this.data.tweets.map((tweet) => tweet.tweet.id)
+      if (tweetIds.length === 0) {
+        return
+      }
+      this.$api.twitter.getTweetsLike('main', tweetIds).then((res) => {
+        this.liked.main = res.tweets
+          .filter((tweet) => tweet.liked)
+          .map((tweet) => tweet.id)
+      })
+      this.$api.twitter.getTweetsLike('sub', tweetIds).then((res) => {
+        this.liked.sub = res.tweets
+          .filter((tweet) => tweet.liked)
+          .map((tweet) => tweet.id)
+      })
+    },
     getUserText(user: User): string {
       return `${user.name} (@${user.screen_name})`
     },
@@ -252,6 +283,13 @@ export default Vue.extend({
           }
         })
         .catch((err) => {
+          if (err instanceof WebSocketAPIError) {
+            this.$nuxt.$emit('snackbar', {
+              message: `Likeに失敗: ${err.data.message}`,
+              color: 'error',
+            })
+            return
+          }
           this.$nuxt.$emit('snackbar', {
             message: `Likeに失敗: ${err.message}\n${
               err.response?.data.detail || ''
