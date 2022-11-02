@@ -16,8 +16,8 @@ import {
   AddTweetLikeResponse,
   CheckShadowBanRequest,
   CheckShadowBanResponse,
-  GetTweetLikeRequest,
-  GetTweetLikeResponse,
+  GetTweetsLikeRequest,
+  GetTweetsLikeResponse,
   RemoveTweetLikeRequest,
   RemoveTweetLikeResponse,
   SearchTweetRequest,
@@ -106,7 +106,7 @@ export type Request =
   | GetUserRequest
   | SearchTweetRequest
   | CheckShadowBanRequest
-  | GetTweetLikeRequest
+  | GetTweetsLikeRequest
   | AddTweetLikeRequest
   | RemoveTweetLikeRequest
   | GetItemMuteRequest
@@ -130,7 +130,7 @@ export type Response =
   | GetUserResponse
   | SearchTweetResponse
   | CheckShadowBanResponse
-  | GetTweetLikeResponse
+  | GetTweetsLikeResponse
   | AddTweetLikeResponse
   | RemoveTweetLikeResponse
   | GetItemMuteResponse

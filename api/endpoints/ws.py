@@ -10,7 +10,7 @@ from api.endpoints.websocket.item_mute_event import AddItemMuteApi, GetItemMuteA
 from api.endpoints.websocket.manga_event import AddMangaLikeApi, GetMangaApi, RecommendedMangaApi, SearchMangaApi
 from api.endpoints.websocket.novel_event import GetNovelApi, RecommendedNovelApi, SearchNovelApi
 from api.endpoints.websocket.series_event import GetNovelSeriesApi
-from api.endpoints.websocket.twitter_event import AddTweetLikeApi, CheckShadowBanApi, GetTweetLikeApi, \
+from api.endpoints.websocket.twitter_event import AddTweetLikeApi, CheckShadowBanApi, GetTweetsLikeApi, \
     RemoveTweetLikeApi, SearchTweetApi
 from api.endpoints.websocket.user_event import GetUserApi
 from api.endpoints.websocket.viewed_event import AddViewedApi, GetViewedApi
@@ -33,7 +33,7 @@ webSocketEndPoints = {
     "getUser": GetUserApi(),
     "searchTweet": SearchTweetApi(),
     "checkShadowBan": CheckShadowBanApi(),
-    "getTweetLike": GetTweetLikeApi(),
+    "getTweetsLike": GetTweetsLikeApi(),
     "addTweetLike": AddTweetLikeApi(),
     "removeTweetLike": RemoveTweetLikeApi(),
     "getViewed": GetViewedApi(),

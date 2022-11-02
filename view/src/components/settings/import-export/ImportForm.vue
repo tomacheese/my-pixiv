@@ -68,6 +68,22 @@ export default Vue.extend({
     importFromClipboard() {
       this.isLoading = true
 
+      if (!navigator.clipboard) {
+        const textarea = document.createElement('textarea')
+        document.body.appendChild(textarea)
+        textarea.focus()
+        document.execCommand('paste')
+        const text = textarea.value
+        document.body.removeChild(textarea)
+        if (text.length === 0) {
+          this.isImportFailed = true
+          this.isLoading = false
+          return
+        }
+        this.import(text)
+        return
+      }
+
       navigator.clipboard
         .readText()
         .then((text) => {

@@ -51,17 +51,22 @@ export interface CheckShadowBanResponse extends BaseResponse {
 
 export type TwitterAccountType = 'main' | 'sub'
 
+export interface TweetLikeStatus {
+  id: string
+  liked: boolean
+}
+
 /** ツイートいいね取得リクエストモデル */
-export interface GetTweetLikeRequest extends BaseRequest {
-  type: 'getTweetLike'
+export interface GetTweetsLikeRequest extends BaseRequest {
+  type: 'getTweetsLike'
   account: TwitterAccountType
-  tweet_id: string
+  tweet_ids: string[]
 }
 
 /** ツイートいいね追加レスポンスモデル */
-export interface GetTweetLikeResponse extends BaseResponse {
-  type: 'getTweetLike'
-  is_liked: boolean
+export interface GetTweetsLikeResponse extends BaseResponse {
+  type: 'getTweetsLike'
+  tweets: TweetLikeStatus[]
 }
 
 /** ツイートいいね追加リクエストモデル */
@@ -127,15 +132,15 @@ export class TwitterAPI {
     )
   }
 
-  public isLiked(
+  public getTweetsLike(
     account: TwitterAccountType,
-    tweetId: string
-  ): Promise<GetTweetLikeResponse> {
-    return this.utils.request<GetTweetLikeRequest, GetTweetLikeResponse>(
-      'getTweetLike',
+    tweetIds: string[]
+  ): Promise<GetTweetsLikeResponse> {
+    return this.utils.request<GetTweetsLikeRequest, GetTweetsLikeResponse>(
+      'getTweetsLike',
       {
         account,
-        tweet_id: tweetId,
+        tweet_ids: tweetIds,
       }
     )
   }
