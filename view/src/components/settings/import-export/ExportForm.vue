@@ -46,6 +46,16 @@ export default Vue.extend({
     exportToClipboard() {
       const data = this.$accessor.settings.settings
       const text = JSON.stringify(data)
+      if (!navigator.clipboard) {
+        const textarea = document.createElement('textarea')
+        textarea.value = text
+        document.body.appendChild(textarea)
+        textarea.select()
+        document.execCommand('copy')
+        document.body.removeChild(textarea)
+        this.isExportSuccess = true
+        return
+      }
       navigator.clipboard
         .writeText(text)
         .then(() => {
