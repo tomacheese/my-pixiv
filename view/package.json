@@ -44,7 +44,7 @@
     "nuxt-typed-vuex": "0.3.1",
     "postcss-html": "1.5.0",
     "prettier": "2.7.1",
-    "stylelint": "14.14.0",
+    "stylelint": "14.14.1",
     "stylelint-config-prettier": "9.0.3",
     "stylelint-config-recommended-vue": "1.4.0",
     "stylelint-config-standard": "29.0.0",
