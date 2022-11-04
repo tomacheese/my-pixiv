@@ -49,16 +49,16 @@ jobs:
           echo "lint: $lint"
           echo "test: $test"
 
-          echo "::set-output name=compile::$compile"
-          echo "::set-output name=build::$build"
-          echo "::set-output name=generate::$generate"
-          echo "::set-output name=package::$package"
-          echo "::set-output name=lint::$lint"
-          echo "::set-output name=test::$test"
+          echo "compile=$compile" >> $GITHUB_OUTPUT
+          echo "build=$build" >> $GITHUB_OUTPUT
+          echo "generate=$generate" >> $GITHUB_OUTPUT
+          echo "package=$package" >> $GITHUB_OUTPUT
+          echo "lint=$lint" >> $GITHUB_OUTPUT
+          echo "test=$test" >> $GITHUB_OUTPUT
 
       - name: 🛠 Get yarn cache directory path
         id: yarn-cache-dir-path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
+        run: echo "dir=$(yarn cache dir)" >> $GITHUB_OUTPUT
 
       - name: 📦 Cache node_modules
         uses: actions/cache@v3
@@ -104,7 +104,7 @@ jobs:
         id: check-dist
         working-directory: ${{ matrix.directory }}
         run: |
-          echo "::set-output name=exists::$(test -d dist && echo true || echo false)"
+          echo "exists=$(test -d dist && echo true || echo false)" >> $GITHUB_OUTPUT
 
       - name: 📦 Upload artifact
         if: steps.check-dist.outputs.exists == 'true'
