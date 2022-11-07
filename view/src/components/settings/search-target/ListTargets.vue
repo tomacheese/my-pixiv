@@ -73,8 +73,12 @@ export default Vue.extend({
       this.editingIndex = i
       this.isEditing = true
     },
-    onUpdated(): void {
+    onUpdated(target: Target): void {
       console.log('updated')
+      this.$accessor.settings.updateTarget({
+        index: this.editingIndex,
+        target,
+      })
       this.isEditing = false
     },
     getTypeName(value: string) {
