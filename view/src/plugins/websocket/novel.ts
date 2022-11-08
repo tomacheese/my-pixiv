@@ -17,6 +17,7 @@ export interface GetNovelResponse extends BaseResponse {
 export interface SearchNovelRequest extends BaseRequest {
   type: 'searchNovel'
   word: string
+  search_item_count: number
 }
 
 /** 小説検索レスポンスモデル */
@@ -65,11 +66,15 @@ export class NovelAPI {
    * @param word 検索するワード。タグを指定する。複数指定する場合はスペース区切りで指定
    * @returns 検索結果レスポンス
    */
-  public searchByTag(word: string): Promise<SearchNovelResponse> {
+  public searchByTag(
+    word: string,
+    searchItemCount: number
+  ): Promise<SearchNovelResponse> {
     return this.utils.request<SearchNovelRequest, SearchNovelResponse>(
       'searchNovel',
       {
         word,
+        search_item_count: searchItemCount,
       }
     )
   }
