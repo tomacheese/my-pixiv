@@ -17,6 +17,7 @@ export interface GetIllustResponse extends BaseResponse {
 export interface SearchIllustRequest extends BaseRequest {
   type: 'searchIllust'
   word: string
+  search_item_count: number
 }
 
 /** イラスト検索レスポンスモデル */
@@ -79,11 +80,15 @@ export class IllustAPI {
    * @param word 検索するワード。タグを指定する。複数指定する場合はスペース区切りで指定
    * @returns 検索結果レスポンス
    */
-  public searchByTag(word: string): Promise<SearchIllustResponse> {
+  public searchByTag(
+    word: string,
+    searchItemCount: number
+  ): Promise<SearchIllustResponse> {
     return this.utils.request<SearchIllustRequest, SearchIllustResponse>(
       'searchIllust',
       {
         word,
+        search_item_count: searchItemCount,
       }
     )
   }

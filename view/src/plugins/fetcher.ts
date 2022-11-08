@@ -82,7 +82,7 @@ export class Fetcher {
       }
       const apiMethod = this.getApiMethod(this.targetType)
       apiMethod
-        .searchByTag(target.tag.join(' '))
+        .searchByTag(target.tag.join(' '), target.searchItemCount ?? 150)
         .then(
           (
             result:

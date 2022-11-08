@@ -14,6 +14,7 @@
       label="除外する文字列をカンマかスペース区切りで入力"
     />
     <v-text-field v-model="minLikeCount" label="最低すき！数" type="number" />
+    <v-text-field v-model="searchItemCount" label="検索件数" type="number" />
     <v-btn v-if="item === null" color="success" block @click="add()"
       >追加</v-btn
     >
@@ -47,6 +48,7 @@ export default Vue.extend({
     tag: string
     ignores: string
     minLikeCount: string
+    searchItemCount: string
     targetTypes: string[]
   } {
     return {
@@ -54,6 +56,7 @@ export default Vue.extend({
       tag: '',
       ignores: '',
       minLikeCount: '0',
+      searchItemCount: '150',
       targetTypes: Object.keys(targetTypeMap),
     }
   },
@@ -77,6 +80,7 @@ export default Vue.extend({
         ignores:
           this.ignores.trim().length !== 0 ? this.ignores.split(/[ ,]/) : [],
         minLikeCount: parseInt(this.minLikeCount),
+        searchItemCount: parseInt(this.searchItemCount),
       })
     },
     update(): void {
@@ -86,6 +90,7 @@ export default Vue.extend({
         ignores:
           this.ignores.trim().length !== 0 ? this.ignores.split(/[ ,]/) : [],
         minLikeCount: parseInt(this.minLikeCount),
+        searchItemCount: parseInt(this.searchItemCount),
       })
     },
   },

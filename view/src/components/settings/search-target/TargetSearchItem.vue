@@ -28,8 +28,12 @@
       >{{ t }}</v-chip
     >
     <v-chip class="ma-1" color="primary">
-      <v-icon>mdi-heart</v-icon>
-      {{ item.minLikeCount }}
+      <v-icon class="mr-1">mdi-heart</v-icon>
+      {{ item.minLikeCount ?? 0 }}
+    </v-chip>
+    <v-chip class="ma-1" color="primary">
+      <v-icon class="mr-1">mdi-file-document-multiple</v-icon>
+      {{ item.searchItemCount ?? 150 }}
     </v-chip>
   </v-card-text>
 </template>
