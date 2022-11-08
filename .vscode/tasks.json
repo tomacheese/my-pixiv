@@ -1,0 +1,40 @@
+{
+  "version": "2.0.0",
+  "options": {
+    "shell": {
+      "executable": "pwsh.exe"
+    }
+  },
+  "tasks": [
+    {
+      "label": "Run",
+      "dependsOn": ["Run client-dev", "Run server-dev", "Open browser"],
+      "runOptions": {
+        "runOn": "folderOpen"
+      }
+    },
+    {
+      "label": "Run client-dev",
+      "type": "shell",
+      "command": "${workspaceFolder}/scripts/client-dev.ps1",
+      "presentation": {
+        "group": "groupServerStuff"
+      }
+    },
+    {
+      "label": "Run server-dev",
+      "type": "shell",
+      "command": "${workspaceFolder}/scripts/server-dev.ps1",
+      "presentation": {
+        "group": "groupServerStuff"
+      }
+    },
+    {
+      "label": "Open browser",
+      "type": "process",
+      "command": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+      "args": ["http://localhost:3000"],
+      "isBackground": true
+    }
+  ]
+}

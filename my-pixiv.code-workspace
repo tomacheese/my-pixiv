@@ -12,5 +12,8 @@
       "name": "my-pixiv",
       "path": "."
     }
-  ]
+  ],
+  "settings": {
+    "task.allowAutomaticTasks": "on"
+  }
 }
