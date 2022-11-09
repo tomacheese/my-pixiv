@@ -61,6 +61,7 @@ export default Vue.extend({
 
   methods: {
     update() {
+      console.log('[DEBUG] update()')
       this.started = false
       this.items = null
       this.waitUntilReady()
