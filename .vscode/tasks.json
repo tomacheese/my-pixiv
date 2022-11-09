@@ -8,10 +8,17 @@
   "tasks": [
     {
       "label": "Run",
-      "dependsOn": ["Run client-dev", "Run server-dev", "Open browser"],
+      "dependsOn": ["Open browser", "Run client-dev", "Run server-dev"],
       "runOptions": {
         "runOn": "folderOpen"
       }
+    },
+    {
+      "label": "Open browser",
+      "type": "process",
+      "command": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+      "args": ["http://localhost:3000"],
+      "hide": true
     },
     {
       "label": "Run client-dev",
@@ -28,13 +35,6 @@
       "presentation": {
         "group": "groupServerStuff"
       }
-    },
-    {
-      "label": "Open browser",
-      "type": "process",
-      "command": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
-      "args": ["http://localhost:3000"],
-      "isBackground": true
     }
   ]
 }

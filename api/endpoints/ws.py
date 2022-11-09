@@ -1,9 +1,10 @@
 import json
 import traceback
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 from starlette.websockets import WebSocket
 
+from api import get_hashed_password, sha512
 from api.endpoints.websocket import clients
 from api.endpoints.websocket.illust_event import AddIllustLikeApi, GetIllustApi, RecommendedIllustApi, SearchIllustApi
 from api.endpoints.websocket.item_mute_event import AddItemMuteApi, GetItemMuteApi, RemoveItemMuteApi
@@ -83,7 +84,18 @@ async def execute(ws: WebSocket, text: str):
 
 @router.websocket("")
 async def on_websocket(ws: WebSocket):
-    await ws.accept()
+    protocol = ws.headers.get("sec-websocket-protocol")
+    await ws.accept(protocol)
+
+    # 認証フェーズ
+    hashed_password = get_hashed_password()
+    if hashed_password is not None:
+        if protocol is None:
+            await ws.close(1002, "Protocol required")
+            return
+        if sha512(protocol) != hashed_password:
+            await ws.close(1002, "Invalid password")
+            return
 
     key = ws.headers.get('sec-websocket-key')
     clients[key] = ws

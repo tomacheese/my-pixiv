@@ -26,7 +26,10 @@
     </div>
 
     <p>
-      設定データはWebSocket経由でサーバに送信され、サーバから待ち受けしているすべての端末に送信されます。
+      設定データはWebSocket経由でサーバに送信され、サーバから待ち受けしているすべての端末に送信されます。<br />
+      認証機能を利用する場合は、サーバサイドの
+      <code>config.json</code> ファイルにて、<code>password</code>
+      を設定する必要があります。
     </p>
   </div>
 </template>
@@ -59,12 +62,26 @@ export default Vue.extend({
         this.$config.baseURL === '/'
           ? `${location.host}/`
           : this.$config.baseURL.replace(/https?:\/\//, '')
-      this.client = new WebSocket(`${protocol}://${domain}api/settings-sync`)
+      const password =
+        this.$accessor.auth.password !== ''
+          ? this.$accessor.auth.password
+          : undefined
+      this.client = new WebSocket(
+        `${protocol}://${domain}api/settings-sync`,
+        password
+      )
       this.client.onopen = () => {
         this.isConnected = true
       }
-      this.client.onclose = () => {
+      this.client.onclose = (event) => {
         this.isConnected = false
+        if (event.code === 1002) {
+          this.$nuxt.$emit('snackbar', {
+            message:
+              '同期待ち受けに失敗しました。認証用パスワードが正しいか確認してください。',
+            color: 'error',
+          })
+        }
       }
       this.client.onerror = () => {
         this.isConnected = false
@@ -96,7 +113,14 @@ export default Vue.extend({
           ? `${location.host}/`
           : this.$config.baseURL.replace(/https?:\/\//, '')
       this.isDisabled = true
-      this.client = new WebSocket(`${protocol}://${domain}api/settings-sync`)
+      const password =
+        this.$accessor.auth.password !== ''
+          ? this.$accessor.auth.password
+          : undefined
+      this.client = new WebSocket(
+        `${protocol}://${domain}api/settings-sync`,
+        password
+      )
       this.client.onopen = () => {
         this.client?.send(
           JSON.stringify({
@@ -105,8 +129,15 @@ export default Vue.extend({
           })
         )
       }
-      this.client.onclose = () => {
+      this.client.onclose = (event) => {
         this.isDisabled = false
+        if (event.code === 1002) {
+          this.$nuxt.$emit('snackbar', {
+            message:
+              '同期に失敗しました。認証用パスワードが正しいか確認してください。',
+            color: 'error',
+          })
+        }
       }
       this.client.onerror = () => {
         this.isDisabled = false

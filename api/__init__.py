@@ -1,4 +1,5 @@
 import asyncio
+import hashlib
 import json
 import os
 import re
@@ -79,6 +80,23 @@ def init_pixiv_api():
     PIXIV_API = api
 
     return api
+
+
+def get_hashed_password():
+    if not os.path.exists(CONFIG_FILE):
+        return None
+
+    with open(CONFIG_FILE, "r", encoding="utf-8") as f:
+        config = json.load(f)
+
+    if "password" not in config:
+        return None
+
+    return sha512(config["password"])
+
+
+def sha512(s: str):
+    return hashlib.sha512(s.encode("utf-8")).hexdigest()
 
 
 def pixiv_download(url: str,

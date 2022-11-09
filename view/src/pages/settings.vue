@@ -76,6 +76,7 @@ import MutedItemSettings from '@/components/settings/item-mutes/MutedItemSetting
 import ImportExportForm from '@/components/settings/import-export/ImportExports.vue'
 import ViewedSettings from '@/components/settings/viewed/ViewedSettings.vue'
 import SyncSettings from '@/components/settings/sync-settings/SyncSettings.vue'
+import AuthSettings from '@/components/settings/auth/AuthSettings.vue'
 import OtherSettings from '@/components/settings/other/OtherSettings.vue'
 import DebugInfo from '@/components/settings/debug/DebugInfo.vue'
 import MyPixivInfo from '@/components/settings/mypixiv/MyPixivInfo.vue'
@@ -86,6 +87,7 @@ interface SettingItem {
 
 interface Category {
   name: string
+  tabName: string
   icon: `mdi-${string}`
   shortDescription: string
   description: string
@@ -104,6 +106,7 @@ export default Vue.extend({
       categories: [
         {
           name: '検索設定',
+          tabName: 'search',
           icon: 'mdi-magnify',
           shortDescription: '検索対象アイテムの登録・一覧表示・解除',
           description:
@@ -119,6 +122,7 @@ export default Vue.extend({
         },
         {
           name: '表示設定',
+          tabName: 'view',
           icon: 'mdi-view-list',
           shortDescription:
             '一覧表示の表示種別・イラストポップアップのボタン位置',
@@ -132,6 +136,7 @@ export default Vue.extend({
         },
         {
           name: 'グローバルフィルタ設定',
+          tabName: 'global-filter',
           icon: 'mdi-filter',
           shortDescription: 'おすすめにも適用されるフィルタ設定',
           description:
@@ -144,6 +149,7 @@ export default Vue.extend({
         },
         {
           name: 'アイテムミュート設定',
+          tabName: 'item-mutes',
           icon: 'mdi-volume-off',
           shortDescription: '非表示にするアイテムの登録・一覧表示・解除',
           description:
@@ -156,6 +162,7 @@ export default Vue.extend({
         },
         {
           name: '既読情報',
+          tabName: 'viewed',
           icon: 'mdi-bookmark',
           shortDescription: '既読情報の一覧表示・解除',
           description:
@@ -168,6 +175,7 @@ export default Vue.extend({
         },
         {
           name: 'インポート・エクスポート',
+          tabName: 'import-export',
           icon: 'mdi-import',
           shortDescription: '設定のインポート・エクスポート',
           description: '設定のインポート・エクスポートが行えます。',
@@ -179,6 +187,7 @@ export default Vue.extend({
         },
         {
           name: '設定の同期',
+          tabName: 'sync-settings',
           icon: 'mdi-sync',
           shortDescription: '他の端末と設定を同期',
           description: '他の端末と設定を同期することができます。',
@@ -189,7 +198,20 @@ export default Vue.extend({
           ],
         },
         {
+          name: '認証',
+          tabName: 'auth',
+          icon: 'mdi-lock',
+          shortDescription: '認証に関する設定',
+          description: '認証に関する設定を行えます。',
+          values: [
+            {
+              component: AuthSettings,
+            },
+          ],
+        },
+        {
           name: 'その他',
+          tabName: 'other',
           icon: 'mdi-cog',
           shortDescription: 'その他の設定',
           description: 'その他の設定が行えます。',
@@ -201,6 +223,7 @@ export default Vue.extend({
         },
         {
           name: 'デバッグ情報',
+          tabName: 'debug',
           icon: 'mdi-bug',
           shortDescription: 'デバッグ情報の表示',
           description: 'デバッグ情報の表示が行えます。',
@@ -212,6 +235,7 @@ export default Vue.extend({
         },
         {
           name: 'my-pixiv について',
+          tabName: 'about',
           icon: 'mdi-information',
           shortDescription: 'my-pixiv に関する情報',
           description: 'my-pixiv に関する情報を確認できます。',
@@ -256,6 +280,15 @@ export default Vue.extend({
       return
     }
     this.selectedIndex = 0
+
+    if (this.$route.query.category) {
+      const category = this.categories.find(
+        (category) => category.tabName === this.$route.query.category
+      )
+      if (category) {
+        this.selectedIndex = this.categories.indexOf(category)
+      }
+    }
   },
 })
 </script>
