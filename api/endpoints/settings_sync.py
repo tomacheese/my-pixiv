@@ -4,6 +4,8 @@ import traceback
 from fastapi import APIRouter
 from starlette.websockets import WebSocket
 
+from api import get_hashed_password, sha512
+
 router = APIRouter(prefix="/settings-sync")
 clients: dict[str, WebSocket] = {}
 
@@ -37,7 +39,18 @@ async def action_sync(client: WebSocket, data: dict):
 
 @router.websocket("")
 async def ws_settings_sync(ws: WebSocket):
-    await ws.accept()
+    protocol = ws.headers.get("sec-websocket-protocol")
+    await ws.accept(protocol)
+
+    # 認証フェーズ
+    hashed_password = get_hashed_password()
+    if hashed_password is not None:
+        if protocol is None:
+            await ws.close(1002, "Protocol required")
+            return
+        if sha512(protocol) != hashed_password:
+            await ws.close(1002, "Invalid password")
+            return
 
     key = ws.headers.get('sec-websocket-key')
     clients[key] = ws

@@ -64,6 +64,17 @@ export default Vue.extend({
         name: this.types[val].value,
       })
     },
+    '$route.path': {
+      handler(path) {
+        console.log(path)
+        const index = this.types.findIndex((t) => t.value === path.slice(1))
+        if (index !== -1) {
+          this.selected = index
+        }
+      },
+      immediate: true,
+      deep: true,
+    },
   },
   mounted() {
     this.selected = this.types.findIndex(

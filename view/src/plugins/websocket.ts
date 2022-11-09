@@ -1,4 +1,3 @@
-import { NuxtRuntimeConfig } from '@nuxt/types/config/runtime'
 import { Context, Plugin } from '@nuxt/types'
 import {
   AddIllustLikeRequest,
@@ -205,6 +204,7 @@ export class WSUtils {
 export class WebSocketAPI {
   private ws!: WebSocket
   private $accessor!: Context['$accessor']
+  private $error: Context['error']
 
   public illust!: IllustAPI
   public manga!: MangaAPI
@@ -215,13 +215,15 @@ export class WebSocketAPI {
   public itemMute!: ItemMuteAPI
   public viewed!: ViewedAPI
 
-  constructor($config: NuxtRuntimeConfig, $accessor: Context['$accessor']) {
+  constructor(context: Context) {
+    const $config = context.$config
     const protocol = location.protocol === 'https:' ? 'wss' : 'ws'
     const domain =
       $config.baseURL === '/'
         ? `${location.host}/`
         : $config.baseURL.replace(/https?:\/\//, '')
-    this.$accessor = $accessor
+    this.$accessor = context.$accessor
+    this.$error = context.error
 
     this.connect(`${protocol}://${domain}api/ws`)
   }
@@ -250,7 +252,11 @@ export class WebSocketAPI {
       throw new Error('url is required')
     }
 
-    this.ws = new WebSocket(url ?? this.ws.url)
+    const password =
+      this.$accessor.auth.password !== ''
+        ? this.$accessor.auth.password
+        : undefined
+    this.ws = new WebSocket(url ?? this.ws.url, password)
     this.ws.addEventListener('open', this.onOpen.bind(this))
     this.ws.addEventListener('close', this.onClose.bind(this))
     this.ws.addEventListener('message', this.onMessage.bind(this))
@@ -298,10 +304,19 @@ export class WebSocketAPI {
   private onClose(event: CloseEvent) {
     console.log('[WebSocket] closed', event.code, event.reason)
 
+    if (event.code === 1002) {
+      // 1002: protocol error = authorization failed
+      this.$error({
+        message: 'WebSocket authorization failed',
+        statusCode: 401,
+      })
+      return
+    }
+
     setTimeout(() => {
       console.log('[WebSocket] reconnecting...')
       this.connect()
-    })
+    }, 1000)
   }
 
   private onMessage(event: MessageEvent) {
@@ -371,7 +386,7 @@ declare module 'vuex/types/index' {
 
 let api: WebSocketAPI | null = null
 const websocketPlugin: Plugin = (context, inject) => {
-  api = new WebSocketAPI(context.$config, context.$accessor)
+  api = new WebSocketAPI(context)
   inject('api', api)
 }
 
