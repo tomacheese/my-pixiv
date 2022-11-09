@@ -61,13 +61,14 @@ export default Vue.extend({
 
   methods: {
     update() {
+      console.log('[DEBUG] update()')
       this.started = false
       this.items = null
       this.waitUntilReady()
     },
 
     waitUntilReady() {
-      console.log('[DEBUG] waitUntilReady(), ', this.isReady())
+      console.log('[DEBUG] waitUntilReady()', this.isReady())
 
       if (this.isReady()) {
         this.positionItems()
@@ -78,10 +79,19 @@ export default Vue.extend({
       } else this.getReady()
     },
 
-    isReady() {
+    isReady(): boolean {
+      console.log(
+        '[DEBUG] isReady()',
+        !!this.$el,
+        !!this.items,
+        this.items ? this.items?.length : undefined,
+        this.items && this.items.length > 0
+          ? this.items[0].getBoundingClientRect().width
+          : undefined
+      )
       return (
         this.$el &&
-        this.items &&
+        !!this.items &&
         this.items.length > 0 &&
         this.items[0].getBoundingClientRect().width > 0
       )
@@ -101,7 +111,7 @@ export default Vue.extend({
     },
 
     init() {
-      console.log('[DEBUG] init()', this.started)
+      console.log('[DEBUG] init()', this.isReady(), this.started)
       if (!this.isReady() || this.started) return
       ;(this.$el as HTMLElement).style.position = 'relative'
 
