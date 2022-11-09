@@ -67,6 +67,8 @@ export default Vue.extend({
     },
 
     waitUntilReady() {
+      console.log('[DEBUG] waitUntilReady(), ', this.isReady())
+
       if (this.isReady()) {
         this.positionItems()
 
@@ -86,10 +88,12 @@ export default Vue.extend({
     },
 
     getReady() {
+      console.log('[DEBUG] getReady()')
       const interval = setInterval(() => {
         this.items = this.$el.children
 
         if (this.isReady()) {
+          console.log('[DEBUG] ready')
           clearInterval(interval)
           this.init()
         }
@@ -97,6 +101,7 @@ export default Vue.extend({
     },
 
     init() {
+      console.log('[DEBUG] init()', this.started)
       if (!this.isReady() || this.started) return
       ;(this.$el as HTMLElement).style.position = 'relative'
 
