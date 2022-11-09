@@ -1,6 +1,7 @@
 import asyncio
 import hashlib
 import json
+import math
 import os
 import re
 import time
@@ -150,7 +151,8 @@ def twi_img_download(url: str,
 
 
 def search_pixiv(item_type: str,
-                 word: str):
+                 word: str,
+                 search_item_count: int):
     api = init_pixiv_api()
     if item_type == "illust":
         func = api.search_illust
@@ -178,9 +180,11 @@ def search_pixiv(item_type: str,
             if cache["updated_at"] > time.time() - 3600:
                 return cache["items"]
 
-    # とりあえず150件取得
+    # 1ページに30件。search_item_countを30で割った数だけ検索する
+    search_page_count = math.ceil(search_item_count / 30)
+
     items = []
-    for i in range(5):
+    for i in range(search_page_count):
         results = func(word, offset=i * 30)
         if key not in results:
             print(results)

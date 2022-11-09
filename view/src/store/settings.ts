@@ -9,6 +9,7 @@ export interface Target {
   tag: string[]
   ignores: string[]
   minLikeCount: number
+  searchItemCount: number
 }
 
 export interface Filter {

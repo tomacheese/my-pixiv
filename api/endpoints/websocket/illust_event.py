@@ -46,8 +46,9 @@ class SearchIllustApi:
                 "message": "word is required"
             })
             return
+        search_item_count = data.get("search_item_count", 150)
 
-        items = search_pixiv("illust", word)
+        items = search_pixiv("illust", word, search_item_count)
         if items is None:
             await client.send_json({
                 "status": False,

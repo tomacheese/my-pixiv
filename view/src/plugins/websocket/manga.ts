@@ -18,6 +18,7 @@ export interface GetMangaResponse extends BaseResponse {
 export interface SearchMangaRequest extends BaseRequest {
   type: 'searchManga'
   word: string
+  search_item_count: number
 }
 
 /** マンガ検索レスポンスモデル */
@@ -77,11 +78,15 @@ export class MangaAPI {
    * @param word 検索するワード。タグを指定する。複数指定する場合はスペース区切りで指定
    * @returns 検索結果レスポンス
    */
-  public searchByTag(word: string): Promise<SearchMangaResponse> {
+  public searchByTag(
+    word: string,
+    searchItemCount: number
+  ): Promise<SearchMangaResponse> {
     return this.utils.request<SearchMangaRequest, SearchMangaResponse>(
       'searchManga',
       {
         word,
+        search_item_count: searchItemCount,
       }
     )
   }
