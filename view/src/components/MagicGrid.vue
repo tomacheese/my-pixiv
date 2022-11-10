@@ -71,6 +71,7 @@ export default Vue.extend({
       console.log('[DEBUG] waitUntilReady()', this.isReady())
 
       if (this.isReady()) {
+        this.started = true
         this.positionItems()
 
         window.addEventListener('resize', () => {
@@ -121,7 +122,6 @@ export default Vue.extend({
         if (this.animate) item.style.transition = 'top, left 0.2s ease'
       })
 
-      this.started = true
       this.waitUntilReady()
     },
 
