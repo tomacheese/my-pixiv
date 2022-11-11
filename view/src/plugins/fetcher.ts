@@ -71,6 +71,19 @@ export class Fetcher {
       .filter((item) => !this.isMutedItem(item))
   }
 
+  public getFetchLater() {
+    const items = this.$accessor.settings.later
+
+    return items
+      .filter((item) => !this.isFilterItem(null, item))
+      .filter((item) => !this.isMutedItem(item))
+      .filter((item) =>
+        this.targetType === 'ILLUST'
+          ? isPixivIllustItem(item)
+          : isPixivNovelItem(item)
+      )
+  }
+
   public isLoadMoreAvailable() {
     return this.recommendedNextUrl !== null
   }

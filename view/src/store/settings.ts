@@ -1,4 +1,5 @@
 import { actionTree, getterTree, mutationTree } from 'typed-vuex'
+import { isPixivIllustItem, PixivItem } from '@/types/pixivItem'
 
 export type TargetType = 'ILLUST' | 'MANGA' | 'NOVEL'
 
@@ -35,6 +36,7 @@ interface Settings {
   getTweetTiming: GetTweetTiming
   targets: Target[]
   filters: Filter[]
+  later: PixivItem[]
 }
 
 export const state = (): Settings => ({
@@ -51,6 +53,7 @@ export const state = (): Settings => ({
   getTweetTiming: 'POPUP_OPEN',
   targets: [],
   filters: [],
+  later: [],
 })
 
 export type RootState = ReturnType<typeof state>
@@ -75,6 +78,14 @@ export const getters = getterTree(state, {
     )
   },
   filters: (state) => state.filters,
+  later: (state) => state.later,
+  isLater: (state) => (item: PixivItem) => {
+    return state.later.some(
+      (later) =>
+        later.id === item.id &&
+        isPixivIllustItem(item) === isPixivIllustItem(later)
+    )
+  },
 })
 
 export const mutations = mutationTree(state, {
@@ -101,6 +112,7 @@ export const mutations = mutationTree(state, {
       state.getTweetTiming = settings.getTweetTiming
     if (settings.targets !== undefined) state.targets = settings.targets
     if (settings.filters !== undefined) state.filters = settings.filters
+    if (settings.later !== undefined) state.later = settings.later
   },
   setDarkMode(state, isDarkMode: boolean) {
     state.isDarkMode = isDarkMode
@@ -140,6 +152,9 @@ export const mutations = mutationTree(state, {
   },
   setFilters(state, filters: Filter[]) {
     state.filters = filters
+  },
+  setLater(state, later: PixivItem[]) {
+    state.later = later
   },
 })
 
@@ -183,6 +198,15 @@ export const actions = actionTree(
         state.filters.filter(
           (f) => f.type !== filter.type || f.value !== filter.value
         )
+      )
+    },
+    addLater({ state, commit }, item: PixivItem) {
+      commit('setLater', [...state.later, item])
+    },
+    removeLater({ state, commit }, item: PixivItem) {
+      commit(
+        'setLater',
+        state.later.filter((i) => i !== item)
       )
     },
   }
