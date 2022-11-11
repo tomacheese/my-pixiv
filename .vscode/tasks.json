@@ -8,17 +8,10 @@
   "tasks": [
     {
       "label": "Run",
-      "dependsOn": ["Open browser", "Run client-dev", "Run server-dev"],
+      "dependsOn": ["Run client-dev", "Run server-dev", "Open browser"],
       "runOptions": {
         "runOn": "folderOpen"
       }
-    },
-    {
-      "label": "Open browser",
-      "type": "process",
-      "command": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
-      "args": ["http://localhost:3000"],
-      "hide": true
     },
     {
       "label": "Run client-dev",
@@ -34,6 +27,16 @@
       "command": "${workspaceFolder}/scripts/server-dev.ps1",
       "presentation": {
         "group": "groupServerStuff"
+      }
+    },
+    {
+      "label": "Open browser",
+      "type": "process",
+      "command": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+      "args": ["http://localhost:3000"],
+      "hide": true,
+      "presentation": {
+        "close": true
       }
     }
   ]
