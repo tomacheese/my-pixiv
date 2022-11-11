@@ -1,7 +1,7 @@
 <!-- eslint-disable vue/no-v-html -->
 <template>
-  <ItemMuting :item="item">
-    <v-card class="disable-tap-expand" @click="open(item)">
+  <ItemLongPress :item="item">
+    <v-card @click="open(item)">
       <div
         class="d-flex flex-no-wrap justify-space-between"
         style="min-height: 200px"
@@ -59,12 +59,12 @@
         </v-badge>
       </div>
     </v-card>
-  </ItemMuting>
+  </ItemLongPress>
 </template>
 
 <script lang="ts">
 import Vue from 'vue'
-import ItemMuting from './ItemMuting.vue'
+import ItemLongPress from './ItemLongPress.vue'
 import {
   isPixivNovelItem,
   PixivItem,
@@ -72,7 +72,7 @@ import {
 } from '@/types/pixivItem'
 
 export default Vue.extend({
-  components: { ItemMuting },
+  components: { ItemLongPress },
   props: {
     item: {
       type: Object as () => PixivItemWithSearchTag,
@@ -129,10 +129,6 @@ export default Vue.extend({
 </script>
 
 <style scoped>
-.disable-tap-expand {
-  touch-action: manipulation;
-}
-
 .item-card-tags {
   height: 37px;
   overflow-y: scroll;

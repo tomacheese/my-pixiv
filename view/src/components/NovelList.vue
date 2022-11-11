@@ -5,7 +5,8 @@
       :loaded="count.loaded"
       :failed="count.failed"
       :total="count.total"
-    ></VLoadProgress>
+    >
+    </VLoadProgress>
     <ItemList
       :items="items"
       :loading="loading"
@@ -30,6 +31,11 @@ export default Vue.extend({
   name: 'NovelList',
   props: {
     recommended: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+    later: {
       type: Boolean,
       required: false,
       default: false,
@@ -70,7 +76,8 @@ export default Vue.extend({
   async created() {
     this.selectType = this.$accessor.settings.novelViewType
 
-    if (!this.recommended) {
+    // 既読情報は検索結果画面のみで使用
+    if (!this.recommended && !this.later) {
       this.vieweds = this.$accessor.viewed.novels
     } else {
       this.vieweds = undefined
@@ -86,6 +93,15 @@ export default Vue.extend({
         return !this.fetcher?.isMutedItem(item)
       })
     })
+    this.$nuxt.$on('update-laters', async () => {
+      if (!this.fetcher) {
+        return
+      }
+      if (!this.later) {
+        return
+      }
+      await this.fetch()
+    })
   },
   methods: {
     async fetch() {
@@ -98,7 +114,11 @@ export default Vue.extend({
           'NOVEL'
         )
       }
-      if (!this.recommended) {
+      if (this.recommended) {
+        this.items = await this.fetcher.getFetchRecommended()
+      } else if (this.later) {
+        this.items = this.fetcher.getFetchLater()
+      } else {
         const targets = this.$accessor.settings.specificTargets('NOVEL')
         this.count.total = targets.length
         await Promise.all(
@@ -115,8 +135,6 @@ export default Vue.extend({
             this.count.loaded++
           })
         )
-      } else {
-        this.items = await this.fetcher.getFetchRecommended()
       }
       this.loading = false
     },

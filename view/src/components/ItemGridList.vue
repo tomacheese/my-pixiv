@@ -16,7 +16,7 @@
         :loading="loading"
         @intersect="onItemViewing"
       >
-        <ItemMuting :item="item">
+        <ItemLongPress :item="item">
           <v-badge
             overlap
             :content="'NEW'"
@@ -47,7 +47,7 @@
               </v-img>
             </v-card>
           </v-badge>
-        </ItemMuting>
+        </ItemLongPress>
       </ItemWrapper>
     </MagicGrid>
     <v-btn

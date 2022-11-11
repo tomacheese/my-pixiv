@@ -4,9 +4,14 @@
       <v-tabs
         v-model="selected"
         fixed-tabs
+        show-arrows
+        :icons-and-text="!isXsBreakpoint"
         :class="{ 'sticky-header': isHeaderSticky }"
       >
-        <v-tab v-for="t of types" :key="t.value">{{ t.name }}</v-tab>
+        <v-tab v-for="t of types" :key="t.value">
+          <div class="hidden-xs-only">{{ t.name }}</div>
+          <v-icon>{{ t.icon }}</v-icon>
+        </v-tab>
         <DarkModeSwitch />
       </v-tabs>
       <Nuxt />
@@ -26,27 +31,40 @@ export default Vue.extend({
     DarkModeSwitch,
     GlobalSnackbar,
   },
-  data() {
+  data(): {
+    selected: number
+    types: { icon: `mdi-${string}`; name: string; value: string }[]
+  } {
     return {
       selected: -1,
       types: [
         {
+          icon: 'mdi-home',
           name: 'おすすめ',
           value: 'recommended',
         },
         {
+          icon: 'mdi-image',
           name: 'イラスト',
           value: 'illust',
         },
         {
+          icon: 'mdi-book-open',
           name: 'マンガ',
           value: 'manga',
         },
         {
+          icon: 'mdi-text',
           name: '小説',
           value: 'novel',
         },
         {
+          icon: 'mdi-paperclip',
+          name: 'あとで見る',
+          value: 'later',
+        },
+        {
+          icon: 'mdi-cog',
           name: '設定',
           value: 'settings',
         },
@@ -56,6 +74,9 @@ export default Vue.extend({
   computed: {
     isHeaderSticky(): boolean {
       return this.$accessor.settings.headerSticky
+    },
+    isXsBreakpoint(): boolean {
+      return this.$vuetify.breakpoint.name === 'xs'
     },
   },
   watch: {
