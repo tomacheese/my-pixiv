@@ -18,7 +18,17 @@
         v-model="page"
         :length="item.meta_pages.length === 0 ? 1 : item.meta_pages.length"
         class="mt-3"
-      ></v-pagination>
+      >
+      </v-pagination>
+      <v-row
+        v-if="isLoadingImage"
+        class="fill-height ma-0"
+        align="center"
+        justify="center"
+      >
+        <v-progress-circular indeterminate class="my-10" color="grey lighten-5">
+        </v-progress-circular>
+      </v-row>
       <div class="text-center">
         <v-img
           ref="image"
@@ -28,14 +38,6 @@
           @click="clickImage"
           @load="loadedImage()"
         >
-          <template #placeholder>
-            <v-row class="fill-height ma-0" align="center" justify="center">
-              <v-progress-circular
-                indeterminate
-                color="grey lighten-5"
-              ></v-progress-circular>
-            </v-row>
-          </template>
         </v-img>
       </div>
     </v-card-text>
@@ -95,6 +97,7 @@ export default Vue.extend({
   },
   data(): {
     isLiked: boolean
+    isLoadingImage: boolean
     page: number
     isTweetOpened: boolean
     tweetStatus: TweetStatus
@@ -103,6 +106,7 @@ export default Vue.extend({
   } {
     return {
       isLiked: false,
+      isLoadingImage: true,
       page: 1,
       isTweetOpened: false,
       tweetStatus: 'LOADING',
@@ -119,6 +123,7 @@ export default Vue.extend({
       this.page = 1
 
       this.tweetStatus = 'LOADING'
+      this.isLoadingImage = true
       setTimeout(() => {
         this.getTweets()
       }, 1000)
@@ -162,6 +167,7 @@ export default Vue.extend({
       }
     },
     loadedImage() {
+      this.isLoadingImage = false
       if (this.$accessor.settings.getTweetTiming !== 'IMAGE_LOADED') {
         return
       }
