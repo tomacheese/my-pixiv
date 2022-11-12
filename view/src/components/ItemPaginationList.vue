@@ -4,18 +4,30 @@
       v-model="page"
       :length="
         Math.ceil(
-          items.filter((item) => (isOnlyNew ? !isViewed(item) : true)).length /
+          items
+            .filter((item) => (isOnlyNew ? !isViewed(item) : true))
+            .filter((item) => (isExcludeLiked ? !isLiked(item) : true)).length /
             getPaginationLimit()
         )
       "
       :total-visible="11"
       class="my-3"
     ></v-pagination>
-    <v-switch
-      v-if="vieweds !== undefined"
-      v-model="isOnlyNew"
-      label="New のみ表示"
-    ></v-switch>
+    <v-row>
+      <v-col>
+        <v-switch
+          v-if="vieweds !== undefined"
+          v-model="isOnlyNew"
+          label="New のみ表示"
+        ></v-switch>
+      </v-col>
+      <v-col>
+        <v-switch
+          v-model="isExcludeLiked"
+          label="未いいね！のみ表示"
+        ></v-switch>
+      </v-col>
+    </v-row>
     <v-row>
       <v-col v-if="getItems().length === 0 && !loading" cols="12">
         <v-card>
@@ -48,7 +60,9 @@
       v-if="
         page ===
           Math.ceil(
-            items.filter((item) => (isOnlyNew ? !isViewed(item) : true))
+            items
+              .filter((item) => (isOnlyNew ? !isViewed(item) : true))
+              .filter((item) => (isExcludeLiked ? !isLiked(item) : true))
               .length / getPaginationLimit()
           ) && isLoadMoreAvailable
       "
@@ -88,19 +102,25 @@ export default Vue.extend({
   data(): {
     page: number
     isOnlyNew: boolean
+    isExcludeLiked: boolean
   } {
     return {
       page: 1,
       isOnlyNew: false,
+      isExcludeLiked: false,
     }
   },
   watch: {
     isOnlyNew() {
       this.$accessor.settings.setOnlyNew(this.isOnlyNew)
     },
+    isExcludeLiked() {
+      this.$accessor.settings.setExcludeLiked(this.isExcludeLiked)
+    },
   },
   mounted() {
     this.isOnlyNew = this.$accessor.settings.onlyNew
+    this.isExcludeLiked = this.$accessor.settings.excludeLiked
   },
   methods: {
     getPaginationLimit() {
@@ -109,6 +129,7 @@ export default Vue.extend({
     getItems(): PixivItem[] {
       return this.items
         .filter((item) => (this.isOnlyNew ? !this.isViewed(item) : true))
+        .filter((item) => (this.isExcludeLiked ? !this.isLiked(item) : true))
         .slice(
           (this.page - 1) * this.getPaginationLimit(),
           this.page * this.getPaginationLimit()
@@ -130,6 +151,9 @@ export default Vue.extend({
         return false
       }
       return this.vieweds.includes(item.id)
+    },
+    isLiked(item: PixivItem): boolean {
+      return item.is_bookmarked
     },
     loadMore(): void {
       this.$emit('load-more')

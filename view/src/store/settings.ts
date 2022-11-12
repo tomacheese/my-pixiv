@@ -25,6 +25,7 @@ export type GetTweetTiming = 'POPUP_OPEN' | 'IMAGE_LOADED'
 interface Settings {
   isDarkMode: boolean
   isOnlyNew: boolean
+  isExcludeLiked: boolean
   isAutoSyncVieweds: boolean
   isAutoSyncMutes: boolean
   viewType: ViewType
@@ -42,6 +43,7 @@ interface Settings {
 export const state = (): Settings => ({
   isDarkMode: false,
   isOnlyNew: false,
+  isExcludeLiked: false,
   isAutoSyncVieweds: false,
   isAutoSyncMutes: false,
   viewType: 'PAGINATION',
@@ -62,6 +64,7 @@ export const getters = getterTree(state, {
   settings: (state) => state,
   darkMode: (state) => state.isDarkMode,
   onlyNew: (state) => state.isOnlyNew,
+  excludeLiked: (state) => state.isExcludeLiked,
   autoSyncVieweds: (state) => state.isAutoSyncVieweds,
   autoSyncMutes: (state) => state.isAutoSyncMutes,
   viewType: (state) => state.viewType,
@@ -93,6 +96,8 @@ export const mutations = mutationTree(state, {
     if (settings.isDarkMode !== undefined)
       state.isDarkMode = settings.isDarkMode
     if (settings.isOnlyNew !== undefined) state.isOnlyNew = settings.isOnlyNew
+    if (settings.isExcludeLiked !== undefined)
+      state.isExcludeLiked = settings.isExcludeLiked
     if (settings.isAutoSyncVieweds !== undefined)
       state.isAutoSyncVieweds = settings.isAutoSyncVieweds
     if (settings.isAutoSyncMutes !== undefined)
@@ -119,6 +124,9 @@ export const mutations = mutationTree(state, {
   },
   setOnlyNew(state, isOnlyNew: boolean) {
     state.isOnlyNew = isOnlyNew
+  },
+  setExcludeLiked(state, isExcludeLiked: boolean) {
+    state.isExcludeLiked = isExcludeLiked
   },
   setAutoSyncVieweds(state, isAutoSyncVieweds: boolean) {
     state.isAutoSyncVieweds = isAutoSyncVieweds

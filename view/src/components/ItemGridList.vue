@@ -1,16 +1,26 @@
 <template>
   <div>
-    <v-switch
-      v-if="vieweds !== undefined"
-      v-model="isOnlyNew"
-      label="New のみ表示"
-    ></v-switch>
-    <v-card v-if="getItems.length === 0 && !loading">
+    <v-row>
+      <v-col>
+        <v-switch
+          v-if="vieweds !== undefined"
+          v-model="isOnlyNew"
+          label="New のみ表示"
+        ></v-switch>
+      </v-col>
+      <v-col>
+        <v-switch
+          v-model="isExcludeLiked"
+          label="未いいね！のみ表示"
+        ></v-switch>
+      </v-col>
+    </v-row>
+    <v-card v-if="getItems().length === 0 && !loading">
       <v-card-title>該当するアイテムはありません。</v-card-title>
     </v-card>
     <MagicGrid ref="magic-grid" :animate="true" :use-min="true" :gap="10">
       <ItemWrapper
-        v-for="item of getItems"
+        v-for="item of getItems()"
         :key="item.id"
         :item="item"
         :loading="loading"
@@ -90,18 +100,13 @@ export default Vue.extend({
   data(): {
     page: number
     isOnlyNew: boolean
+    isExcludeLiked: boolean
   } {
     return {
       page: 1,
       isOnlyNew: false,
+      isExcludeLiked: false,
     }
-  },
-  computed: {
-    getItems(): PixivItem[] {
-      return this.items.filter((item) =>
-        this.isOnlyNew ? !this.isViewed(item) : true
-      )
-    },
   },
   watch: {
     isOnlyNew() {
@@ -109,6 +114,9 @@ export default Vue.extend({
       this.$nextTick(() => {
         ;(this.$refs['magic-grid'] as any).update()
       })
+    },
+    isExcludeLiked() {
+      this.$accessor.settings.setExcludeLiked(this.isExcludeLiked)
     },
     items() {
       this.$nextTick(() => {
@@ -126,8 +134,14 @@ export default Vue.extend({
   },
   mounted() {
     this.isOnlyNew = this.$accessor.settings.onlyNew
+    this.isExcludeLiked = this.$accessor.settings.excludeLiked
   },
   methods: {
+    getItems(): PixivItem[] {
+      return this.items
+        .filter((item) => (this.isOnlyNew ? !this.isViewed(item) : true))
+        .filter((item) => (this.isExcludeLiked ? !this.isLiked(item) : true))
+    },
     open(item: PixivItem): void {
       this.$emit('open', item)
     },
@@ -139,6 +153,9 @@ export default Vue.extend({
         return false
       }
       return this.vieweds.includes(item.id)
+    },
+    isLiked(item: PixivItem): boolean {
+      return item.is_bookmarked
     },
     calcHeight(item: PixivItem): string {
       if (isPixivNovelItem(item)) return '338px'
