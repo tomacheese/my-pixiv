@@ -1,20 +1,30 @@
 <template>
   <v-container>
-    <v-switch
-      v-if="vieweds !== undefined"
-      v-model="isOnlyNew"
-      label="New のみ表示"
-    ></v-switch>
     <v-row>
-      <v-col v-if="getItems.length === 0 && !loading" cols="12">
+      <v-col>
+        <v-switch
+          v-if="vieweds !== undefined"
+          v-model="isOnlyNew"
+          label="New のみ表示"
+        ></v-switch>
+      </v-col>
+      <v-col>
+        <v-switch
+          v-model="isExcludeLiked"
+          label="未いいね！のみ表示"
+        ></v-switch>
+      </v-col>
+    </v-row>
+    <v-row>
+      <v-col v-if="getItems().length === 0 && !loading" cols="12">
         <v-card>
           <v-card-title>該当するアイテムはありません。</v-card-title>
         </v-card>
       </v-col>
       <v-virtual-scroll
-        v-if="getItems.length > 0"
+        v-if="getItems().length > 0"
         :bench="10"
-        :items="getItems"
+        :items="getItems()"
         item-height="210"
         style="overflow-y: hidden"
       >
@@ -66,28 +76,32 @@ export default Vue.extend({
   data(): {
     page: number
     isOnlyNew: boolean
+    isExcludeLiked: boolean
   } {
     return {
       page: 1,
       isOnlyNew: false,
+      isExcludeLiked: false,
     }
-  },
-  computed: {
-    getItems(): PixivItem[] {
-      return this.items.filter((item) =>
-        this.isOnlyNew ? !this.isViewed(item) : true
-      )
-    },
   },
   watch: {
     isOnlyNew() {
       this.$accessor.settings.setOnlyNew(this.isOnlyNew)
     },
+    isExcludeLiked() {
+      this.$accessor.settings.setExcludeLiked(this.isExcludeLiked)
+    },
   },
   mounted() {
     this.isOnlyNew = this.$accessor.settings.onlyNew
+    this.isExcludeLiked = this.$accessor.settings.excludeLiked
   },
   methods: {
+    getItems(): PixivItem[] {
+      return this.items
+        .filter((item) => (this.isOnlyNew ? !this.isViewed(item) : true))
+        .filter((item) => (this.isExcludeLiked ? !this.isLiked(item) : true))
+    },
     changePage() {
       setTimeout(() => {
         window.scroll({ top: 0, behavior: 'smooth' })
@@ -104,6 +118,9 @@ export default Vue.extend({
         return false
       }
       return this.vieweds.includes(item.id)
+    },
+    isLiked(item: PixivItem): boolean {
+      return item.is_bookmarked
     },
   },
 })
