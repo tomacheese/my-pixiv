@@ -20,11 +20,15 @@
         class="mt-3"
       >
       </v-pagination>
-      <v-progress-linear
+      <v-row
         v-if="isLoadingImage"
-        indeterminate
-        class="my-5"
-      ></v-progress-linear>
+        class="fill-height ma-0"
+        align="center"
+        justify="center"
+      >
+        <v-progress-circular indeterminate class="my-10" color="grey lighten-5">
+        </v-progress-circular>
+      </v-row>
       <div class="text-center">
         <v-img
           ref="image"
