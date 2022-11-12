@@ -6,7 +6,11 @@
       color="orange"
       :class="{ 'sticky-later-header': isHeaderSticky }"
     >
-      <v-tab v-for="t of types" :key="t.value">{{ t.name }}</v-tab>
+      <v-tab v-for="t of types" :key="t.value">
+        <v-badge :content="getCount(t.value)" :value="getCount(t.value)">
+          {{ t.name }}
+        </v-badge>
+      </v-tab>
     </v-tabs>
     <v-container fluid>
       <IllustList
@@ -26,6 +30,7 @@
 <script lang="ts">
 import Vue from 'vue'
 import { TargetType } from '@/store/settings'
+import { isPixivIllustItem, isPixivNovelItem } from '@/types/pixivItem'
 export default Vue.extend({
   name: 'LaterPage',
   data(): {
@@ -51,6 +56,13 @@ export default Vue.extend({
   computed: {
     isHeaderSticky(): boolean {
       return this.$accessor.settings.headerSticky
+    },
+  },
+  methods: {
+    getCount(type: TargetType): number {
+      return this.$accessor.settings.later.filter((item) =>
+        type === 'ILLUST' ? isPixivIllustItem(item) : isPixivNovelItem(item)
+      ).length
     },
   },
 })
