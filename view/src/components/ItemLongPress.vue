@@ -85,6 +85,29 @@
                 </v-list-item-subtitle>
               </v-list-item-content>
             </v-list-item>
+
+            <v-list-item v-if="isShareable" two-line @click="shareItem()">
+              <v-list-item-icon>
+                <v-icon>mdi-share-variant</v-icon>
+              </v-list-item-icon>
+              <v-list-item-content>
+                <v-list-item-title>共有</v-list-item-title>
+                <v-list-item-subtitle>
+                  このアイテムを共有します
+                </v-list-item-subtitle>
+              </v-list-item-content>
+            </v-list-item>
+            <v-list-item v-else two-line @click="copyItemUrl()">
+              <v-list-item-icon>
+                <v-icon>mdi-content-copy</v-icon>
+              </v-list-item-icon>
+              <v-list-item-content>
+                <v-list-item-title>URLをコピー</v-list-item-title>
+                <v-list-item-subtitle>
+                  このアイテムのURLをコピーします
+                </v-list-item-subtitle>
+              </v-list-item-content>
+            </v-list-item>
           </v-list>
         </v-card-text>
       </v-card>
@@ -117,6 +140,7 @@ type SnackBarType =
   | 'ADDED_ITEM'
   | 'ADDED_AUTHOR'
   | 'ADDED_SERIES'
+  | 'COPIED'
   | 'ALREADY_MUTE_ADDED'
   | 'FAILED'
 interface SnackBarView {
@@ -172,6 +196,11 @@ export default Vue.extend({
           message: 'このシリーズをミュートしました。',
           color: 'success',
         },
+        COPIED: {
+          icon: 'mdi-check',
+          message: 'URLをコピーしました。',
+          color: 'success',
+        },
         ALREADY_MUTE_ADDED: {
           icon: 'mdi-warning',
           message: 'すでにミュートされています。',
@@ -198,6 +227,9 @@ export default Vue.extend({
     },
     isLater(): boolean {
       return this.$accessor.settings.isLater(this.item)
+    },
+    isShareable(): boolean {
+      return 'share' in navigator
     },
     seriesTitle(): string {
       if (!isSeriesItem(this.item.series)) return ''
@@ -278,6 +310,36 @@ export default Vue.extend({
           break
       }
       this.isSnackbar = true
+    },
+    shareItem(): void {
+      navigator.share({
+        url: this.getShareUrl(),
+      })
+      this.isOpen = false
+    },
+    copyItemUrl(): void {
+      const url = this.getShareUrl()
+      if (!navigator.clipboard) {
+        const textarea = document.createElement('textarea')
+        textarea.value = url
+        document.body.appendChild(textarea)
+        textarea.select()
+        document.execCommand('copy')
+        document.body.removeChild(textarea)
+      } else {
+        navigator.clipboard.writeText(url)
+      }
+      this.snackbarType = 'COPIED'
+      this.isSnackbar = true
+      this.isOpen = false
+    },
+    getShareUrl(): string {
+      if (isPixivIllustItem(this.item)) {
+        return `https://www.pixiv.net/artworks/${this.item.id}`
+      } else if (isPixivNovelItem(this.item)) {
+        return `https://www.pixiv.net/novel/show.php?id=${this.item.id}`
+      }
+      return ''
     },
     onLongPress() {
       this.isOpen = true
