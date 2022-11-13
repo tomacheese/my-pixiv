@@ -26,6 +26,7 @@ interface Settings {
   isDarkMode: boolean
   isOnlyNew: boolean
   isExcludeLiked: boolean
+  isExcludeR18: boolean
   isAutoSyncVieweds: boolean
   isAutoSyncMutes: boolean
   viewType: ViewType
@@ -44,6 +45,7 @@ export const state = (): Settings => ({
   isDarkMode: false,
   isOnlyNew: false,
   isExcludeLiked: false,
+  isExcludeR18: false,
   isAutoSyncVieweds: false,
   isAutoSyncMutes: false,
   viewType: 'PAGINATION',
@@ -65,6 +67,7 @@ export const getters = getterTree(state, {
   darkMode: (state) => state.isDarkMode,
   onlyNew: (state) => state.isOnlyNew,
   excludeLiked: (state) => state.isExcludeLiked,
+  excludeR18: (state) => state.isExcludeR18,
   autoSyncVieweds: (state) => state.isAutoSyncVieweds,
   autoSyncMutes: (state) => state.isAutoSyncMutes,
   viewType: (state) => state.viewType,
@@ -98,6 +101,8 @@ export const mutations = mutationTree(state, {
     if (settings.isOnlyNew !== undefined) state.isOnlyNew = settings.isOnlyNew
     if (settings.isExcludeLiked !== undefined)
       state.isExcludeLiked = settings.isExcludeLiked
+    if (settings.isExcludeR18 !== undefined)
+      state.isExcludeR18 = settings.isExcludeR18
     if (settings.isAutoSyncVieweds !== undefined)
       state.isAutoSyncVieweds = settings.isAutoSyncVieweds
     if (settings.isAutoSyncMutes !== undefined)
@@ -127,6 +132,9 @@ export const mutations = mutationTree(state, {
   },
   setExcludeLiked(state, isExcludeLiked: boolean) {
     state.isExcludeLiked = isExcludeLiked
+  },
+  setExcludeR18(state, isExcludeR18: boolean) {
+    state.isExcludeR18 = isExcludeR18
   },
   setAutoSyncVieweds(state, isAutoSyncVieweds: boolean) {
     state.isAutoSyncVieweds = isAutoSyncVieweds

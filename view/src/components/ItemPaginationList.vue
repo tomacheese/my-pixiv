@@ -2,14 +2,7 @@
   <v-container>
     <v-pagination
       v-model="page"
-      :length="
-        Math.ceil(
-          items
-            .filter((item) => (isOnlyNew ? !isViewed(item) : true))
-            .filter((item) => (isExcludeLiked ? !isLiked(item) : true)).length /
-            getPaginationLimit()
-        )
-      "
+      :length="Math.ceil(getFilteredItems().length / getPaginationLimit())"
       :total-visible="11"
       class="my-3"
     ></v-pagination>
@@ -24,8 +17,11 @@
       <v-col>
         <v-switch
           v-model="isExcludeLiked"
-          label="未いいね！のみ表示"
+          label="いいね！済みを非表示"
         ></v-switch>
+      </v-col>
+      <v-col>
+        <v-switch v-model="isExcludeR18" label="R18を非表示"></v-switch>
       </v-col>
     </v-row>
     <v-row>
@@ -46,25 +42,15 @@
     </v-row>
     <v-pagination
       v-model="page"
-      :length="
-        Math.ceil(
-          items.filter((item) => (isOnlyNew ? !isViewed(item) : true)).length /
-            getPaginationLimit()
-        )
-      "
+      :length="Math.ceil(getFilteredItems().length / getPaginationLimit())"
       :total-visible="11"
       class="my-3"
       @input="changePage"
     ></v-pagination>
     <v-btn
       v-if="
-        page ===
-          Math.ceil(
-            items
-              .filter((item) => (isOnlyNew ? !isViewed(item) : true))
-              .filter((item) => (isExcludeLiked ? !isLiked(item) : true))
-              .length / getPaginationLimit()
-          ) && isLoadMoreAvailable
+        page === Math.ceil(getFilteredItems().length / getPaginationLimit()) &&
+        isLoadMoreAvailable
       "
       block
       large
@@ -103,11 +89,13 @@ export default Vue.extend({
     page: number
     isOnlyNew: boolean
     isExcludeLiked: boolean
+    isExcludeR18: boolean
   } {
     return {
       page: 1,
       isOnlyNew: false,
       isExcludeLiked: false,
+      isExcludeR18: false,
     }
   },
   watch: {
@@ -117,23 +105,30 @@ export default Vue.extend({
     isExcludeLiked() {
       this.$accessor.settings.setExcludeLiked(this.isExcludeLiked)
     },
+    isExcludeR18() {
+      this.$accessor.settings.setExcludeR18(this.isExcludeR18)
+    },
   },
   mounted() {
     this.isOnlyNew = this.$accessor.settings.onlyNew
     this.isExcludeLiked = this.$accessor.settings.excludeLiked
+    this.isExcludeR18 = this.$accessor.settings.excludeR18
   },
   methods: {
     getPaginationLimit() {
       return this.$accessor.settings.paginationLimit
     },
-    getItems(): PixivItem[] {
+    getFilteredItems() {
       return this.items
         .filter((item) => (this.isOnlyNew ? !this.isViewed(item) : true))
         .filter((item) => (this.isExcludeLiked ? !this.isLiked(item) : true))
-        .slice(
-          (this.page - 1) * this.getPaginationLimit(),
-          this.page * this.getPaginationLimit()
-        )
+        .filter((item) => (this.isExcludeR18 ? !this.isR18(item) : true))
+    },
+    getItems(): PixivItem[] {
+      return this.getFilteredItems().slice(
+        (this.page - 1) * this.getPaginationLimit(),
+        this.page * this.getPaginationLimit()
+      )
     },
     changePage() {
       setTimeout(() => {
@@ -154,6 +149,9 @@ export default Vue.extend({
     },
     isLiked(item: PixivItem): boolean {
       return item.is_bookmarked
+    },
+    isR18(item: PixivItem): boolean {
+      return item.tags.some((tag) => tag.name === 'R-18')
     },
     loadMore(): void {
       this.$emit('load-more')
