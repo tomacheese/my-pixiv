@@ -14,6 +14,9 @@
           label="未いいね！のみ表示"
         ></v-switch>
       </v-col>
+      <v-col>
+        <v-switch v-model="isExcludeR18" label="R18を非表示"></v-switch>
+      </v-col>
     </v-row>
     <v-row>
       <v-col v-if="getItems().length === 0 && !loading" cols="12">
@@ -77,11 +80,13 @@ export default Vue.extend({
     page: number
     isOnlyNew: boolean
     isExcludeLiked: boolean
+    isExcludeR18: boolean
   } {
     return {
       page: 1,
       isOnlyNew: false,
       isExcludeLiked: false,
+      isExcludeR18: false,
     }
   },
   watch: {
@@ -90,6 +95,9 @@ export default Vue.extend({
     },
     isExcludeLiked() {
       this.$accessor.settings.setExcludeLiked(this.isExcludeLiked)
+    },
+    isExcludeR18() {
+      this.$accessor.settings.setExcludeR18(this.isExcludeR18)
     },
   },
   mounted() {
@@ -101,6 +109,7 @@ export default Vue.extend({
       return this.items
         .filter((item) => (this.isOnlyNew ? !this.isViewed(item) : true))
         .filter((item) => (this.isExcludeLiked ? !this.isLiked(item) : true))
+        .filter((item) => (this.isExcludeR18 ? !this.isR18(item) : true))
     },
     changePage() {
       setTimeout(() => {
@@ -121,6 +130,9 @@ export default Vue.extend({
     },
     isLiked(item: PixivItem): boolean {
       return item.is_bookmarked
+    },
+    isR18(item: PixivItem): boolean {
+      return item.tags.some((tag) => tag.name === 'R-18')
     },
   },
 })
