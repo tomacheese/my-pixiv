@@ -1,29 +1,26 @@
 <template>
   <div>
     <ViewTypeSelector />
+    <IllustPopupSettings />
     <PaginationSettings v-if="isActivePagination()" />
-    <ActionsPosition />
-    <GetTweetTiming />
     <HeaderSticky />
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue'
-import GetTweetTiming from './GetTweetTiming.vue'
 import ViewTypeSelector from '@/components/settings/view/ViewTypeSelector.vue'
 import PaginationSettings from '@/components/settings/view/PaginationSettings.vue'
-import ActionsPosition from '@/components/settings/view/ActionsPosition.vue'
 import HeaderSticky from '@/components/settings/view/HeaderSticky.vue'
+import IllustPopupSettings from '@/components/settings/view/IllustPopupSettings.vue'
 
 export default Vue.extend({
   name: 'ViewSettings',
   components: {
     ViewTypeSelector,
     PaginationSettings,
-    ActionsPosition,
     HeaderSticky,
-    GetTweetTiming,
+    IllustPopupSettings,
   },
   methods: {
     isActivePagination(): boolean {

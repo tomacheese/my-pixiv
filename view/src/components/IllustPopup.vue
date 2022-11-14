@@ -33,7 +33,7 @@
         <v-img
           ref="image"
           contain
-          max-height="100vh"
+          :max-height="illustPopupMaxHeight"
           :src="getImage(item)"
           @click="clickImage"
           @load="loadedImage()"
@@ -113,6 +113,11 @@ export default Vue.extend({
       tweets: null,
       shadowBans: [],
     }
+  },
+  computed: {
+    illustPopupMaxHeight(): string {
+      return `${this.$accessor.settings.illustPopupMaxHeight}vh`
+    },
   },
   watch: {
     item() {

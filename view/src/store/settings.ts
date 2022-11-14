@@ -29,6 +29,7 @@ interface Settings {
   isExcludeR18: boolean
   isAutoSyncVieweds: boolean
   isAutoSyncMutes: boolean
+  illustPopupMaxHeight: number
   viewType: ViewType
   novelViewType: ViewType
   paginationLimit: number
@@ -48,6 +49,7 @@ export const state = (): Settings => ({
   isExcludeR18: false,
   isAutoSyncVieweds: false,
   isAutoSyncMutes: false,
+  illustPopupMaxHeight: 100,
   viewType: 'PAGINATION',
   novelViewType: 'PAGINATION',
   paginationLimit: 10,
@@ -70,6 +72,7 @@ export const getters = getterTree(state, {
   excludeR18: (state) => state.isExcludeR18,
   autoSyncVieweds: (state) => state.isAutoSyncVieweds,
   autoSyncMutes: (state) => state.isAutoSyncMutes,
+  illustPopupMaxHeight: (state) => state.illustPopupMaxHeight,
   viewType: (state) => state.viewType,
   novelViewType: (state) => state.novelViewType,
   paginationLimit: (state) => state.paginationLimit,
@@ -107,6 +110,8 @@ export const mutations = mutationTree(state, {
       state.isAutoSyncVieweds = settings.isAutoSyncVieweds
     if (settings.isAutoSyncMutes !== undefined)
       state.isAutoSyncMutes = settings.isAutoSyncMutes
+    if (settings.illustPopupMaxHeight !== undefined)
+      state.illustPopupMaxHeight = settings.illustPopupMaxHeight
     if (settings.viewType !== undefined) state.viewType = settings.viewType
     if (settings.novelViewType !== undefined)
       state.novelViewType = settings.novelViewType
@@ -141,6 +146,9 @@ export const mutations = mutationTree(state, {
   },
   setAutoSyncMutes(state, isAutoSyncMutes: boolean) {
     state.isAutoSyncMutes = isAutoSyncMutes
+  },
+  setIllustPopupMaxHeight(state, illustPopupMaxHeight: number) {
+    state.illustPopupMaxHeight = illustPopupMaxHeight
   },
   setViewType(state, viewType: ViewType) {
     state.viewType = viewType
