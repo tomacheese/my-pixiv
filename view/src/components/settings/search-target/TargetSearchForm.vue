@@ -60,19 +60,31 @@ export default Vue.extend({
       targetTypes: Object.keys(targetTypeMap),
     }
   },
+  watch: {
+    item: {
+      handler() {
+        this.init()
+      },
+      immediate: true,
+      deep: true,
+    },
+  },
   mounted() {
-    if (!this.item) {
-      return
-    }
-    this.targetType = this.item.targetType.map(
-      (t) =>
-        Object.keys(targetTypeMap).find((k) => targetTypeMap[k] === t) || ''
-    )
-    this.tag = this.item.tag.join(' ')
-    this.ignores = this.item.ignores.join(' ')
-    this.minLikeCount = this.item.minLikeCount.toString()
+    this.init()
   },
   methods: {
+    init() {
+      if (!this.item) {
+        return
+      }
+      this.targetType = this.item.targetType.map(
+        (t) =>
+          Object.keys(targetTypeMap).find((k) => targetTypeMap[k] === t) || ''
+      )
+      this.tag = this.item.tag.join(' ')
+      this.ignores = this.item.ignores.join(' ')
+      this.minLikeCount = this.item.minLikeCount.toString()
+    },
     add(): void {
       this.$accessor.settings.addTarget({
         targetType: this.targetType.map((t) => targetTypeMap[t]),
