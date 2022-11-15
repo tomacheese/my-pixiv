@@ -188,7 +188,8 @@ def search_pixiv(item_type: str,
         results = func(word, offset=i * 30)
         if key not in results:
             print(results)
-            raise HTTPException(status_code=500, detail=item_type + " not found (" + results["message"] + ")")
+            error_message = results["error"]["message"] if "error" in results else "Unknown error"
+            raise HTTPException(status_code=500, detail=item_type + " not found (" + error_message + ")")
 
         if item_type == "novel":
             # 小説の場合typeがない
