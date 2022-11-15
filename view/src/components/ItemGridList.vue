@@ -11,7 +11,7 @@
       <v-col>
         <v-switch
           v-model="isExcludeLiked"
-          label="未いいね！のみ表示"
+          label="いいね！済みを非表示"
         ></v-switch>
       </v-col>
       <v-col>
