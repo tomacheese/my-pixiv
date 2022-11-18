@@ -156,6 +156,7 @@ export default Vue.extend({
   },
   methods: {
     fetch() {
+      this.pageCount = Math.ceil(this.$accessor.itemMute.items.length / 10)
       for (const item of this.$accessor.itemMute.items) {
         if (this.items.find((i) => i.id === item.id && i.type === item.type)) {
           continue
