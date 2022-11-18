@@ -67,6 +67,7 @@
                   icon
                   elevation="5"
                   :color="getHeartColor(tweet, 'main')"
+                  :loading="likeLoading"
                   @click.stop="toggleLike(tweet, 'main')"
                 >
                   <v-icon>mdi-cards-heart</v-icon>
@@ -75,6 +76,7 @@
                   icon
                   elevation="5"
                   :color="getHeartColor(tweet, 'sub')"
+                  :loading="likeLoading"
                   @click.stop="toggleLike(tweet, 'sub')"
                 >
                   <v-icon>mdi-tag-heart</v-icon>
@@ -126,6 +128,7 @@ export interface TweetPopupProp {
 
 export interface TweetPopupData {
   loading: boolean
+  likeLoading: boolean
   liked: { [key in TwitterAccountType]: string[] }
 }
 
@@ -183,6 +186,7 @@ export default Vue.extend({
   data(): TweetPopupData {
     return {
       loading: false,
+      likeLoading: false,
       liked: {
         main: [],
         sub: [],
@@ -266,6 +270,7 @@ export default Vue.extend({
       )
     },
     requestLike(tweet: Tweet, account: TwitterAccountType, isAdd: boolean) {
+      this.likeLoading = true
       if (this.$api.getReadyState() !== WebSocket.OPEN) {
         this.$api.reconnect()
       }
@@ -281,6 +286,7 @@ export default Vue.extend({
               (id) => id !== tweet.tweet.id
             )
           }
+          this.likeLoading = false
         })
         .catch((err) => {
           if (err instanceof WebSocketAPIError) {
@@ -296,6 +302,7 @@ export default Vue.extend({
             }`,
             color: 'error',
           })
+          this.likeLoading = false
         })
     },
     isCheckingShadowBan(screenName: string) {
