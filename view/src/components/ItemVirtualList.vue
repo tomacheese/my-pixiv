@@ -103,6 +103,7 @@ export default Vue.extend({
   mounted() {
     this.isOnlyNew = this.$accessor.settings.onlyNew
     this.isExcludeLiked = this.$accessor.settings.excludeLiked
+    this.isExcludeR18 = this.$accessor.settings.excludeR18
   },
   methods: {
     getItems(): PixivItem[] {
