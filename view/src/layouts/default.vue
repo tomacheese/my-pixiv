@@ -15,6 +15,7 @@
         <DarkModeSwitch />
       </v-tabs>
       <Nuxt />
+      <WebSocketStatusSnackbar />
       <GlobalSnackbar />
     </v-main>
   </v-app>
@@ -23,12 +24,14 @@
 <script lang="ts">
 import Vue from 'vue'
 import DarkModeSwitch from '@/components/DarkModeSwitch.vue'
+import WebSocketStatusSnackbar from '@/components/WebSocketStatusSnackbar.vue'
 import GlobalSnackbar from '@/components/GlobalSnackbar.vue'
 
 export default Vue.extend({
   name: 'DefaultLayout',
   components: {
     DarkModeSwitch,
+    WebSocketStatusSnackbar,
     GlobalSnackbar,
   },
   data(): {
