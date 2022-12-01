@@ -210,6 +210,7 @@ export class WebSocketAPI {
   private $error: Context['error']
 
   private pingInterval: NodeJS.Timer | null = null
+  public lastCloseEvent: CloseEvent | null = null
 
   public illust!: IllustAPI
   public manga!: MangaAPI
@@ -265,7 +266,6 @@ export class WebSocketAPI {
     this.ws = new WebSocket(url ?? this.ws.url, password)
     this.ws.addEventListener('open', this.onOpen.bind(this))
     this.ws.addEventListener('close', this.onClose.bind(this))
-    this.ws.addEventListener('error', this.onError.bind(this))
     this.ws.addEventListener('message', this.onMessage.bind(this))
 
     this.illust = new IllustAPI(this.ws)
@@ -323,17 +323,9 @@ export class WebSocketAPI {
     }
   }
 
-  private onError(e: Event) {
-    console.error('[WebSocket] error', e)
-
-    this.$error({
-      message: 'WebSocket error occurred',
-      statusCode: 0,
-    })
-  }
-
   private onClose(event: CloseEvent) {
     console.log('[WebSocket] closed', event.code, event.reason)
+    this.lastCloseEvent = event
 
     if (event.code === 1002) {
       // 1002: protocol error = authorization failed
