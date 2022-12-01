@@ -10,6 +10,7 @@ from api.endpoints.websocket.illust_event import AddIllustLikeApi, GetIllustApi,
 from api.endpoints.websocket.item_mute_event import AddItemMuteApi, GetItemMuteApi, RemoveItemMuteApi
 from api.endpoints.websocket.manga_event import AddMangaLikeApi, GetMangaApi, RecommendedMangaApi, SearchMangaApi
 from api.endpoints.websocket.novel_event import GetNovelApi, RecommendedNovelApi, SearchNovelApi
+from api.endpoints.websocket.ping_event import PingPongApi
 from api.endpoints.websocket.series_event import GetNovelSeriesApi
 from api.endpoints.websocket.twitter_event import AddTweetLikeApi, CheckShadowBanApi, GetTweetsLikeApi, \
     RemoveTweetLikeApi, SearchTweetApi
@@ -42,6 +43,7 @@ webSocketEndPoints = {
     "getItemMute": GetItemMuteApi(),
     "addItemMute": AddItemMuteApi(),
     "removeItemMute": RemoveItemMuteApi(),
+    "ping": PingPongApi()
 }
 
 

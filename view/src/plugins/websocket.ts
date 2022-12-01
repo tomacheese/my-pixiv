@@ -68,6 +68,7 @@ import {
   GetNovelSeriesResponse,
   NovelSeriesAPI,
 } from './websocket/novel-series'
+import { PingAPI, PingRequest, PingResponse } from './websocket/ping'
 
 export interface BaseRequest {
   type: string
@@ -113,6 +114,7 @@ export type Request =
   | RemoveItemMuteRequest
   | GetViewedRequest
   | AddViewedRequest
+  | PingRequest
 export type Response =
   | GetIllustResponse
   | SearchIllustResponse
@@ -138,6 +140,7 @@ export type Response =
   | GetViewedResponse
   | AddViewedResponse
   | ShareAddViewedResponse
+  | PingResponse
 
 export class WSUtils {
   protected ws!: WebSocket
@@ -206,6 +209,8 @@ export class WebSocketAPI {
   private $accessor!: Context['$accessor']
   private $error: Context['error']
 
+  private pingInterval: NodeJS.Timer | null = null
+
   public illust!: IllustAPI
   public manga!: MangaAPI
   public novel!: NovelAPI
@@ -214,6 +219,7 @@ export class WebSocketAPI {
   public twitter!: TwitterAPI
   public itemMute!: ItemMuteAPI
   public viewed!: ViewedAPI
+  public ping!: PingAPI
 
   constructor(context: Context) {
     const $config = context.$config
@@ -259,6 +265,7 @@ export class WebSocketAPI {
     this.ws = new WebSocket(url ?? this.ws.url, password)
     this.ws.addEventListener('open', this.onOpen.bind(this))
     this.ws.addEventListener('close', this.onClose.bind(this))
+    this.ws.addEventListener('error', this.onError.bind(this))
     this.ws.addEventListener('message', this.onMessage.bind(this))
 
     this.illust = new IllustAPI(this.ws)
@@ -269,10 +276,25 @@ export class WebSocketAPI {
     this.twitter = new TwitterAPI(this.ws)
     this.itemMute = new ItemMuteAPI(this.ws)
     this.viewed = new ViewedAPI(this.ws)
+    this.ping = new PingAPI(this.ws)
   }
 
   private onOpen() {
     console.log('[WebSocket] connected')
+
+    // 定期的にpingを送信
+    if (this.pingInterval) {
+      clearInterval(this.pingInterval)
+    }
+    this.pingInterval = setInterval(() => {
+      this.ping.ping().catch(() => {
+        console.warn('[WebSocket] ping failed. reconnecting...')
+        this.reconnect()
+      })
+    }, 30000)
+    this.ws.addEventListener('close', () => {
+      this.pingInterval && clearInterval(this.pingInterval)
+    })
 
     // ViewedとItemMuteの同期
     if (this.$accessor.settings.isAutoSyncVieweds) {
@@ -299,6 +321,15 @@ export class WebSocketAPI {
           console.error('[WebSocket] ItemMute sync failed', e)
         })
     }
+  }
+
+  private onError(e: Event) {
+    console.error('[WebSocket] error', e)
+
+    this.$error({
+      message: 'WebSocket error occurred',
+      statusCode: 0,
+    })
   }
 
   private onClose(event: CloseEvent) {
