@@ -263,11 +263,11 @@ export default Vue.extend({
       if (!this.item) {
         return
       }
-      this.requestLike(
-        tweet,
-        account,
-        !this.liked[account].includes(tweet.tweet.id)
-      )
+      const isLiked = this.liked[account].includes(tweet.tweet.id)
+      if (isLiked && !confirm('いいねを取り消しますか？')) {
+        return
+      }
+      this.requestLike(tweet, account, !isLiked)
     },
     requestLike(tweet: Tweet, account: TwitterAccountType, isAdd: boolean) {
       this.likeLoading = true
