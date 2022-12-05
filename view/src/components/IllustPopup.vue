@@ -132,6 +132,12 @@ export default Vue.extend({
       setTimeout(() => {
         this.getTweets()
       }, 1000)
+
+      // イラストポップアップアクセス中は #illust-popup をつける
+      if (window.location.hash !== '#illust-popup') {
+        history.pushState(null, '', location.href)
+        history.replaceState(null, '', '#illust-popup')
+      }
     },
   },
   mounted() {
@@ -144,6 +150,18 @@ export default Vue.extend({
     if (this.$accessor.settings.getTweetTiming === 'POPUP_OPEN') {
       this.getTweets()
     }
+
+    // イラストポップアップアクセス中は #illust-popup をつける
+    if (window.location.hash !== '#illust-popup') {
+      history.pushState(null, '', location.href)
+      history.replaceState(null, '', '#illust-popup')
+    }
+
+    window.addEventListener('popstate', () => {
+      if (window.location.hash !== '#illust-popup') {
+        this.close()
+      }
+    })
   },
   methods: {
     openTwitter() {
@@ -280,6 +298,11 @@ export default Vue.extend({
       this.isTweetOpened = false
       this.tweetStatus = 'FAILED'
       this.$emit('close-popup')
+
+      const hash = window.location.hash
+      if (hash === '#illust-popup') {
+        history.back()
+      }
     },
     changeFullScreen() {
       this.$emit('change-fullscreen')
