@@ -96,6 +96,11 @@ export default Vue.extend({
     targetType() {
       this.fetch()
     },
+    'overlay.isIllustOpened'(val) {
+      if (!val && window.location.hash === '#illust-popup') {
+        history.back()
+      }
+    },
   },
   async created() {
     this.selectType = this.$accessor.settings.viewType
