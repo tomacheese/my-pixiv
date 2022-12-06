@@ -6,7 +6,10 @@
       :failed="count.failed"
       :total="count.total"
     >
-    </VLoadProgress>
+    </VLoadProgress
+    ><v-alert v-if="count.failed !== 0" type="warning" dense text
+      >一部の検索が失敗したため、すべての結果が表示されていません。</v-alert
+    >
     <ItemList
       :items="items"
       :loading="loading"
