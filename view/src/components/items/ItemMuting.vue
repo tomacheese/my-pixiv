@@ -85,6 +85,7 @@ import {
   PixivItem,
 } from '@/types/pixivItem'
 import { MuteTargetType } from '@/plugins/websocket/item-mute'
+import VLongPress from '@/components/utils/VLongPress.vue'
 
 type SnackBarType =
   | 'ADDED_ITEM'
@@ -100,6 +101,9 @@ interface SnackBarView {
 
 export default Vue.extend({
   name: 'ItemMuting',
+  components: {
+    VLongPress,
+  },
   props: {
     item: {
       type: Object as () => PixivItem,

@@ -23,9 +23,9 @@
 
 <script lang="ts">
 import Vue from 'vue'
-import DarkModeSwitch from '@/components/DarkModeSwitch.vue'
-import WebSocketStatusSnackbar from '@/components/WebSocketStatusSnackbar.vue'
-import GlobalSnackbar from '@/components/GlobalSnackbar.vue'
+import DarkModeSwitch from '@/components/utils/DarkModeSwitch.vue'
+import WebSocketStatusSnackbar from '@/components/utils/WebSocketStatusSnackbar.vue'
+import GlobalSnackbar from '@/components/utils/GlobalSnackbar.vue'
 
 export default Vue.extend({
   name: 'DefaultLayout',

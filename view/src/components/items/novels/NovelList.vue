@@ -7,6 +7,9 @@
       :total="count.total"
     >
     </VLoadProgress>
+    <v-alert v-if="count.failed !== 0" type="warning" dense text
+      >一部の検索が失敗したため、すべての結果が表示されていません。</v-alert
+    >
     <ItemList
       :items="items"
       :loading="loading"
@@ -17,17 +20,6 @@
       @intersect-item="onItemViewing"
       @load-more="loadMore"
     ></ItemList>
-    <v-dialog
-      v-model="overlay.isIllustOpened"
-      :fullscreen="overlay.isFullscreen"
-    >
-      <IllustPopup
-        :item="overlay.target"
-        :fullscreen="overlay.isFullscreen"
-        @change-fullscreen="overlay.isFullscreen = !overlay.isFullscreen"
-        @close-popup="close()"
-      ></IllustPopup>
-    </v-dialog>
   </v-container>
 </template>
 
@@ -35,15 +27,18 @@
 import Vue from 'vue'
 import { PixivItem, PixivItemWithSearchTag } from '@/types/pixivItem'
 import { Fetcher } from '@/plugins/fetcher'
-import { TargetType, ViewType } from '@/store/settings'
+import { ViewType } from '@/store/settings'
+import { openPixivNovel } from '@/utils/pixiv'
+import VLoadProgress from '@/components/utils/VLoadProgress.vue'
+import ItemList from '@/components/items/lists/ItemList.vue'
 
 export default Vue.extend({
-  name: 'IllustList',
+  name: 'NovelList',
+  components: {
+    VLoadProgress,
+    ItemList,
+  },
   props: {
-    targetType: {
-      type: String as () => TargetType,
-      required: true,
-    },
     recommended: {
       type: Boolean,
       required: false,
@@ -66,11 +61,6 @@ export default Vue.extend({
       failed: number
       total: number
     }
-    overlay: {
-      isIllustOpened: boolean
-      target: PixivItem | null
-      isFullscreen: boolean
-    }
     loading: boolean
   } {
     return {
@@ -84,11 +74,6 @@ export default Vue.extend({
         failed: 0,
         total: 0,
       },
-      overlay: {
-        isIllustOpened: false,
-        target: null,
-        isFullscreen: false,
-      },
       loading: false,
     }
   },
@@ -96,18 +81,13 @@ export default Vue.extend({
     targetType() {
       this.fetch()
     },
-    'overlay.isIllustOpened'(val) {
-      if (!val && window.location.hash === '#illust-popup') {
-        history.back()
-      }
-    },
   },
   async created() {
-    this.selectType = this.$accessor.settings.viewType
+    this.selectType = this.$accessor.settings.novelViewType
 
     // 既読情報は検索結果画面のみで使用
     if (!this.recommended && !this.later) {
-      this.vieweds = this.$accessor.viewed.illusts
+      this.vieweds = this.$accessor.viewed.novels
     } else {
       this.vieweds = undefined
     }
@@ -135,13 +115,12 @@ export default Vue.extend({
   methods: {
     async fetch() {
       this.loading = true
-
       if (!this.fetcher) {
         this.fetcher = new Fetcher(
           this.$config,
           this.$api,
           this.$accessor,
-          this.targetType
+          'NOVEL'
         )
       }
       if (this.recommended) {
@@ -149,12 +128,13 @@ export default Vue.extend({
       } else if (this.later) {
         this.items = this.fetcher.getFetchLater()
       } else {
-        const targets = this.$accessor.settings.specificTargets(this.targetType)
+        const targets = this.$accessor.settings.specificTargets('NOVEL')
         this.count.total = targets.length
-
         await Promise.all(
           targets.map(async (target) => {
-            const items = await this.fetcher?.getFetchItemPromise(target)
+            const items = await this.fetcher
+              ?.getFetchItemPromise(target)
+              .catch(() => null)
             if (!items) {
               this.count.failed++
               return
@@ -167,7 +147,6 @@ export default Vue.extend({
           })
         )
       }
-
       this.loading = false
     },
     loadMore() {
@@ -178,7 +157,6 @@ export default Vue.extend({
         return
       }
       this.loading = true
-
       this.fetcher
         .getFetchRecommended(true)
         .then((items) => {
@@ -197,12 +175,10 @@ export default Vue.extend({
       return this.fetcher.isLoadMoreAvailable()
     },
     open(item: PixivItem): void {
-      this.overlay.isIllustOpened = true
-      this.overlay.target = item
-    },
-    close() {
-      this.overlay.isIllustOpened = false
-      this.overlay.target = null
+      this.loading = true
+      openPixivNovel(this.$accessor, item.id).then(() => {
+        this.loading = false
+      })
     },
     onItemViewing(item: PixivItem) {
       if (this.loading) {
@@ -211,7 +187,7 @@ export default Vue.extend({
       if (this.recommended) {
         return
       }
-      this.$accessor.viewed.addIllust({
+      this.$accessor.viewed.addNovel({
         itemId: item.id,
         isSync: this.$accessor.settings.isAutoSyncVieweds,
       })

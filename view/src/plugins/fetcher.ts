@@ -89,7 +89,7 @@ export class Fetcher {
   }
 
   public getFetchItemPromise(target: Target) {
-    return new Promise<PixivItemWithSearchTag[]>((resolve) => {
+    return new Promise<PixivItemWithSearchTag[]>((resolve, reject) => {
       if (this.$api.getReadyState() !== WebSocket.OPEN) {
         this.$api.reconnect()
       }
@@ -125,7 +125,7 @@ export class Fetcher {
             )
           }
         )
-        .catch(null)
+        .catch((e) => reject(e))
     })
   }
 

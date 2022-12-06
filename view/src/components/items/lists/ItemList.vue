@@ -37,7 +37,16 @@
 import Vue from 'vue'
 import { PixivItem } from '@/types/pixivItem'
 import { ViewType } from '@/store/settings'
+import ItemPaginationList from '@/components/items/lists/ItemPaginationList.vue'
+import ItemVirtualList from '@/components/items/lists/ItemVirtualList.vue'
+import ItemGridList from '@/components/items/lists/ItemGridList.vue'
+
 export default Vue.extend({
+  components: {
+    ItemPaginationList,
+    ItemVirtualList,
+    ItemGridList,
+  },
   props: {
     type: {
       type: String as () => ViewType,
