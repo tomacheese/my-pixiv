@@ -31,8 +31,15 @@
 import Vue from 'vue'
 import { TargetType } from '@/store/settings'
 import { isPixivIllustItem, isPixivNovelItem } from '@/types/pixivItem'
+import IllustList from '@/components/items/illusts/IllustList.vue'
+import NovelList from '@/components/items/novels/NovelList.vue'
+
 export default Vue.extend({
   name: 'LaterPage',
+  components: {
+    IllustList,
+    NovelList,
+  },
   data(): {
     selected: number
     types: { name: string; value: TargetType }[]
