@@ -138,19 +138,18 @@ export function isShadowBanned(
 ) {
   const item = shadowBans.find(
     (result) =>
-      result.profile.screen_name.toLocaleLowerCase() ===
+      result.user.screen_name.toLocaleLowerCase() ===
       screenName.toLocaleLowerCase()
   )
   if (item == null) {
     return false
   }
   return (
-    item.profile.error === null &&
-    item.tests &&
-    (item.tests.ghost.ban ||
-      item.tests.more_replies.ban ||
-      !item.tests.search ||
-      !item.tests.typeahead)
+    !item.not_found &&
+    (item.ghost_ban ||
+      item.reply_deboosting ||
+      item.search_ban ||
+      item.search_suggestion_ban)
   )
 }
 
@@ -160,7 +159,7 @@ export function isCheckingShadowBan(
 ) {
   return !shadowBans.some(
     (result) =>
-      result.profile.screen_name.toLocaleLowerCase() ===
+      result.user.screen_name.toLocaleLowerCase() ===
       screenName.toLocaleLowerCase()
   )
 }
@@ -315,8 +314,7 @@ export default Vue.extend({
       if (
         !this.shadowBans.some(
           (result) =>
-            result.profile.screen_name.toLowerCase() ===
-            screenName.toLowerCase()
+            result.user.screen_name.toLowerCase() === screenName.toLowerCase()
         )
       ) {
         return 'grey'

@@ -260,7 +260,7 @@ export default Vue.extend({
       for (const screenName of this.tweets.screen_names) {
         if (
           this.shadowBans.some(
-            (result) => result.profile.screen_name === screenName
+            (result) => result.user.screen_name === screenName
           )
         ) {
           continue
