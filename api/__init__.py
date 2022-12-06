@@ -469,10 +469,10 @@ def get_shadow_ban(screen_name: str):
             if cache["updated_at"] > time.time() - 60 * 60 * 24:
                 return cache["result"]
 
-    response = requests.get("https://shadowban.hmpf.club/" + screen_name)
+    response = requests.get("https://taishin-miyamoto.com/ShadowBan/API/JSON", {
+        "screen_name": screen_name
+    })
     result = response.json()
-    if "screen_name" not in result["profile"]:
-        result["profile"]["screen_name"] = screen_name
 
     with open(path, "w", encoding="utf-8") as f:
         f.write(json.dumps({"result": result, "updated_at": time.time()}))

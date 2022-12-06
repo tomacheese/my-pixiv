@@ -21,26 +21,23 @@ export interface CheckShadowBanRequest extends BaseRequest {
 }
 
 export interface ShadowBanResult {
-  profile: {
-    error?: any
-    exists: boolean
-    has_tweets: boolean
-    id: string
+  Unfollowed: boolean
+  ghost_ban: boolean
+  no_tweet: boolean
+  not_found: boolean
+  protect: boolean
+  reply_deboosting: boolean
+  search_ban: boolean
+  search_suggestion_ban: boolean
+  suspend: boolean
+  user: {
+    followers_count: number
+    friends_count: number
+    id: number
+    name: string
+    profile_image_url_https: string
     screen_name: string
   }
-  tests?: {
-    ghost: {
-      ban: boolean
-    }
-    more_replies: {
-      ban: boolean
-      in_reply_to: string
-      tweet: string
-    }
-    search: boolean
-    typeahead: boolean
-  }
-  timestamp: number
 }
 
 /** シャドウバン確認レスポンスモデル */
