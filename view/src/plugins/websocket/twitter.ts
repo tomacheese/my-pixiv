@@ -1,5 +1,5 @@
 import { BaseRequest, BaseResponse, WSUtils } from '../websocket'
-import { Tweet } from '@/components/TweetPopup.vue'
+import { Tweet } from '@/components/items/illusts/TweetPopup.vue'
 
 /** ツイート検索リクエストモデル */
 export interface SearchTweetRequest extends BaseRequest {

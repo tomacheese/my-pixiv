@@ -26,9 +26,15 @@ import { PixivItem, PixivItemWithSearchTag } from '@/types/pixivItem'
 import { Fetcher } from '@/plugins/fetcher'
 import { ViewType } from '@/store/settings'
 import { openPixivNovel } from '@/utils/pixiv'
+import VLoadProgress from '@/components/utils/VLoadProgress.vue'
+import ItemList from '@/components/items/lists/ItemList.vue'
 
 export default Vue.extend({
   name: 'NovelList',
+  components: {
+    VLoadProgress,
+    ItemList,
+  },
   props: {
     recommended: {
       type: Boolean,
@@ -123,7 +129,9 @@ export default Vue.extend({
         this.count.total = targets.length
         await Promise.all(
           targets.map(async (target) => {
-            const items = await this.fetcher?.getFetchItemPromise(target)
+            const items = await this.fetcher
+              ?.getFetchItemPromise(target)
+              .catch(() => null)
             if (!items) {
               this.count.failed++
               return

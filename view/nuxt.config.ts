@@ -87,7 +87,7 @@ const config: NuxtConfig = {
     { src: '@/plugins/fetcher.ts', ssr: false },
   ],
 
-  components: true,
+  components: false,
 
   buildModules: [
     '@nuxt/typescript-build',

@@ -1,11 +1,5 @@
 <template>
   <v-container>
-    <v-pagination
-      v-model="page"
-      :length="Math.ceil(getFilteredItems().length / getPaginationLimit())"
-      :total-visible="11"
-      class="my-3"
-    ></v-pagination>
     <v-row>
       <v-col>
         <v-switch
@@ -30,42 +24,46 @@
           <v-card-title>該当するアイテムはありません。</v-card-title>
         </v-card>
       </v-col>
-      <v-col v-for="(item, i) in getItems()" :key="i" cols="12">
-        <ItemWrapper :item="item" :loading="loading" @intersect="onItemViewing">
-          <ItemCard
-            :item="item"
-            :is-viewed="vieweds !== undefined && !isViewed(item)"
-            @open="open"
-          />
-        </ItemWrapper>
-      </v-col>
+      <v-virtual-scroll
+        v-if="getItems().length > 0"
+        :bench="10"
+        :items="getItems()"
+        item-height="210"
+        style="overflow-y: hidden"
+      >
+        <template #default="{ item }">
+          <v-col cols="12">
+            <ItemWrapper
+              :item="item"
+              :loading="loading"
+              @intersect="onItemViewing"
+            >
+              <ItemCard
+                :item="item"
+                :is-viewed="vieweds !== undefined && !isViewed(item)"
+                @open="open"
+                @intersect="onItemViewing"
+              />
+            </ItemWrapper>
+          </v-col>
+        </template>
+      </v-virtual-scroll>
+      <!-- バーチャルスクロールでは、さらに読み込むボタン押下後にアイテムがロードされない不具合があるので実装しない -->
     </v-row>
-    <v-pagination
-      v-model="page"
-      :length="Math.ceil(getFilteredItems().length / getPaginationLimit())"
-      :total-visible="11"
-      class="my-3"
-      @input="changePage"
-    ></v-pagination>
-    <v-btn
-      v-if="
-        page === Math.ceil(getFilteredItems().length / getPaginationLimit()) &&
-        isLoadMoreAvailable
-      "
-      block
-      large
-      class="my-5"
-      :loading="loading"
-      @click="loadMore()"
-      >さらに読み込む</v-btn
-    >
   </v-container>
 </template>
 
 <script lang="ts">
 import Vue from 'vue'
 import { PixivItem } from '@/types/pixivItem'
+import ItemWrapper from '@/components/items/ItemWrapper.vue'
+import ItemCard from '@/components/items/ItemCard.vue'
+
 export default Vue.extend({
+  components: {
+    ItemWrapper,
+    ItemCard,
+  },
   props: {
     items: {
       type: Array as () => PixivItem[],
@@ -115,20 +113,11 @@ export default Vue.extend({
     this.isExcludeR18 = this.$accessor.settings.excludeR18
   },
   methods: {
-    getPaginationLimit() {
-      return this.$accessor.settings.paginationLimit
-    },
-    getFilteredItems() {
+    getItems(): PixivItem[] {
       return this.items
         .filter((item) => (this.isOnlyNew ? !this.isViewed(item) : true))
         .filter((item) => (this.isExcludeLiked ? !this.isLiked(item) : true))
         .filter((item) => (this.isExcludeR18 ? !this.isR18(item) : true))
-    },
-    getItems(): PixivItem[] {
-      return this.getFilteredItems().slice(
-        (this.page - 1) * this.getPaginationLimit(),
-        this.page * this.getPaginationLimit()
-      )
     },
     changePage() {
       setTimeout(() => {
@@ -152,9 +141,6 @@ export default Vue.extend({
     },
     isR18(item: PixivItem): boolean {
       return item.tags.some((tag) => tag.name === 'R-18')
-    },
-    loadMore(): void {
-      this.$emit('load-more')
     },
   },
 })

@@ -36,9 +36,17 @@ import Vue from 'vue'
 import { PixivItem, PixivItemWithSearchTag } from '@/types/pixivItem'
 import { Fetcher } from '@/plugins/fetcher'
 import { TargetType, ViewType } from '@/store/settings'
+import VLoadProgress from '@/components/utils/VLoadProgress.vue'
+import ItemList from '@/components/items/lists/ItemList.vue'
+import IllustPopup from '@/components/items/illusts/IllustPopup.vue'
 
 export default Vue.extend({
   name: 'IllustList',
+  components: {
+    VLoadProgress,
+    ItemList,
+    IllustPopup,
+  },
   props: {
     targetType: {
       type: String as () => TargetType,
@@ -154,7 +162,9 @@ export default Vue.extend({
 
         await Promise.all(
           targets.map(async (target) => {
-            const items = await this.fetcher?.getFetchItemPromise(target)
+            const items = await this.fetcher
+              ?.getFetchItemPromise(target)
+              .catch(() => null)
             if (!items) {
               this.count.failed++
               return

@@ -26,8 +26,15 @@
 <script lang="ts">
 import Vue from 'vue'
 import { TargetType } from '@/store/settings'
+import IllustList from '@/components/items/illusts/IllustList.vue'
+import NovelList from '@/components/items/novels/NovelList.vue'
+
 export default Vue.extend({
   name: 'RecommendedPage',
+  components: {
+    IllustList,
+    NovelList,
+  },
   data(): {
     selected: number
     types: { name: string; value: TargetType }[]
