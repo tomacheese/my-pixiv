@@ -25,7 +25,7 @@
                 :key="item.id + '-' + tag.name"
                 :color="getTagColor(item.searchTags, tag.name)"
                 class="ma-1"
-                @click.stop="copyToClipboard(tag.name)"
+                @click.stop="addMuteTag(tag.name)"
                 >{{ tag.name }}</v-chip
               >
             </div>
@@ -102,16 +102,28 @@ export default Vue.extend({
     open(item: PixivItem): void {
       this.$emit('open', item)
     },
-    copyToClipboard(text: string) {
-      const textarea = document.createElement('textarea')
-      textarea.value = text
-      document.body.appendChild(textarea)
-      textarea.select()
-      document.execCommand('copy')
-      textarea.remove()
-
+    addMuteTag(text: string) {
+      if (!confirm(`「${text}」をミュートタグに追加しますか？`)) {
+        return
+      }
+      if (
+        this.$accessor.settings.isFiltered({
+          type: 'TAG',
+          value: text,
+        })
+      ) {
+        this.$nuxt.$emit('snackbar', {
+          message: `「${text}」は既にミュートタグに追加されています`,
+          color: 'error',
+        })
+        return
+      }
+      this.$accessor.settings.addFilter({
+        type: 'TAG',
+        value: text,
+      })
       this.$nuxt.$emit('snackbar', {
-        message: `コピーしました。`,
+        message: `「${text}」をミュートタグに追加しました。`,
         color: 'success',
       })
     },

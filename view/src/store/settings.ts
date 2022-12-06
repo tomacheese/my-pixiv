@@ -87,6 +87,11 @@ export const getters = getterTree(state, {
     )
   },
   filters: (state) => state.filters,
+  isFiltered: (state) => (filter: Filter) => {
+    return state.filters.some(
+      (f) => f.type === filter.type && f.value === filter.value
+    )
+  },
   later: (state) => state.later,
   isLater: (state) => (item: PixivItem) => {
     return state.later.some(
