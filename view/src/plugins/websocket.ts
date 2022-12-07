@@ -399,14 +399,6 @@ declare module '@nuxt/types' {
   }
 }
 
-declare module 'vuex/types/index' {
-  // this.$myInjectedFunction inside Vuex stores
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  interface Store<S> {
-    $myInjectedFunction(message: string): void
-  }
-}
-
 let api: WebSocketAPI | null = null
 const websocketPlugin: Plugin = (context, inject) => {
   api = new WebSocketAPI(context)

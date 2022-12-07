@@ -85,6 +85,7 @@ const config: NuxtConfig = {
     { src: '@/plugins/settings.ts', ssr: false },
     { src: '@/plugins/websocket.ts', ssr: false },
     { src: '@/plugins/fetcher.ts', ssr: false },
+    { src: '@/plugins/workbox.ts', mode: 'client' },
   ],
 
   components: false,
