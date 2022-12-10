@@ -40,7 +40,7 @@
               <v-img
                 width="240px"
                 :height="calcHeight(item)"
-                :src="item.image_urls.medium"
+                :src="getImageUrl(item)"
                 class="white--text align-end"
                 gradient="to bottom, rgba(0,0,0,.1), rgba(0,0,0,.5)"
               >
@@ -174,8 +174,15 @@ export default Vue.extend({
       return item.tags.some((tag) => tag.name === 'R-18')
     },
     calcHeight(item: PixivItem): string {
+      if (this.$accessor.settings.imageSizes.illustGridList === 'square_medium')
+        return '240px'
       if (isPixivNovelItem(item)) return '338px'
       return `${(item.height / item.width) * 240}px`
+    },
+    getImageUrl(item: PixivItem): string {
+      const size = this.$accessor.settings.imageSizes.illustGridList ?? 'medium'
+      console.log(size)
+      return item.image_urls[size] ?? ''
     },
     loadMore(): void {
       this.$emit('load-more')

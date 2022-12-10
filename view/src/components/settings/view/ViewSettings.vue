@@ -2,6 +2,7 @@
   <div>
     <ViewTypeSelector />
     <IllustPopupSettings />
+    <ImageSizeSetting />
     <PaginationSettings v-if="isActivePagination()" />
     <HeaderSticky />
   </div>
@@ -13,12 +14,14 @@ import ViewTypeSelector from '@/components/settings/view/ViewTypeSelector.vue'
 import PaginationSettings from '@/components/settings/view/PaginationSettings.vue'
 import HeaderSticky from '@/components/settings/view/HeaderSticky.vue'
 import IllustPopupSettings from '@/components/settings/view/IllustPopupSettings.vue'
+import ImageSizeSetting from '@/components/settings/view/ImageSizeSetting.vue'
 
 export default Vue.extend({
   name: 'ViewSettings',
   components: {
     ViewTypeSelector,
     PaginationSettings,
+    ImageSizeSetting,
     HeaderSticky,
     IllustPopupSettings,
   },

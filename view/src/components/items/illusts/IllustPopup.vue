@@ -168,10 +168,14 @@ export default Vue.extend({
       this.isTweetOpened = true
     },
     getImage(item: PixivIllustItem): string {
+      const size = this.$accessor.settings.imageSizes.illustPopup || 'large'
       if (item.meta_pages.length === 0) {
-        return item.image_urls.large
+        return item.image_urls[size] || item.image_urls.large
       }
-      return item.meta_pages[this.page - 1].image_urls.large
+      return (
+        item.meta_pages[this.page - 1].image_urls[size] ??
+        item.meta_pages[this.page - 1].image_urls.large
+      )
     },
     clickImage(e: MouseEvent) {
       const { naturalWidth } = this.$refs.image as HTMLImageElement
