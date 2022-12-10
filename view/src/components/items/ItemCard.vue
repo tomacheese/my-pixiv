@@ -45,7 +45,7 @@
             tile
             :class="{ 'hidden-md-and-down': isPixivNovelItem(item) }"
           >
-            <v-img :src="item.image_urls.square_medium">
+            <v-img :src="imageUrl">
               <template #placeholder>
                 <v-row class="fill-height ma-0" align="center" justify="center">
                   <v-progress-circular
@@ -84,6 +84,11 @@ export default Vue.extend({
     },
   },
   computed: {
+    imageUrl(): string {
+      const size =
+        this.$accessor.settings.imageSizes.illustList ?? 'square_medium'
+      return this.item.image_urls[size] ?? ''
+    },
     tags(): PixivItem['tags'] {
       const tag = this.item.tags
       return [

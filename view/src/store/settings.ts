@@ -1,5 +1,6 @@
 import { actionTree, getterTree, mutationTree } from 'typed-vuex'
 import { isPixivIllustItem, PixivItem } from '@/types/pixivItem'
+import { ImageUrls } from '@/types/pixivIllust'
 
 export type TargetType = 'ILLUST' | 'MANGA' | 'NOVEL'
 
@@ -16,6 +17,12 @@ export interface Target {
 export interface Filter {
   type: 'TITLE' | 'CAPTION' | 'TAG'
   value: string
+}
+
+export interface ImageSizes {
+  illustList: keyof ImageUrls
+  illustGridList: keyof ImageUrls
+  illustPopup: keyof ImageUrls
 }
 
 export type ActionPosition = 'LEFT' | 'RIGHT'
@@ -37,6 +44,7 @@ interface Settings {
   actionPosition: ActionPosition
   headerSticky: boolean
   getTweetTiming: GetTweetTiming
+  imageSizes: ImageSizes
   targets: Target[]
   filters: Filter[]
   later: PixivItem[]
@@ -57,6 +65,11 @@ export const state = (): Settings => ({
   actionPosition: 'RIGHT',
   headerSticky: false,
   getTweetTiming: 'POPUP_OPEN',
+  imageSizes: {
+    illustList: 'square_medium',
+    illustGridList: 'medium',
+    illustPopup: 'original',
+  },
   targets: [],
   filters: [],
   later: [],
@@ -80,6 +93,7 @@ export const getters = getterTree(state, {
   actionPosition: (state) => state.actionPosition,
   headerSticky: (state) => state.headerSticky,
   getTweetTiming: (state) => state.getTweetTiming,
+  imageSizes: (state) => state.imageSizes,
   targets: (state) => state.targets,
   specificTargets: (state) => (targetType: TargetType) => {
     return state.targets.filter((target) =>
@@ -130,6 +144,8 @@ export const mutations = mutationTree(state, {
       state.headerSticky = settings.headerSticky
     if (settings.getTweetTiming !== undefined)
       state.getTweetTiming = settings.getTweetTiming
+    if (settings.imageSizes !== undefined)
+      state.imageSizes = settings.imageSizes
     if (settings.targets !== undefined) state.targets = settings.targets
     if (settings.filters !== undefined) state.filters = settings.filters
     if (settings.later !== undefined) state.later = settings.later
@@ -175,6 +191,9 @@ export const mutations = mutationTree(state, {
   },
   setGetTweetTiming(state, getTweetTiming: GetTweetTiming) {
     state.getTweetTiming = getTweetTiming
+  },
+  setImageSizes(state, imageSizes: ImageSizes) {
+    state.imageSizes = imageSizes
   },
   setTargets: (state, targets: Target[]) => {
     state.targets = targets
