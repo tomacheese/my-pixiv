@@ -32,7 +32,7 @@
 
 <script lang="ts">
 import Vue from 'vue'
-import { ImageUrls } from '@/types/pixivIllust'
+import { ImageUrls } from 'my-pixiv-types'
 import { ImageSizes } from '@/store/settings'
 
 export default Vue.extend({

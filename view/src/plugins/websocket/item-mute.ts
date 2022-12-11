@@ -1,57 +1,16 @@
 import { Context } from '@nuxt/types'
-import { BaseRequest, BaseResponse, WSUtils } from '../websocket'
-
-export type MuteTargetType = 'ILLUST' | 'NOVEL' | 'USER' | 'NOVEL_SERIES'
-
-export interface ItemMute {
-  type: MuteTargetType
-  id: number
-}
-
-/** アイテムミュート取得リクエストモデル */
-export interface GetItemMuteRequest extends BaseRequest {
-  type: 'getItemMute'
-}
-
-/** アイテムミュート取得レスポンスモデル */
-export interface GetItemMuteResponse extends BaseResponse {
-  type: 'getItemMute'
-  items: ItemMute[]
-}
-
-/** アイテムミュート追加リクエストモデル */
-export interface AddItemMuteRequest extends BaseRequest {
-  type: 'addItemMute'
-  item: ItemMute
-}
-
-/** アイテムミュート追加レスポンスモデル */
-export interface AddItemMuteResponse extends BaseResponse {
-  type: 'addItemMute'
-}
-
-/** アイテムミュート削除リクエストモデル */
-export interface RemoveItemMuteRequest extends BaseRequest {
-  type: 'removeItemMute'
-  item: ItemMute
-}
-
-/** アイテムミュート削除レスポンスモデル */
-export interface RemoveItemMuteResponse extends BaseRequest {
-  type: 'removeItemMute'
-}
-
-/** アイテムミュート追加シェアレスポンスモデル */
-export interface ShareAddItemMuteResponse extends BaseResponse {
-  type: 'shareAddItemMute'
-  item: ItemMute
-}
-
-/** アイテムミュート削除シェアレスポンスモデル */
-export interface ShareRemoveItemMuteResponse extends BaseResponse {
-  type: 'shareRemoveItemMute'
-  item: ItemMute
-}
+import {
+  GetItemMuteResponse,
+  GetItemMuteRequest,
+  ItemMute,
+  AddItemMuteResponse,
+  AddItemMuteRequest,
+  RemoveItemMuteResponse,
+  RemoveItemMuteRequest,
+  ShareAddItemMuteResponse,
+  ShareRemoveItemMuteResponse,
+} from 'my-pixiv-types'
+import { WSUtils } from '../websocket'
 
 /**
  * my-pixiv WebSocket Item-Mute Sharing API

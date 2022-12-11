@@ -92,33 +92,15 @@
 
 <script lang="ts">
 import Vue from 'vue'
-import { PixivItem } from '@/types/pixivItem'
-import { openTwitterTweet, openTwitterUser } from '@/utils/twitter'
 import {
-  ShadowBanResult,
+  Tweet,
   TwitterAccountType,
-} from '@/plugins/websocket/twitter'
+  ShadowBanResult,
+  TwitterUser,
+} from 'my-pixiv-types'
+import { openTwitterTweet, openTwitterUser } from '@/utils/twitter'
 import { WebSocketAPIError } from '@/plugins/websocket'
-
-export interface User {
-  id: string
-  name: string
-  screen_name: string
-  profile_image_url: string
-}
-
-export interface TweetData {
-  id: string
-  text: string
-  media_url: string
-  user: User
-}
-
-export interface Tweet {
-  tweet: TweetData
-  similarity: number
-  identity: string
-}
+import { PixivItem } from '@/types/pixivItem'
 
 export interface TweetPopupProp {
   screen_names: string[]
@@ -223,7 +205,7 @@ export default Vue.extend({
           .map((tweet) => tweet.id)
       })
     },
-    getUserText(user: User): string {
+    getUserText(user: TwitterUser): string {
       return `${user.name} (@${user.screen_name})`
     },
     open(tweet: Tweet) {

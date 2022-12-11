@@ -1,19 +1,28 @@
 {
   "folders": [
     {
-      "name": "view",
-      "path": "view"
-    },
-    {
       "name": "api",
       "path": "api"
     },
     {
-      "name": "my-pixiv",
+      "name": "view",
+      "path": "view"
+    },
+    {
+      "name": "types",
+      "path": "types"
+    },
+    {
+      "name": "nginx",
+      "path": "nginx"
+    },
+    {
+      "name": "my-pixiv-v3",
       "path": "."
     }
   ],
-  "settings": {
-    "task.allowAutomaticTasks": "on"
+  "settings": {},
+  "extensions": {
+    "recommendations": ["anweber.vscode-httpyac"]
   }
 }

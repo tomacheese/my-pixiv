@@ -1,146 +1,21 @@
 import { Context, Plugin } from '@nuxt/types'
 import {
-  AddIllustLikeRequest,
-  AddIllustLikeResponse,
-  GetIllustRequest,
-  GetIllustResponse,
-  IllustAPI,
-  RecommendedIllustRequest,
-  RecommendedIllustResponse,
-  SearchIllustRequest,
-  SearchIllustResponse,
-} from './websocket/illust'
-import {
-  AddTweetLikeRequest,
-  AddTweetLikeResponse,
-  CheckShadowBanRequest,
-  CheckShadowBanResponse,
-  GetTweetsLikeRequest,
-  GetTweetsLikeResponse,
-  RemoveTweetLikeRequest,
-  RemoveTweetLikeResponse,
-  SearchTweetRequest,
-  SearchTweetResponse,
-  TwitterAPI,
-} from './websocket/twitter'
-import {
-  SearchMangaRequest,
-  RecommendedMangaRequest,
-  SearchMangaResponse,
-  RecommendedMangaResponse,
-  MangaAPI,
-  GetMangaRequest,
-  GetMangaResponse,
-  AddMangaLikeRequest,
-  AddMangaLikeResponse,
-} from './websocket/manga'
-import {
-  SearchNovelRequest,
-  RecommendedNovelRequest,
-  SearchNovelResponse,
-  RecommendedNovelResponse,
-  NovelAPI,
-  GetNovelResponse,
-  GetNovelRequest,
-} from './websocket/novel'
-import { GetUserRequest, GetUserResponse, UserAPI } from './websocket/user'
-import {
-  GetItemMuteRequest,
-  AddItemMuteRequest,
-  RemoveItemMuteRequest,
-  GetItemMuteResponse,
-  AddItemMuteResponse,
-  RemoveItemMuteResponse,
-  ItemMuteAPI,
+  BaseErrorResponse,
+  BaseResponseWithError,
   ShareAddItemMuteResponse,
-  ShareRemoveItemMuteResponse,
-} from './websocket/item-mute'
-import {
-  AddViewedRequest,
-  AddViewedResponse,
-  GetViewedRequest,
-  GetViewedResponse,
   ShareAddViewedResponse,
-  ViewedAPI,
-} from './websocket/viewed'
-import {
-  GetNovelSeriesRequest,
-  GetNovelSeriesResponse,
-  NovelSeriesAPI,
-} from './websocket/novel-series'
-import { PingAPI, PingRequest, PingResponse } from './websocket/ping'
-
-export interface BaseRequest {
-  type: string
-}
-
-export interface BaseResponse {
-  status: boolean
-  rid: number
-  type: string
-}
-
-interface BaseErrorResponse {
-  status: false
-  rid: number
-  type: string
-  code?: number
-  message: string
-}
-
-type BaseResponseWithError = BaseResponse | BaseErrorResponse
-
-export type Request =
-  | GetIllustRequest
-  | SearchIllustRequest
-  | RecommendedIllustRequest
-  | AddIllustLikeRequest
-  | GetMangaRequest
-  | SearchMangaRequest
-  | RecommendedMangaRequest
-  | AddMangaLikeRequest
-  | GetNovelRequest
-  | SearchNovelRequest
-  | RecommendedNovelRequest
-  | GetNovelSeriesRequest
-  | GetUserRequest
-  | SearchTweetRequest
-  | CheckShadowBanRequest
-  | GetTweetsLikeRequest
-  | AddTweetLikeRequest
-  | RemoveTweetLikeRequest
-  | GetItemMuteRequest
-  | AddItemMuteRequest
-  | RemoveItemMuteRequest
-  | GetViewedRequest
-  | AddViewedRequest
-  | PingRequest
-export type Response =
-  | GetIllustResponse
-  | SearchIllustResponse
-  | RecommendedIllustResponse
-  | AddIllustLikeResponse
-  | GetMangaResponse
-  | SearchMangaResponse
-  | RecommendedMangaResponse
-  | AddMangaLikeResponse
-  | GetNovelResponse
-  | SearchNovelResponse
-  | RecommendedNovelResponse
-  | GetNovelSeriesResponse
-  | GetUserResponse
-  | SearchTweetResponse
-  | CheckShadowBanResponse
-  | GetTweetsLikeResponse
-  | AddTweetLikeResponse
-  | RemoveTweetLikeResponse
-  | GetItemMuteResponse
-  | AddItemMuteResponse
-  | RemoveItemMuteResponse
-  | GetViewedResponse
-  | AddViewedResponse
-  | ShareAddViewedResponse
-  | PingResponse
+  ShareRemoveItemMuteResponse,
+  WebSocketRequest,
+  WebSocketResponse,
+} from 'my-pixiv-types'
+import { IllustAPI } from './websocket/illust'
+import { TwitterAPI } from './websocket/twitter'
+import { MangaAPI } from './websocket/manga'
+import { NovelAPI } from './websocket/novel'
+import { UserAPI } from './websocket/user'
+import { ItemMuteAPI } from './websocket/item-mute'
+import { ViewedAPI } from './websocket/viewed'
+import { PingAPI } from './websocket/ping'
 
 export class WSUtils {
   protected ws!: WebSocket
@@ -151,14 +26,14 @@ export class WSUtils {
     }
   }
 
-  public send(data: Request) {
+  public send(data: WebSocketRequest) {
     if (!this.ws) {
       throw new Error('WebSocket is not initialized')
     }
     this.ws.send(JSON.stringify(data))
   }
 
-  public request<Req extends Request, Res extends Response>(
+  public request<Req extends WebSocketRequest, Res extends WebSocketResponse>(
     type: Req['type'],
     params: Omit<Req, 'type'>
   ): Promise<Res> {
@@ -181,7 +56,7 @@ export class WSUtils {
           )
           return
         }
-        resolve(response as Res)
+        resolve(response as unknown as Res)
       }
       this.ws.addEventListener('message', event)
 
@@ -215,7 +90,6 @@ export class WebSocketAPI {
   public illust!: IllustAPI
   public manga!: MangaAPI
   public novel!: NovelAPI
-  public novelSeries!: NovelSeriesAPI
   public user!: UserAPI
   public twitter!: TwitterAPI
   public itemMute!: ItemMuteAPI
@@ -271,7 +145,6 @@ export class WebSocketAPI {
     this.illust = new IllustAPI(this.ws)
     this.manga = new MangaAPI(this.ws)
     this.novel = new NovelAPI(this.ws)
-    this.novelSeries = new NovelSeriesAPI(this.ws)
     this.user = new UserAPI(this.ws)
     this.twitter = new TwitterAPI(this.ws)
     this.itemMute = new ItemMuteAPI(this.ws)
@@ -352,17 +225,20 @@ export class WebSocketAPI {
       case 'shareAddItemMute':
         this.itemMute.onAddItemMute(
           this.$accessor,
-          data as ShareAddItemMuteResponse
+          data as unknown as ShareAddItemMuteResponse
         )
         break
       case 'shareRemoveItemMute':
         this.itemMute.onRemoveItemMute(
           this.$accessor,
-          data as ShareRemoveItemMuteResponse
+          data as unknown as ShareRemoveItemMuteResponse
         )
         break
       case 'shareAddViewed':
-        this.viewed.onAddViewed(this.$accessor, data as ShareAddViewedResponse)
+        this.viewed.onAddViewed(
+          this.$accessor,
+          data as unknown as ShareAddViewedResponse
+        )
         break
     }
   }

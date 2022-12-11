@@ -1,17 +1,5 @@
-import { BaseRequest, BaseResponse, WSUtils } from '../websocket'
-import { PixivUserItem } from '@/types/pixivUser'
-
-/** ユーザー取得リクエストモデル */
-export interface GetUserRequest extends BaseRequest {
-  type: 'getUser'
-  user_id: number
-}
-
-/** ユーザー取得レスポンスモデル */
-export interface GetUserResponse extends BaseResponse {
-  type: 'getUser'
-  item: PixivUserItem
-}
+import { GetUserResponse, GetUserRequest } from 'my-pixiv-types'
+import { WSUtils } from '../websocket'
 
 /**
  * my-pixiv WebSocket User API

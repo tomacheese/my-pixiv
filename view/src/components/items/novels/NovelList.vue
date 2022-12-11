@@ -25,12 +25,12 @@
 
 <script lang="ts">
 import Vue from 'vue'
-import { PixivItem, PixivItemWithSearchTag } from '@/types/pixivItem'
 import { Fetcher } from '@/plugins/fetcher'
 import { ViewType } from '@/store/settings'
 import { openPixivNovel } from '@/utils/pixiv'
 import VLoadProgress from '@/components/utils/VLoadProgress.vue'
 import ItemList from '@/components/items/lists/ItemList.vue'
+import { PixivItem, PixivItemWithSearchTag } from '@/types/pixivItem'
 
 export default Vue.extend({
   name: 'NovelList',

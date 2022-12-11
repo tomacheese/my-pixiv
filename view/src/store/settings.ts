@@ -1,6 +1,6 @@
+import { ImageUrls } from 'my-pixiv-types'
 import { actionTree, getterTree, mutationTree } from 'typed-vuex'
 import { isPixivIllustItem, PixivItem } from '@/types/pixivItem'
-import { ImageUrls } from '@/types/pixivIllust'
 
 export type TargetType = 'ILLUST' | 'MANGA' | 'NOVEL'
 

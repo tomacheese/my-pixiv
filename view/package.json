@@ -24,6 +24,7 @@
     "webpack": "5.75.0"
   },
   "devDependencies": {
+    "my-pixiv-types": "*",
     "@babel/eslint-parser": "7.19.1",
     "@commitlint/cli": "17.3.0",
     "@commitlint/config-conventional": "17.3.0",

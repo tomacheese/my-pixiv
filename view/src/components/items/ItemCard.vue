@@ -63,6 +63,7 @@
 </template>
 
 <script lang="ts">
+import { Tag } from 'my-pixiv-types'
 import Vue from 'vue'
 import ItemLongPress from './ItemLongPress.vue'
 import {
@@ -92,8 +93,8 @@ export default Vue.extend({
     tags(): PixivItem['tags'] {
       const tag = this.item.tags
       return [
-        tag.some((t) => t.name === 'R-18') ? { name: 'R-18' } : null,
-        ...tag.filter((t) => t.name !== 'R-18'),
+        tag.some((t: Tag) => t.name === 'R-18') ? { name: 'R-18' } : null,
+        ...tag.filter((t: Tag) => t.name !== 'R-18'),
       ].filter((t) => t) as PixivItem['tags']
     },
   },

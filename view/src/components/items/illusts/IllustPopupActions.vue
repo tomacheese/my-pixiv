@@ -50,9 +50,9 @@
 
 <script lang="ts">
 import Vue from 'vue'
-import { PixivItem } from '@/types/pixivItem'
 import { openPixivIllust } from '@/utils/pixiv'
 import { WebSocketAPIError } from '@/plugins/websocket'
+import { PixivItem } from '@/types/pixivItem'
 
 export type TweetStatus =
   | 'LOADING'

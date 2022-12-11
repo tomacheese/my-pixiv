@@ -87,20 +87,22 @@
 <script lang="ts">
 import Vue from 'vue'
 import {
+  MuteTargetType,
+  PixivUserItem,
+  NovelSeriesDetail,
+  GetIllustResponse,
+  GetNovelResponse,
+  GetUserResponse,
+  GetNovelSeriesResponse,
+} from 'my-pixiv-types'
+import { MuteItem } from '@/store/itemMute'
+import {
   isNovelSeriesDetail,
   isPixivItem,
   isPixivNovelSeriesItem,
   isPixivUserItem,
   PixivItem,
 } from '@/types/pixivItem'
-import { MuteItem } from '@/store/itemMute'
-import { GetIllustResponse } from '@/plugins/websocket/illust'
-import { GetNovelResponse } from '@/plugins/websocket/novel'
-import { GetUserResponse } from '@/plugins/websocket/user'
-import { MuteTargetType } from '@/plugins/websocket/item-mute'
-import { PixivUserItem } from '@/types/pixivUser'
-import { GetNovelSeriesResponse } from '@/plugins/websocket/novel-series'
-import { NovelSeriesDetail } from '@/types/pixivNovelSeries'
 
 const targetsMap: {
   [key in MuteTargetType]: string
@@ -165,8 +167,7 @@ export default Vue.extend({
           this.$api.reconnect()
         }
         const apiMethod = this.getApiMethod(item.type)
-        apiMethod
-          .get(item.id)
+        apiMethod(item.id)
           .then(
             (
               res:
@@ -186,7 +187,7 @@ export default Vue.extend({
               })
             }
           )
-          .catch((err) => {
+          .catch((err: any) => {
             this.items.push({
               id: item.id,
               type: item.type,
@@ -298,13 +299,13 @@ export default Vue.extend({
     getApiMethod(type: MuteTargetType) {
       switch (type) {
         case 'ILLUST':
-          return this.$api.illust
+          return this.$api.illust.get
         case 'NOVEL':
-          return this.$api.novel
+          return this.$api.novel.get
         case 'USER':
-          return this.$api.user
+          return this.$api.user.get
         case 'NOVEL_SERIES':
-          return this.$api.novelSeries
+          return this.$api.novel.getSeries
       }
     },
     getTypeName(type: MuteTargetType): string {

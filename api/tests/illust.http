@@ -1,0 +1,42 @@
+@host=ws://localhost:8000
+
+###
+# @name getIllust
+WS /ws
+
+{{@streaming
+  async function writeStream(){
+    await sleep(1000);
+    websocketClient.send(JSON.stringify({
+      type: "getIllust",
+      rid: 1,
+      data: {
+        illust_id: 94829880
+      }
+    }));
+    await sleep(1000);
+  }
+  exports.waitPromise = writeStream();
+}}
+
+###
+# @name searchIllust
+WS /ws
+
+{{@streaming
+  async function writeStream(){
+    await sleep(1000);
+    websocketClient.send(JSON.stringify({
+      type: "searchIllust",
+      rid: 2,
+      data: {
+        word: 'ホロライブ',
+        search_item_count: 30,
+      }
+    }));
+    await sleep(1000);
+  }
+  exports.waitPromise = writeStream();
+}}
+
+# todo

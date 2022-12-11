@@ -7,6 +7,7 @@
 <script lang="ts">
 import Vue from 'vue'
 import { PixivItem } from '@/types/pixivItem'
+
 export default Vue.extend({
   props: {
     item: {

@@ -68,15 +68,14 @@
 
 <script lang="ts">
 import Vue from 'vue'
+import { PixivIllustItem, ShadowBanResult } from 'my-pixiv-types'
 import TweetPopup, {
   isCheckingShadowBan,
   isShadowBanned,
   TweetPopupProp,
 } from './TweetPopup.vue'
 import IllustPopupActions, { TweetStatus } from './IllustPopupActions.vue'
-import { ShadowBanResult } from '@/plugins/websocket/twitter'
 import { WebSocketAPIError } from '@/plugins/websocket'
-import { PixivIllustItem } from '@/types/pixivIllust'
 
 export default Vue.extend({
   components: {

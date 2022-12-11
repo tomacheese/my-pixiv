@@ -127,6 +127,7 @@ const config: NuxtConfig = {
   build: {
     parallel: true,
     cache: true,
+    postcss: false,
   },
 }
 export default config

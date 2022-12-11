@@ -1,8 +1,12 @@
 import type { NuxtRuntimeConfig } from '@nuxt/types/config/runtime'
 import { Context } from '@nuxt/types'
-import { SearchIllustResponse } from './websocket/illust'
-import { SearchMangaResponse } from './websocket/manga'
-import { SearchNovelResponse } from './websocket/novel'
+import {
+  SearchNovelResponse,
+  SearchMangaResponse,
+  SearchIllustResponse,
+  Tag,
+} from 'my-pixiv-types'
+import { Filter, Target, TargetType } from '@/store/settings'
 import {
   isPixivIllustItem,
   isPixivNovelItem,
@@ -10,7 +14,6 @@ import {
   PixivItem,
   PixivItemWithSearchTag,
 } from '@/types/pixivItem'
-import { Filter, Target, TargetType } from '@/store/settings'
 
 export class Fetcher {
   private $config: NuxtRuntimeConfig
@@ -196,7 +199,7 @@ export class Fetcher {
         case 'TAG':
           if (
             item.tags.some(
-              (tag) =>
+              (tag: Tag) =>
                 tag.name.includes(filter.value) ||
                 (tag.translated_name &&
                   tag.translated_name.includes(filter.value))
@@ -214,7 +217,7 @@ export class Fetcher {
           return (
             item.title.includes(ignore) ||
             item.user.name.includes(ignore) ||
-            item.tags.some((tag) => tag.name.includes(ignore))
+            item.tags.some((tag: Tag) => tag.name.includes(ignore))
           )
         })
       : false

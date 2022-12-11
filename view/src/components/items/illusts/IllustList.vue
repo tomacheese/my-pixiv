@@ -36,12 +36,12 @@
 
 <script lang="ts">
 import Vue from 'vue'
-import { PixivItem, PixivItemWithSearchTag } from '@/types/pixivItem'
 import { Fetcher } from '@/plugins/fetcher'
 import { TargetType, ViewType } from '@/store/settings'
 import VLoadProgress from '@/components/utils/VLoadProgress.vue'
 import ItemList from '@/components/items/lists/ItemList.vue'
 import IllustPopup from '@/components/items/illusts/IllustPopup.vue'
+import { PixivItem, PixivItemWithSearchTag } from '@/types/pixivItem'
 
 export default Vue.extend({
   name: 'IllustList',

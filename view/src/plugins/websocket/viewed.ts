@@ -1,41 +1,14 @@
 import { Context } from '@nuxt/types'
-import { BaseRequest, BaseResponse, WSUtils } from '../websocket'
-
-type ViewedItemType = 'illust' | 'novel'
-
-export interface ViewedItem {
-  type: ViewedItemType
-  id: number
-}
-
-/** 既読取得リクエストモデル */
-export interface GetViewedRequest extends BaseRequest {
-  type: 'getViewed'
-  item_type: ViewedItemType
-}
-
-/** 既読取得レスポンスモデル */
-export interface GetViewedResponse extends BaseResponse {
-  type: 'getViewed'
-  item_ids: number[]
-}
-
-/** 既読追加リクエストモデル */
-export interface AddViewedRequest extends BaseRequest {
-  type: 'addViewed'
-  item: ViewedItem
-}
-
-/** 既読追加レスポンスモデル */
-export interface AddViewedResponse extends BaseResponse {
-  type: 'addViewed'
-}
-
-/** アイテムミュート追加シェアレスポンスモデル */
-export interface ShareAddViewedResponse extends BaseResponse {
-  type: 'shareAddViewed'
-  item: ViewedItem
-}
+import {
+  ViewedItemType,
+  GetViewedResponse,
+  GetViewedRequest,
+  ViewedItem,
+  AddViewedResponse,
+  AddViewedRequest,
+  ShareAddViewedResponse,
+} from 'my-pixiv-types'
+import { WSUtils } from '../websocket'
 
 /**
  * my-pixiv WebSocket Viewed Sharing API

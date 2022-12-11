@@ -1,11 +1,7 @@
-node_modules/
-.idea/
-venv/
-.nuxt/
-cache/
-data/
-
-token.json
+node_modules
+cache
 config.json
-*.pyc
-sw.*
+.env
+yarn-error.log
+data/
+*.bak

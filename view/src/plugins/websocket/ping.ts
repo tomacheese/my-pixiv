@@ -1,14 +1,5 @@
-import { BaseRequest, BaseResponse, WSUtils } from '../websocket'
-
-/** Pingリクエストモデル */
-export interface PingRequest extends BaseRequest {
-  type: 'ping'
-}
-
-/** Pingレスポンスモデル */
-export interface PingResponse extends BaseResponse {
-  type: 'ping'
-}
+import { PingRequest, PingResponse } from 'my-pixiv-types'
+import { WSUtils } from '../websocket'
 
 /**
  * my-pixiv WebSocket Ping API
