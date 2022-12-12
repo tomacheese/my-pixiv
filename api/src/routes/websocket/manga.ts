@@ -13,7 +13,7 @@ import {
 } from 'my-pixiv-types'
 import fs from 'fs'
 import { dirname, join } from 'path'
-import { PATH } from '@/utils'
+import { PATH } from '@/utils/utils'
 import { RecommendedIllustOptions } from '@/pixiv/options'
 
 interface CacheGetManga {

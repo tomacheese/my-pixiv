@@ -1,6 +1,6 @@
 import { BaseWSRouter } from '@/base-ws-router'
 import { loadPixiv, Pixiv } from '@/pixiv/pixiv'
-import { PATH } from '@/utils'
+import { PATH } from '@/utils/utils'
 import {
   GetIllustResponse,
   GetIllustRequest,
@@ -58,6 +58,12 @@ export class GetIllust extends BaseWSRouter<
     const illustDetail = await pixiv.getIllustDetail({
       illustId,
     })
+
+    if (illustDetail.status !== 200) {
+      this.sendError('illust not found')
+      return
+    }
+
     const data = illustDetail.data.illust
 
     // キャッシュを保存

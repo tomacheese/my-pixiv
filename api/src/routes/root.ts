@@ -6,7 +6,7 @@ export class RootRouter extends BaseRouter {
     this.fastify.register((route, _opts, done) => {
       route.get('/', this.routeGetRoot.bind(this))
       done()
-    })
+    }, { prefix: '/api' })
   }
 
   routeGetRoot(_request: FastifyRequest, reply: FastifyReply) {

@@ -79,3 +79,8 @@ export interface GetNovelSeriesOptions {
   filter?: Filters
   lastOrder?: string
 }
+
+export interface GetUserDetailOptions {
+  userId: number
+  filter?: Filters
+}

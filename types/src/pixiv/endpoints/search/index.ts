@@ -1,2 +1,2 @@
-export * from './illust'
-export * from './novel'
+export * from './illust';
+export * from './novel';

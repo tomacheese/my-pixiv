@@ -2,8 +2,8 @@ import { FastifyInstance } from 'fastify'
 import { Configuration } from './config'
 
 export abstract class BaseRouter {
-  public fastify: FastifyInstance
-  public config: Configuration
+  protected fastify: FastifyInstance
+  protected config: Configuration
 
   constructor(fastify: FastifyInstance, config: Configuration) {
     this.fastify = fastify

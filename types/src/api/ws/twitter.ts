@@ -1,4 +1,3 @@
-import { Tweet } from '../../twitter'
 import { WebSocketBase } from './base'
 
 /** ツイート検索リクエストモデル */
@@ -9,12 +8,28 @@ export interface SearchTweetRequest extends WebSocketBase {
   }
 }
 
+export interface SearchTweetResult {
+  tweet: {
+    id: string
+    text: string
+    media_url: string
+    user: {
+      id: string
+      name: string
+      screen_name: string
+      profile_image_url: string
+    }
+  }
+  similarity: number
+  identity: string
+}
+
 /** ツイート検索レスポンスモデル */
 export interface SearchTweetResponse extends WebSocketBase {
   type: 'searchTweet'
   data: {
     screen_names: string[]
-    tweets: Tweet[]
+    tweets: SearchTweetResult[]
   }
 }
 

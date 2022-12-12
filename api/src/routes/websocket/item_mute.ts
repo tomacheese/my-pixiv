@@ -1,4 +1,5 @@
 import { BaseWSRouter } from '@/base-ws-router'
+import { ItemMuteApi } from '@/utils/item-mute'
 import {
   GetItemMuteRequest,
   AddItemMuteRequest,
@@ -6,6 +7,8 @@ import {
   GetItemMuteResponse,
   RemoveItemMuteResponse,
   RemoveItemMuteRequest,
+  ShareAddItemMuteResponse,
+  ShareRemoveItemMuteResponse,
 } from 'my-pixiv-types'
 
 export class GetItemMute extends BaseWSRouter<
@@ -13,11 +16,15 @@ export class GetItemMute extends BaseWSRouter<
   GetItemMuteResponse
 > {
   validate(): boolean {
-    return false
+    // 入力値無し
+    return true
   }
 
   async execute() {
-    console.log(this.data)
+    const itemMuteApi = ItemMuteApi.of()
+    this.send({
+      items: itemMuteApi.get(),
+    })
   }
 }
 
@@ -26,11 +33,27 @@ export class AddItemMute extends BaseWSRouter<
   AddItemMuteResponse
 > {
   validate(): boolean {
-    return false
+    return (
+      !!this.data &&
+      !!this.data.type &&
+      !!this.data.id &&
+      this.isVaildId(this.data.id)
+    )
   }
 
   async execute() {
-    console.log(this.data)
+    const itemMuteApi = ItemMuteApi.of()
+    itemMuteApi.add(this.data.type, this.data.id)
+
+    this.share()
+  }
+
+  isVaildId(rawId: any) {
+    return !Number.isNaN(parseInt(rawId, 10)) || parseInt(rawId, 10) < 0
+  }
+
+  share() {
+    this.sendToAll<ShareAddItemMuteResponse>('shareAddItemMute', this.data)
   }
 }
 
@@ -39,10 +62,29 @@ export class RemoveItemMute extends BaseWSRouter<
   RemoveItemMuteResponse
 > {
   validate(): boolean {
-    return false
+    return (
+      !!this.data &&
+      !!this.data.type &&
+      !!this.data.id &&
+      this.isVaildId(this.data.id)
+    )
   }
 
   async execute() {
-    console.log(this.data)
+    const itemMuteApi = ItemMuteApi.of()
+    itemMuteApi.remove(this.data.type, this.data.id)
+
+    this.share()
+  }
+
+  isVaildId(rawId: any) {
+    return !Number.isNaN(parseInt(rawId, 10)) || parseInt(rawId, 10) < 0
+  }
+
+  share() {
+    this.sendToAll<ShareRemoveItemMuteResponse>(
+      'shareRemoveItemMute',
+      this.data
+    )
   }
 }

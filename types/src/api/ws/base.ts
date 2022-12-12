@@ -186,6 +186,8 @@ export type WebSocketShares = {
   shareAddViewed: AddViewedResponse
 }
 
+export type WebSocketShareResponse = WebSocketShares[keyof WebSocketShares]
+
 /** WebSocket のリクエストモデル一覧 */
 export type WebSocketRequest =
   WebSocketEndPoint[keyof WebSocketEndPoint]['request']
@@ -235,8 +237,6 @@ export type WebSocketRequestTypes =
  * 基本リクエスト/レスポンスモデル
  */
 export interface WebSocketBase {
-  /** ステータス */
-  status: true
   /** リクエスト種別 */
   type: WebSocketRequestTypes | keyof WebSocketShares
   /** リクエスト ID */
@@ -249,8 +249,6 @@ export interface WebSocketBase {
  * エラーレスポンスモデル
  */
 export interface WebSocketError {
-  /** ステータス */
-  status: false
   /** リクエスト種別 */
   type: WebSocketRequestTypes
   /** リクエスト ID */

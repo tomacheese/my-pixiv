@@ -5,6 +5,7 @@ export type ViewedItemType = 'illust' | 'novel'
 export interface ViewedItem {
   type: ViewedItemType
   id: number
+  addedAt: string
 }
 
 /** 既読取得リクエストモデル */
@@ -27,7 +28,7 @@ export interface GetViewedResponse extends WebSocketBase {
 export interface AddViewedRequest extends WebSocketBase {
   type: 'addViewed'
   data: {
-    item: ViewedItem
+    item: Omit<ViewedItem, 'addedAt'>
   }
 }
 

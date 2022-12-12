@@ -1,4 +1,5 @@
 import { BaseWSRouter } from '@/base-ws-router'
+import { ViewedApi } from '@/utils/viewed'
 import {
   AddViewedRequest,
   AddViewedResponse,
@@ -11,11 +12,18 @@ export class GetViewed extends BaseWSRouter<
   GetViewedResponse
 > {
   validate(): boolean {
-    return false
+    return (
+      !!this.data &&
+      !!this.data.item_type &&
+      (this.data.item_type === 'illust' || this.data.item_type === 'novel')
+    )
   }
 
   async execute() {
-    console.log(this.data)
+    const viewedApi = ViewedApi.of()
+    this.send({
+      item_ids: viewedApi.get(this.data.item_type).map((item) => item.id),
+    })
   }
 }
 
@@ -24,10 +32,24 @@ export class AddViewed extends BaseWSRouter<
   AddViewedResponse
 > {
   validate(): boolean {
-    return false
+    return (
+      !!this.data.item &&
+      !!this.data.item.id &&
+      !!this.data.item.type &&
+      this.isVaildId(this.data.item.id) &&
+      (this.data.item.type === 'illust' || this.data.item.type === 'novel')
+    )
   }
 
   async execute() {
-    console.log(this.data)
+    const viewedApi = ViewedApi.of()
+    viewedApi.add(
+      this.data.item.type,
+      this.data.item.id
+    )
+  }
+
+  isVaildId(rawId: any) {
+    return !Number.isNaN(parseInt(rawId, 10)) || parseInt(rawId, 10) < 0
   }
 }

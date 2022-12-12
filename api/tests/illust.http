@@ -39,4 +39,19 @@ WS /ws
   exports.waitPromise = writeStream();
 }}
 
-# todo
+###
+# @name recommendedIllust
+WS /ws
+
+{{@streaming
+  async function writeStream(){
+    await sleep(1000);
+    websocketClient.send(JSON.stringify({
+      type: "recommendedIllust",
+      rid: 3,
+      data: {}
+    }));
+    await sleep(1000);
+  }
+  exports.waitPromise = writeStream();
+}}

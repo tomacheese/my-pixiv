@@ -6,4 +6,4 @@ Set-Location ..
 . .\scripts\env.ps1
 
 Start-Process -FilePath yarn -WorkingDirectory "api" -NoNewWindow -Wait
-Start-Process -FilePath yarn -ArgumentList "dev" -WorkingDirectory "api" -NoNewWindow -Wait
+Start-Process -FilePath yarn -ArgumentList "test" -WorkingDirectory "api" -NoNewWindow -Wait

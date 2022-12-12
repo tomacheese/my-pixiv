@@ -151,6 +151,11 @@ export interface PixivIllustItem {
   is_muted: boolean
 
   /**
+   * この作品にコメントしたユーザーの数
+   */
+  total_comments: number
+
+  /**
    * AI使用フラグ
    *
    * 0: 未使用
@@ -163,4 +168,14 @@ export interface PixivIllustItem {
    * @see https://github.com/ArkoClub/async-pixiv/blob/fa45c81093a5c6f4eabfcc942915fc479e42174f/src/async_pixiv/model/other.py#L40-L48
    */
   illust_ai_type: number
+
+  /**
+   * 作品のスタイル？
+   */
+  illust_book_style: number
+
+  /**
+   * コメントの閲覧制御？
+   */
+  comment_access_control: number
 }

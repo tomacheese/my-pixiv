@@ -14,7 +14,7 @@ import {
 } from 'my-pixiv-types'
 import fs from 'fs'
 import { dirname, join } from 'path'
-import { PATH } from '@/utils'
+import { PATH } from '@/utils/utils'
 import { RecommendedNovelOptions } from '@/pixiv/options'
 
 interface CacheGetNovel {

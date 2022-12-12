@@ -1,5 +1,6 @@
 import { BaseRouter } from '@/base-router'
 import { BaseWSRouter } from '@/base-ws-router'
+import { Configuration } from '@/config'
 import { SocketStream } from '@fastify/websocket'
 import { FastifyRequest } from 'fastify'
 import {
@@ -41,6 +42,7 @@ import { GetViewed, AddViewed } from './websocket/viewed'
 const endpoints: {
   [key in WebSocketRequestTypes]: new (
     ws: WebSocket,
+    config: Configuration,
     request: any
   ) => BaseWSRouter<WebSocketRequest, WebSocketResponse>
 } = {
@@ -73,7 +75,7 @@ const endpoints: {
 export class WebSocketRouter extends BaseRouter {
   init(): void {
     this.fastify.register((fastify, _, done) => {
-      fastify.get('/ws', { websocket: true }, (connection, req) => {
+      fastify.get('/api/ws', { websocket: true }, (connection, req) => {
         this.onOpen(connection, req)
         connection.socket.on('message', (message) =>
           this.onMessage(connection.socket, message)
@@ -115,12 +117,11 @@ export class WebSocketRouter extends BaseRouter {
         throw new Error('Invalid type')
       }
 
-      const router = new endpoints[json.type](ws, json)
+      const router = new endpoints[json.type](ws, this.config, json)
 
       if (!router.validate()) {
         ws.send(
           JSON.stringify({
-            status: false,
             rid: json.rid || undefined,
             type: json.type || undefined,
             error: {
@@ -132,9 +133,9 @@ export class WebSocketRouter extends BaseRouter {
       }
 
       router.execute().catch((error) => {
+        console.error(error)
         ws.send(
           JSON.stringify({
-            status: false,
             rid: json.rid || undefined,
             type: json.type || undefined,
             error: {
@@ -146,7 +147,6 @@ export class WebSocketRouter extends BaseRouter {
     } catch (error) {
       ws.send(
         JSON.stringify({
-          status: false,
           error: {
             message: String(error),
           },

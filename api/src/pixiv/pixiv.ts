@@ -1,6 +1,6 @@
 import crypto from 'crypto'
 import axios, { AxiosInstance, AxiosResponse } from 'axios'
-import { PATH } from '@/utils'
+import { PATH } from '@/utils/utils'
 import fs from 'fs'
 import qs from 'qs'
 import {
@@ -12,6 +12,7 @@ import {
   SearchNovelApiResponse,
   RecommendedNovelApiResponse,
   GetNovelSeriesApiResponse,
+  GetUserDetailApiResponse,
 } from 'my-pixiv-types'
 import {
   GetIllustDetailOptions,
@@ -22,7 +23,9 @@ import {
   SearchNovelOptions,
   RecommendedNovelOptions,
   GetNovelSeriesOptions,
+  GetUserDetailOptions,
 } from './options'
+import { dirname, join } from 'path'
 
 interface RequestOptions {
   method: 'GET' | 'POST'
@@ -126,6 +129,48 @@ export class Pixiv {
       })
     }
     throw new Error('Invalid method')
+  }
+
+  public static async downloadImage(itemType: string, itemId: string, url: string): Promise<string> {
+    const extension = url.split('.').pop() || null
+    const regex = /p\d+/
+    const match = url.match(regex)
+    const size = match ? match[0] : null
+    if (!extension || !size) {
+      throw new Error('Invalid input url')
+    }
+    const path = join(PATH.IMAGE_CACHE_DIR, itemType, itemId, `${size}.${extension}`)
+
+    fs.mkdirSync(dirname(path), { recursive: true })
+
+    // なければダウンロード
+    if (!fs.existsSync(path)) {
+      await new Promise<void>((resolve, reject) => {
+        axios
+          .get(url, {
+            headers: {
+              'User-Agent':
+                'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.149 Safari/537.36',
+              Referer: 'https://www.pixiv.net/',
+            },
+            responseType: 'stream',
+          })
+          .then((response) => {
+            response.data.pipe(fs.createWriteStream(path))
+            response.data.on('end', () => {
+              resolve()
+            })
+          })
+          .catch((error) => {
+            if (error.response.status === 404) {
+              resolve()
+            }
+            reject(error)
+          })
+      })
+    }
+
+    return path
   }
 
   public async getIllustDetail(options: GetIllustDetailOptions) {
@@ -268,6 +313,19 @@ export class Pixiv {
     return this.request<GetNovelSeriesApiResponse>({
       method: 'GET',
       path: '/v2/novel/series',
+      params,
+    })
+  }
+
+  public async getUserDetail(options: GetUserDetailOptions) {
+    const params = {
+      user_id: options.userId,
+      filter: options.filter || 'for_ios',
+    }
+
+    return this.request<GetUserDetailApiResponse>({
+      method: 'GET',
+      path: '/v1/user/detail',
       params,
     })
   }
