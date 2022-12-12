@@ -4,7 +4,7 @@
   "version": "3.0.0",
   "private": true,
   "scripts": {
-    "generate": "ctix create -w --noBackup",
+    "generate": "ctix single -w --noBackup -o .",
     "lint": "run-p -c lint:prettier lint:eslint lint:tsc",
     "lint:prettier": "prettier --check src",
     "lint:eslint": "eslint . --ext ts,tsx",
