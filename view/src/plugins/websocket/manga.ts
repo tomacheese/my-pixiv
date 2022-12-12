@@ -53,12 +53,10 @@ export class MangaAPI {
   /**
    * おすすめマンガを取得する
    *
-   * @param nextUrl 次のページのURL。初回はnullを指定する
+   * @param nextUrl 次のページのURL。初回は指定しない
    * @returns おすすめマンガレスポンス
    */
-  public recommended(
-    nextUrl: string | null
-  ): Promise<RecommendedMangaResponse> {
+  public recommended(nextUrl?: string): Promise<RecommendedMangaResponse> {
     return this.utils.request<
       RecommendedMangaRequest,
       RecommendedMangaResponse

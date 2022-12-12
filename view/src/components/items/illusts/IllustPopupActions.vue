@@ -158,7 +158,7 @@ export default Vue.extend({
         .catch((error) => {
           if (error instanceof WebSocketAPIError) {
             this.$nuxt.$emit('snackbar', {
-              message: `Likeに失敗: ${error.data.message}`,
+              message: `Likeに失敗: ${error.data.error.message}`,
               color: 'error',
             })
             return

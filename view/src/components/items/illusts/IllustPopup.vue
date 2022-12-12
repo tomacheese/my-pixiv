@@ -75,7 +75,6 @@ import TweetPopup, {
   TweetPopupProp,
 } from './TweetPopup.vue'
 import IllustPopupActions, { TweetStatus } from './IllustPopupActions.vue'
-import { WebSocketAPIError } from '@/plugins/websocket'
 
 export default Vue.extend({
   components: {
@@ -212,8 +211,8 @@ export default Vue.extend({
         .searchByIllust(this.item.id)
         .then((response) => {
           this.tweets = {
-            screen_names: response.screen_names,
-            tweets: response.tweets.sort((a, b) => {
+            screen_names: response.data.screen_names,
+            tweets: response.data.tweets.sort((a, b) => {
               const similarity = a.similarity - b.similarity
               if (similarity !== 0) {
                 return similarity
@@ -239,20 +238,10 @@ export default Vue.extend({
         })
         .catch((error) => {
           this.tweetStatus = 'FAILED'
-          if (error instanceof WebSocketAPIError && error.data.code === 404) {
-            this.tweets = {
-              screen_names: [],
-              tweets: [],
-              error:
-                'ツイートが見つかりませんでした (' + error.data.message + ')',
-            }
-          } else {
-            this.tweetStatus = 'FAILED'
-            this.tweets = {
-              screen_names: [],
-              tweets: [],
-              error: String(error),
-            }
+          this.tweets = {
+            screen_names: [],
+            tweets: [],
+            error: String(error),
           }
         })
     },
@@ -274,7 +263,7 @@ export default Vue.extend({
         this.$api.twitter
           .checkShadowBan(screenName)
           .then((response) => {
-            this.shadowBans.push(response.result)
+            this.shadowBans.push(response.data.result)
           })
           .catch((error) => {
             console.error(error)

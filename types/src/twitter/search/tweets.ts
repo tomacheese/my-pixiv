@@ -1,4 +1,4 @@
-import { Tweet } from ".."
+import { Tweet } from '../twitter'
 
 interface SearchMetadata {
   completed_in: number

@@ -11,16 +11,13 @@ export interface ViewedItem {
 /** 既読取得リクエストモデル */
 export interface GetViewedRequest extends WebSocketBase {
   type: 'getViewed'
-  data: {
-    item_type: ViewedItemType
-  }
 }
 
 /** 既読取得レスポンスモデル */
 export interface GetViewedResponse extends WebSocketBase {
   type: 'getViewed'
   data: {
-    item_ids: number[]
+    items: ViewedItem[]
   }
 }
 
@@ -28,7 +25,7 @@ export interface GetViewedResponse extends WebSocketBase {
 export interface AddViewedRequest extends WebSocketBase {
   type: 'addViewed'
   data: {
-    item: Omit<ViewedItem, 'addedAt'>
+    item: ViewedItem
   }
 }
 

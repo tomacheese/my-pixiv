@@ -1,6 +1,5 @@
 import { Context } from '@nuxt/types'
 import {
-  ViewedItemType,
   GetViewedResponse,
   GetViewedRequest,
   ViewedItem,
@@ -24,12 +23,10 @@ export class ViewedAPI {
    *
    * @returns 既読追加レスポンス
    */
-  public get(itemType: ViewedItemType): Promise<GetViewedResponse> {
+  public get(): Promise<GetViewedResponse> {
     return this.utils.request<GetViewedRequest, GetViewedResponse>(
       'getViewed',
-      {
-        item_type: itemType,
-      }
+      {}
     )
   }
 
@@ -58,17 +55,17 @@ export class ViewedAPI {
     $accessor: Context['$accessor'],
     res: ShareAddViewedResponse
   ): void {
-    if (!$accessor.settings) return
-    switch (res.item.type) {
+    if (!$accessor.settings.isAutoSyncVieweds) return
+    switch (res.data.item.type) {
       case 'illust':
         $accessor.viewed.addIllust({
-          itemId: res.item.id,
+          itemId: res.data.item.id,
           isSync: false,
         })
         break
       case 'novel':
         $accessor.viewed.addNovel({
-          itemId: res.item.id,
+          itemId: res.data.item.id,
           isSync: false,
         })
         break

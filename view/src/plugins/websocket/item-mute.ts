@@ -43,7 +43,8 @@ export class ItemMuteAPI {
     return this.utils.request<AddItemMuteRequest, AddItemMuteResponse>(
       'addItemMute',
       {
-        item,
+        id: item.id,
+        type: item.type,
       }
     )
   }
@@ -58,7 +59,8 @@ export class ItemMuteAPI {
     return this.utils.request<RemoveItemMuteRequest, RemoveItemMuteResponse>(
       'removeItemMute',
       {
-        item,
+        id: item.id,
+        type: item.type,
       }
     )
   }
@@ -75,7 +77,7 @@ export class ItemMuteAPI {
   ): void {
     if (!$accessor.settings.isAutoSyncMutes) return
     $accessor.itemMute.addMute({
-      item: res.item,
+      item: res.data,
       isSync: false,
     })
   }
@@ -92,7 +94,7 @@ export class ItemMuteAPI {
   ): void {
     if (!$accessor.settings.isAutoSyncMutes) return
     $accessor.itemMute.removeMute({
-      item: res.item,
+      item: res.data,
       isSync: false,
     })
   }

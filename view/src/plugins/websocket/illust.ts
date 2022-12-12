@@ -56,12 +56,10 @@ export class IllustAPI {
   /**
    * おすすめイラストを取得する
    *
-   * @param nextUrl 次のページのURL。初回はnullを指定する
+   * @param nextUrl 次のページのURL。初回は指定しない
    * @returns おすすめイラストレスポンス
    */
-  public recommended(
-    nextUrl: string | null
-  ): Promise<RecommendedIllustResponse> {
+  public recommended(nextUrl?: string): Promise<RecommendedIllustResponse> {
     return this.utils.request<
       RecommendedIllustRequest,
       RecommendedIllustResponse

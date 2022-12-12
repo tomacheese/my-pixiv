@@ -131,15 +131,34 @@ export class Pixiv {
     throw new Error('Invalid method')
   }
 
-  public static async downloadImage(itemType: string, itemId: string, url: string): Promise<string> {
+  public static async downloadImage(
+    itemType: string,
+    itemId: string,
+    url: string
+  ): Promise<string> {
     const extension = url.split('.').pop() || null
-    const regex = /p\d+/
-    const match = url.match(regex)
-    const size = match ? match[0] : null
+
+    let size
+    if (url.includes('img-original')) {
+      size = 'original'
+    } else {
+      const sizeRegex = /\d+x\d+/
+      const match = url.match(sizeRegex)
+      size = match ? match[0] : null
+    }
     if (!extension || !size) {
       throw new Error('Invalid input url')
     }
-    const path = join(PATH.IMAGE_CACHE_DIR, itemType, itemId, `${size}.${extension}`)
+    const pageRegex = /p\d+/
+    const match = url.match(pageRegex)
+    const page = match ? match[0] : null
+    const filename = [
+      size,
+      page ? `-${page}` : '',
+      extension ? `.${extension}` : '',
+    ].join('')
+
+    const path = join(PATH.IMAGE_CACHE_DIR, itemType, itemId, filename)
 
     fs.mkdirSync(dirname(path), { recursive: true })
 

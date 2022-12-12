@@ -45,6 +45,7 @@ export class AddItemMute extends BaseWSRouter<
     const itemMuteApi = ItemMuteApi.of()
     itemMuteApi.add(this.data.type, this.data.id)
 
+    this.send({})
     this.share()
   }
 
@@ -74,6 +75,7 @@ export class RemoveItemMute extends BaseWSRouter<
     const itemMuteApi = ItemMuteApi.of()
     itemMuteApi.remove(this.data.type, this.data.id)
 
+    this.send({})
     this.share()
   }
 

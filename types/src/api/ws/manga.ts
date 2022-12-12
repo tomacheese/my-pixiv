@@ -1,4 +1,5 @@
-import { PixivIllustItem, PixivNovelItem } from '../../pixiv'
+import { PixivIllustItem } from '../../pixiv/pixivIllust'
+import { PixivNovelItem } from '../../pixiv/pixivNovel'
 import { WebSocketBase } from './base'
 
 type PixivItem = PixivIllustItem | PixivNovelItem
@@ -40,7 +41,7 @@ export interface SearchMangaResponse extends WebSocketBase {
 export interface RecommendedMangaRequest extends WebSocketBase {
   type: 'recommendedManga'
   data: {
-    next_url: string | null
+    next_url?: string
   }
 }
 

@@ -1,4 +1,4 @@
-import { PixivIllustItem } from '../../pixiv'
+import { PixivIllustItem } from '../../pixiv/pixivIllust'
 import { WebSocketBase } from './base'
 
 /** イラスト取得リクエストモデル */

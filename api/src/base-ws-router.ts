@@ -6,6 +6,7 @@ import {
 } from 'my-pixiv-types'
 import WebSocket from 'ws'
 import { Configuration } from './config'
+import { websocketClients } from './utils/utils'
 
 export abstract class BaseWSRouter<
   Req extends WebSocketRequest,
@@ -55,12 +56,21 @@ export abstract class BaseWSRouter<
     type: T['type'],
     data: T['data']
   ) {
-    this.ws.send(
-      JSON.stringify({
-        rid: this.rid,
-        type,
-        data,
-      })
-    )
+    for (const ws of Object.values(websocketClients)) {
+      if (ws.readyState !== WebSocket.OPEN) {
+        continue
+      }
+      if (ws === this.ws) {
+        continue
+      }
+
+      ws.send(
+        JSON.stringify({
+          rid: this.rid,
+          type,
+          data,
+        })
+      )
+    }
   }
 }

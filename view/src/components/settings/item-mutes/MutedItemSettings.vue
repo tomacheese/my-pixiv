@@ -16,7 +16,7 @@
           v-model="id"
           label="ミュート対象のアイテムID"
           placeholder="例: 1234567890"
-          :rules="[(v) => !!v || '必須項目です']"
+          :rules="idRules"
           @blur="checkUrl()"
         ></v-text-field>
       </div>
@@ -127,6 +127,7 @@ export default Vue.extend({
     pageCount: number
     items: MuteItemWithDetails[]
     isAutoSyncMutes: boolean
+    idRules: ((v: string) => string | true)[]
   } {
     return {
       id: '',
@@ -142,6 +143,7 @@ export default Vue.extend({
       pageCount: 1,
       items: [],
       isAutoSyncMutes: false,
+      idRules: [(v) => !!v || '必須項目です'],
     }
   },
   mounted() {
@@ -176,9 +178,9 @@ export default Vue.extend({
                 | GetUserResponse
                 | GetNovelSeriesResponse
             ) => {
-              const details = isPixivNovelSeriesItem(res.item)
-                ? res.item.novel_series_detail
-                : res.item
+              const details = isPixivNovelSeriesItem(res.data.item)
+                ? res.data.item.novel_series_detail
+                : res.data.item
 
               this.items.push({
                 id: item.id,
@@ -299,13 +301,13 @@ export default Vue.extend({
     getApiMethod(type: MuteTargetType) {
       switch (type) {
         case 'ILLUST':
-          return this.$api.illust.get
+          return this.$api.illust.get.bind(this.$api.illust)
         case 'NOVEL':
-          return this.$api.novel.get
+          return this.$api.novel.get.bind(this.$api.novel)
         case 'USER':
-          return this.$api.user.get
+          return this.$api.user.get.bind(this.$api.user)
         case 'NOVEL_SERIES':
-          return this.$api.novel.getSeries
+          return this.$api.novel.getSeries.bind(this.$api.novel)
       }
     },
     getTypeName(type: MuteTargetType): string {

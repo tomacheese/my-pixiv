@@ -40,7 +40,7 @@ export class ImagesRouter extends BaseRouter {
   public getExtension(url: string): string {
     const extension = url.split('.').pop() || null
     if (!extension) {
-      throw new Error('Invalid input url')
+      throw new Error('Failed to get extension')
     }
     return extension
   }

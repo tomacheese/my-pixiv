@@ -1,4 +1,5 @@
-import { PixivNovelItem, PixivNovelSeriesItem } from '../../pixiv'
+import { PixivNovelItem } from '../../pixiv/pixivNovel'
+import { PixivNovelSeriesItem } from '../../pixiv/pixivNovelSeries'
 import { WebSocketBase } from './base'
 
 /** 小説取得リクエストモデル */
@@ -38,7 +39,7 @@ export interface SearchNovelResponse extends WebSocketBase {
 export interface RecommendedNovelRequest extends WebSocketBase {
   type: 'recommendedNovel'
   data: {
-    next_url: string | null
+    next_url?: string
   }
 }
 

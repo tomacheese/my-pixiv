@@ -1,7 +1,9 @@
-node_modules
-cache
+node_modules/
+cache/
+data/
+dist/
+
 config.json
 .env
 yarn-error.log
-data/
 *.bak

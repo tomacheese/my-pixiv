@@ -1,6 +1,7 @@
 import { BaseRouter } from '@/base-router'
 import { BaseWSRouter } from '@/base-ws-router'
 import { Configuration } from '@/config'
+import { websocketClients } from '@/utils/utils'
 import { SocketStream } from '@fastify/websocket'
 import { FastifyRequest } from 'fastify'
 import {
@@ -73,6 +74,8 @@ const endpoints: {
 }
 
 export class WebSocketRouter extends BaseRouter {
+  private wsKey: string | undefined
+
   init(): void {
     this.fastify.register((fastify, _, done) => {
       fastify.get('/api/ws', { websocket: true }, (connection, req) => {
@@ -104,12 +107,18 @@ export class WebSocketRouter extends BaseRouter {
     }
 
     const key = req.headers['sec-websocket-key']
-    console.log('Connected:', key)
+    if (key === undefined) {
+      connection.socket.close(1002, 'Key required')
+      return
+    }
+
+    this.wsKey = key
+    console.log('Connected:', this.wsKey)
+
+    websocketClients[this.wsKey] = connection.socket
   }
 
   onMessage(ws: WebSocket, data: WebSocket.RawData) {
-    console.log('onMessage', data.toString())
-
     try {
       const json: WebSocketRequest = JSON.parse(data.toString())
 
@@ -156,7 +165,11 @@ export class WebSocketRouter extends BaseRouter {
   }
 
   onClose(event: WebSocket.CloseEvent) {
-    console.log('onClose', event.code, event.reason)
+    console.log('onClose', this.wsKey, event.code, event.reason)
+
+    if (this.wsKey) {
+      delete websocketClients[this.wsKey]
+    }
   }
 
   onError(event: WebSocket.ErrorEvent) {

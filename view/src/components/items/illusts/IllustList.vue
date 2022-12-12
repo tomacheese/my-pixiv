@@ -118,7 +118,9 @@ export default Vue.extend({
 
     // 既読情報は検索結果画面のみで使用
     if (!this.recommended && !this.later) {
-      this.vieweds = this.$accessor.viewed.illusts
+      this.vieweds = this.$accessor.viewed.items
+        .filter((item) => item.type === 'illust')
+        .map((item) => item.id)
     } else {
       this.vieweds = undefined
     }

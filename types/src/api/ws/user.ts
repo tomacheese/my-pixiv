@@ -1,4 +1,4 @@
-import { PixivUserItem } from '../../pixiv'
+import { PixivUserItem } from '../../pixiv/pixivUser'
 import { WebSocketBase } from './base'
 
 /** ユーザー取得リクエストモデル */

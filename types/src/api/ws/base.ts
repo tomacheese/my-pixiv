@@ -57,6 +57,7 @@ import {
   AddViewedResponse,
   GetViewedRequest,
   GetViewedResponse,
+  ShareAddViewedResponse,
 } from './viewed'
 
 /** WebSocket リクエスト種別(エンドポイント)ごとのリクエスト・レスポンスモデル紐付け */
@@ -183,7 +184,7 @@ export type WebSocketEndPoint = {
 export type WebSocketShares = {
   shareAddItemMute: ShareAddItemMuteResponse
   shareRemoveItemMute: ShareRemoveItemMuteResponse
-  shareAddViewed: AddViewedResponse
+  shareAddViewed: ShareAddViewedResponse
 }
 
 export type WebSocketShareResponse = WebSocketShares[keyof WebSocketShares]
@@ -259,3 +260,6 @@ export interface WebSocketError {
     message: string
   }
 }
+
+export const isWebSocketError = (data: any): data is WebSocketError =>
+  data.type !== undefined && data.rid !== undefined && data.error !== undefined

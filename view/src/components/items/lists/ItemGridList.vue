@@ -15,7 +15,7 @@
         ></v-switch>
       </v-col>
       <v-col>
-        <v-switch v-model="isExcludeR18" label="R18を非表示"></v-switch>
+        <v-switch v-model="isExcludeR18" label="R-18を非表示"></v-switch>
       </v-col>
     </v-row>
     <v-card v-if="getItems().length === 0 && !loading">

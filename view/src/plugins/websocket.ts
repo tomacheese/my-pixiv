@@ -1,12 +1,13 @@
 import { Context, Plugin } from '@nuxt/types'
 import {
-  BaseErrorResponse,
-  BaseResponseWithError,
+  isWebSocketError,
   ShareAddItemMuteResponse,
   ShareAddViewedResponse,
   ShareRemoveItemMuteResponse,
+  WebSocketError,
   WebSocketRequest,
   WebSocketResponse,
+  WebSocketShareResponse,
 } from 'my-pixiv-types'
 import { IllustAPI } from './websocket/illust'
 import { TwitterAPI } from './websocket/twitter'
@@ -35,25 +36,22 @@ export class WSUtils {
 
   public request<Req extends WebSocketRequest, Res extends WebSocketResponse>(
     type: Req['type'],
-    params: Omit<Req, 'type'>
+    data: Req['data']
   ): Promise<Res> {
     if (!this.ws) {
       throw new Error('WebSocket is not initialized')
     }
     const rid = Date.now() / Math.random()
     return new Promise<Res>((resolve, reject) => {
-      const event = (data: MessageEvent) => {
-        const response = JSON.parse(data.data) as BaseResponseWithError
+      const event = (message: MessageEvent) => {
+        const response = JSON.parse(message.data) as
+          | WebSocketResponse
+          | WebSocketError
         if (response.type !== type || response.rid !== rid) {
           return
         }
-        if (!response.status) {
-          reject(
-            new WebSocketAPIError(
-              'Request failed',
-              response as BaseErrorResponse
-            )
-          )
+        if (isWebSocketError(response)) {
+          reject(new WebSocketAPIError('Request failed', response))
           return
         }
         resolve(response as unknown as Res)
@@ -61,16 +59,16 @@ export class WSUtils {
       this.ws.addEventListener('message', event)
 
       setTimeout(() => {
-        reject(new Error('timeout'))
+        reject(new Error(`timeout (${type}#${rid})`))
         this.ws.removeEventListener('message', event)
       }, 30000)
 
       if (this.ws.readyState === WebSocket.CONNECTING) {
         this.ws.addEventListener('open', () => {
-          this.ws.send(JSON.stringify({ rid, type, ...params }))
+          this.ws.send(JSON.stringify({ rid, type, data }))
         })
       } else {
-        this.ws.send(JSON.stringify({ rid, type, ...params }))
+        this.ws.send(JSON.stringify({ rid, type, data }))
       }
     })
   }
@@ -122,6 +120,9 @@ export class WebSocketAPI {
   }
 
   public reconnect() {
+    if (this.ws.readyState === WebSocket.CONNECTING) {
+      return
+    }
     if (this.ws.readyState === WebSocket.OPEN) {
       this.ws.close()
     }
@@ -171,12 +172,10 @@ export class WebSocketAPI {
 
     // ViewedとItemMuteの同期
     if (this.$accessor.settings.isAutoSyncVieweds) {
-      Promise.all([this.viewed.get('illust'), this.viewed.get('novel')])
-        .then(([illust, novel]) => {
-          this.$accessor.viewed.setAllVieweds({
-            illusts: illust.item_ids,
-            novels: novel.item_ids,
-          })
+      this.viewed
+        .get()
+        .then((response) => {
+          this.$accessor.viewed.setItems(response.data.items)
           console.log('[WebSocket] Viewed synced')
         })
         .catch((e) => {
@@ -187,7 +186,7 @@ export class WebSocketAPI {
       this.itemMute
         .get()
         .then((mutes) => {
-          this.$accessor.itemMute.setAllMutes(mutes)
+          this.$accessor.itemMute.setAllMutes(mutes.data)
           console.log('[WebSocket] ItemMute synced')
         })
         .catch((e) => {
@@ -216,8 +215,10 @@ export class WebSocketAPI {
   }
 
   private onMessage(event: MessageEvent) {
-    const data = JSON.parse(event.data.toString()) as BaseResponseWithError
-    if (!data.status) {
+    const data = JSON.parse(event.data.toString()) as
+      | WebSocketShareResponse
+      | WebSocketError
+    if (isWebSocketError(data)) {
       return
     }
 
@@ -245,7 +246,7 @@ export class WebSocketAPI {
 }
 
 export class WebSocketAPIError extends Error {
-  constructor(e: string, public data: BaseErrorResponse) {
+  constructor(e: string, public data: WebSocketError) {
     super(e)
     this.name = new.target.name
 

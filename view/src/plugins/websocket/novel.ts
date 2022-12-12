@@ -68,12 +68,10 @@ export class NovelAPI {
   /**
    * おすすめ小説を取得する
    *
-   * @param nextUrl 次のページのURL。初回はnullを指定する
+   * @param nextUrl 次のページのURL。初回は指定しない
    * @returns おすすめ小説レスポンス
    */
-  public recommended(
-    nextUrl: string | null
-  ): Promise<RecommendedNovelResponse> {
+  public recommended(nextUrl?: string): Promise<RecommendedNovelResponse> {
     return this.utils.request<
       RecommendedNovelRequest,
       RecommendedNovelResponse

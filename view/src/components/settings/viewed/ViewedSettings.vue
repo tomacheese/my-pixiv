@@ -113,8 +113,12 @@ export default Vue.extend({
         return
       }
       this.viewedsText = JSON.stringify(this.$accessor.viewed.allVieweds)
-      this.viewed.illusts = this.$accessor.viewed.illusts.length
-      this.viewed.novels = this.$accessor.viewed.novels.length
+      this.viewed.illusts = this.$accessor.viewed.items.filter(
+        (v) => v.type === 'illust'
+      ).length
+      this.viewed.novels = this.$accessor.viewed.items.filter(
+        (v) => v.type === 'novel'
+      ).length
     },
     importVieweds() {
       if (!window) {

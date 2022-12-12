@@ -53,7 +53,9 @@ export class Fetcher {
     }
     const apiMethod = this.getApiMethod(this.targetType)
     const response = await apiMethod
-      .recommended(more ? this.recommendedNextUrl : null)
+      .recommended(
+        more && this.recommendedNextUrl ? this.recommendedNextUrl : undefined
+      )
       .catch((e) => {
         console.error(e)
         return null
@@ -62,12 +64,12 @@ export class Fetcher {
       throw new Error('Failed to fetch recommended')
     }
 
-    const data = response.items
+    const data = response.data.items
     for (const item of data) {
       this.itemProcessor(item)
     }
 
-    this.recommendedNextUrl = response.next_url
+    this.recommendedNextUrl = response.data.next_url
 
     return data
       .filter((item) => !this.isFilterItem(null, item))
@@ -106,7 +108,7 @@ export class Fetcher {
               | SearchMangaResponse
               | SearchIllustResponse
           ) => {
-            const items = result.items
+            const items = result.data.items
             for (const item of items) {
               this.itemProcessor(item)
             }

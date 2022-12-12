@@ -5,6 +5,7 @@ import {
   AddViewedResponse,
   GetViewedRequest,
   GetViewedResponse,
+  ShareAddViewedResponse,
 } from 'my-pixiv-types'
 
 export class GetViewed extends BaseWSRouter<
@@ -12,17 +13,13 @@ export class GetViewed extends BaseWSRouter<
   GetViewedResponse
 > {
   validate(): boolean {
-    return (
-      !!this.data &&
-      !!this.data.item_type &&
-      (this.data.item_type === 'illust' || this.data.item_type === 'novel')
-    )
+    return true
   }
 
   async execute() {
     const viewedApi = ViewedApi.of()
     this.send({
-      item_ids: viewedApi.get(this.data.item_type).map((item) => item.id),
+      items: viewedApi.get(),
     })
   }
 }
@@ -43,13 +40,17 @@ export class AddViewed extends BaseWSRouter<
 
   async execute() {
     const viewedApi = ViewedApi.of()
-    viewedApi.add(
-      this.data.item.type,
-      this.data.item.id
-    )
+    viewedApi.add(this.data.item)
+
+    this.send({})
+    this.share()
   }
 
   isVaildId(rawId: any) {
     return !Number.isNaN(parseInt(rawId, 10)) || parseInt(rawId, 10) < 0
+  }
+
+  share() {
+    this.sendToAll<ShareAddViewedResponse>('shareAddViewed', this.data)
   }
 }

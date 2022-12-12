@@ -21,7 +21,8 @@
     "vue-server-renderer": "2.7.14",
     "vue-template-compiler": "2.7.14",
     "vuetify": "2.6.12",
-    "webpack": "5.75.0"
+    "webpack": "5.75.0",
+    "ts-loader": "8.0.2"
   },
   "devDependencies": {
     "my-pixiv-types": "*",

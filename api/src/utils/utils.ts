@@ -1,5 +1,6 @@
 import { TwitterApi } from 'twitter-api-v2'
 import { Configuration } from '../config'
+import { WebSocket } from 'ws'
 
 export const PATH = {
   TOKEN_FILE: process.env.PIXIVPY_TOKEN_FILE || '/data/token.json',
@@ -14,6 +15,20 @@ export const PATH = {
   TWEET_CACHE_DIR: process.env.TWEET_CACHE_DIR || '/cache/tweets/',
   SHADOW_BAN_CACHE_DIR:
     process.env.SHADOW_BAN_CACHE_DIR || '/cache/shadow-ban/',
+}
+
+export const websocketClients: {
+  [key: string]: WebSocket
+} = {}
+
+export function organizeWebsocketClients() {
+  const keys = Object.keys(websocketClients)
+  for (const key of keys) {
+    if (websocketClients[key].readyState === WebSocket.OPEN) {
+      continue
+    }
+    delete websocketClients[key]
+  }
 }
 
 const twitterCaches: {

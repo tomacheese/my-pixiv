@@ -21,11 +21,11 @@ export class ViewedApi {
     )
   }
 
-  add(type: ViewedItemType, id: number): void {
-    if (this.isViewed(type, id)) {
+  add(item: ViewedItem): void {
+    if (this.isViewed(item.type, item.id)) {
       return
     }
-    this.vieweds.push({ type, id, addedAt: new Date().toISOString() })
+    this.vieweds.push(item)
 
     this.save()
   }
