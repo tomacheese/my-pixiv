@@ -31,8 +31,6 @@ WORKDIR /build/types
 
 RUN yarn generate
 
-ENV PATH $HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH
-
 # ----- common end ----- #
 
 # -- build view
@@ -41,8 +39,10 @@ WORKDIR /build/view
 COPY view/nuxt.config.ts nuxt.config.ts
 COPY view/src/ src/
 
-RUN yarn build && \
-  yarn generate
+WORKDIR /build
+
+RUN yarn workspace my-pixiv build && \
+  yarn workspace my-pixiv generate
 
 # ----- final image ----- #
 FROM nginx:1.23.2-alpine

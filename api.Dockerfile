@@ -30,15 +30,14 @@ WORKDIR /build/types
 
 RUN yarn generate
 
-ENV PATH $HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH
-
 # ----- common end ----- #
 
 # -- compile api
-WORKDIR /build/api
 
-RUN yarn compile && \
-  yarn package
+WORKDIR /build
+
+RUN yarn workspace my-pixiv-api compile && \
+  yarn workspace my-pixiv-api package
 
 # ----- final image ----- #
 FROM node:18-alpine
