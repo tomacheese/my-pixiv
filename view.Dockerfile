@@ -23,7 +23,7 @@ COPY view/tsconfig.json tsconfig.json
 WORKDIR /build
 
 RUN echo network-timeout 600000 > .yarnrc && \
-  yarn install --pure-lockfile --non-interactive
+  yarn install --frozen-lockfile --non-interactive
 
 # -- regenerate types index
 
