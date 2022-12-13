@@ -22,7 +22,7 @@
     "vue-template-compiler": "2.7.14",
     "vuetify": "2.6.13",
     "webpack": "5.75.0",
-    "ts-loader": "8.0.2",
+    "ts-loader": "8.4.0",
     "@nuxt/typescript-build": "2.1.0"
   },
   "devDependencies": {
