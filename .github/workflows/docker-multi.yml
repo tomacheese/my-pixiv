@@ -4,17 +4,10 @@
 name: Docker
 
 on:
-  push:
-    branches:
-      - main
-      - master
   pull_request:
     branches:
       - main
       - master
-  release:
-    types:
-      - published
 
 env:
   REGISTRY: ghcr.io
@@ -44,12 +37,28 @@ jobs:
         uses: docker/setup-buildx-action@v2
 
       - name: Login to ${{ env.REGISTRY }}
-        if: github.event_name == 'release'
+        if: github.event.pull_request.merged == true
         uses: docker/login-action@v2.1.0
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ env.DOCKER_USERNAME }}
           password: ${{ env.DOCKER_PASSWORD }}
+
+      - name: Bump version and push tag
+        id: tag_version
+        if: github.event.pull_request.merged == true
+        uses: mathieudutour/github-tag-action@v6.1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          default_bump: 'minor'
+          custom_release_rules: 'feat:minor:✨ Features,fix:patch:🐛 Fixes,docs:patch:📰 Docs,chore:patch:🎨 Chore,pref:patch:🎈 Performance improvements,refactor:patch:🧹 Refactoring,build:patch:🔍 Build,ci:patch:🔍 CI,revert:patch:⏪ Revert,style:patch:🧹 Style,test:patch:👀 Test'
+          dry_run: ${{ github.event.pull_request.merged == false }}
+
+      - name: package.json update version
+        run: |
+          sed -r -i "1,/version/s/\"version\": \".+\"/\"version\": \"${{ steps.tag_version.outputs.new_tag }}\"/" view/package.json
+          sed -r -i "1,/version/s/\"version\": \".+\"/\"version\": \"${{ steps.tag_version.outputs.new_tag }}\"/" api/package.json
+          git diff
 
       - name: Extract metadata (tags, labels) for Docker
         id: meta
@@ -59,9 +68,8 @@ jobs:
           tags: |
             type=ref,event=branch
             type=ref,event=pr
-            type=semver,pattern=v{{version}}
-            type=semver,pattern=v{{major}}.{{minor}}
             type=sha
+            type=raw,value=${{ steps.tag_version.outputs.new_tag }}
             type=raw,value=latest,enable={{is_default_branch}}
 
       - name: Build and push Docker image
@@ -69,9 +77,20 @@ jobs:
         with:
           context: .
           file: ${{ fromJson(matrix.target).file }}
-          push: ${{ github.event_name == 'release' }}
+          push: ${{ github.event.pull_request.merged == true }}
           platforms: ${{ env.PLATFORMS }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+      - name: Publish release
+        uses: actions/create-release@v1
+        id: create_release
+        if: github.event.pull_request.merged == true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.tag_version.outputs.new_tag }}
+          release_name: ${{ steps.tag_version.outputs.new_tag }}
+          body: ${{ steps.tag_version.outputs.changelog }}
