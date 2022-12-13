@@ -15,7 +15,7 @@
     "fix:prettier": "prettier --write src"
   },
   "dependencies": {
-    "ctix": "1.7.0",
+    "ctix": "1.8.0",
     "rimraf": "3.0.2"
   },
   "devDependencies": {
