@@ -1,4 +1,4 @@
-# 任意のレジストリに Docker image を公開orビルドする。
+# 任意のレジストリに複数の Docker image を公開orビルドする。
 # master/mainのプッシュ時、プルリクの作成・更新時、リリース時に動作する。
 
 name: Docker
@@ -20,27 +20,28 @@ env:
   REGISTRY: ghcr.io
   DOCKER_USERNAME: ${{ github.actor }}
   DOCKER_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
-  IMAGE_NAME: ${{ github.repository }}
   PLATFORMS: linux/amd64,linux/arm64
 
 jobs:
   job:
-    name: Docker build
+    name: Docker build (${{ fromJson(matrix.target).file }})
     runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        target:
+          - '{ imageName: "tomacheese/my-pixiv", file: "view.Dockerfile" }'
+          - '{ imageName: "tomacheese/my-pixiv-api", file: "api.Dockerfile" }'
 
     steps:
       - name: Check out the repo
         uses: actions/checkout@v3
-        with:
-          ref: ${{ github.event.pull_request.head.sha }}
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
-        with:
-          install: true
 
       - name: Login to ${{ env.REGISTRY }}
         if: github.event_name == 'release'
@@ -50,23 +51,24 @@ jobs:
           username: ${{ env.DOCKER_USERNAME }}
           password: ${{ env.DOCKER_PASSWORD }}
 
-      - name: package.json update version
-        if: github.event_name == 'release'
-        working-directory: ./view
-        run: |
-          sed -r -i "1,/version/s/\"version\": \".+\"/\"version\": \"${{ github.event.release.tag_name }}\"/" package.json
-          git diff
-
       - name: Extract metadata (tags, labels) for Docker
         id: meta
         uses: docker/metadata-action@v4.1.1
         with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          images: ${{ fromJson(matrix.target).imageName }}
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=semver,pattern=v{{version}}
+            type=semver,pattern=v{{major}}.{{minor}}
+            type=sha
+            type=raw,value=latest,enable={{is_default_branch}}
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v3.2.0
         with:
           context: .
+          file: ${{ fromJson(matrix.target).file }}
           push: ${{ github.event_name == 'release' }}
           platforms: ${{ env.PLATFORMS }}
           tags: ${{ steps.meta.outputs.tags }}

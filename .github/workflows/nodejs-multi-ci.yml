@@ -20,7 +20,7 @@ jobs:
       matrix:
         os: [ubuntu-latest]
         node: [16]
-        directory: [view]
+        directory: [view, api]
 
     steps:
       - name: 🛎 Checkout
