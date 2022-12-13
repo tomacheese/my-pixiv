@@ -42,10 +42,7 @@ export class ItemMuteAPI {
   public add(item: ItemMute): Promise<AddItemMuteResponse> {
     return this.utils.request<AddItemMuteRequest, AddItemMuteResponse>(
       'addItemMute',
-      {
-        id: item.id,
-        type: item.type,
-      }
+      item
     )
   }
 
@@ -58,10 +55,7 @@ export class ItemMuteAPI {
   public remove(item: ItemMute): Promise<RemoveItemMuteResponse> {
     return this.utils.request<RemoveItemMuteRequest, RemoveItemMuteResponse>(
       'removeItemMute',
-      {
-        id: item.id,
-        type: item.type,
-      }
+      item
     )
   }
 

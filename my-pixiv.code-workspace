@@ -13,12 +13,9 @@
       "path": "types"
     },
     {
-      "name": "my-pixiv-v3",
+      "name": "my-pixiv",
       "path": "."
     }
   ],
-  "settings": {},
-  "extensions": {
-    "recommendations": ["anweber.vscode-httpyac"]
-  }
+  "settings": {}
 }

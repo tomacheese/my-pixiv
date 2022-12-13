@@ -54,7 +54,7 @@ export class WSUtils {
           reject(new WebSocketAPIError('Request failed', response))
           return
         }
-        resolve(response as unknown as Res)
+        resolve(response as Res)
       }
       this.ws.addEventListener('message', event)
 
@@ -226,20 +226,17 @@ export class WebSocketAPI {
       case 'shareAddItemMute':
         this.itemMute.onAddItemMute(
           this.$accessor,
-          data as unknown as ShareAddItemMuteResponse
+          data as ShareAddItemMuteResponse
         )
         break
       case 'shareRemoveItemMute':
         this.itemMute.onRemoveItemMute(
           this.$accessor,
-          data as unknown as ShareRemoveItemMuteResponse
+          data as ShareRemoveItemMuteResponse
         )
         break
       case 'shareAddViewed':
-        this.viewed.onAddViewed(
-          this.$accessor,
-          data as unknown as ShareAddViewedResponse
-        )
+        this.viewed.onAddViewed(this.$accessor, data as ShareAddViewedResponse)
         break
     }
   }

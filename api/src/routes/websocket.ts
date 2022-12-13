@@ -175,8 +175,4 @@ export class WebSocketRouter extends BaseRouter {
   onError(event: WebSocket.ErrorEvent) {
     console.log('onError', event.error)
   }
-
-  isPromiseFunction(func: any): func is Promise<any> {
-    return func instanceof Promise || func.constructor.name === 'AsyncFunction'
-  }
 }

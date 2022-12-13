@@ -5,5 +5,5 @@ Set-Location ..
 
 . .\scripts\env.ps1
 
-Start-Process -FilePath yarn -WorkingDirectory "api" -NoNewWindow -Wait
-Start-Process -FilePath yarn -ArgumentList "test" -WorkingDirectory "api" -NoNewWindow -Wait
+$args = "workspace my-pixiv-api run test"
+Start-Process -FilePath yarn -ArgumentList $args -NoNewWindow -Wait
