@@ -52,6 +52,7 @@ jobs:
           password: ${{ env.DOCKER_PASSWORD }}
 
       - name: package.json update version
+        if: github.event_name == 'release'
         run: |
           sed -r -i "1,/version/s/\"version\": \".+\"/\"version\": \"${{ github.event.release.tag_name }}\"/" view/package.json
           sed -r -i "1,/version/s/\"version\": \".+\"/\"version\": \"${{ github.event.release.tag_name }}\"/" api/package.json
