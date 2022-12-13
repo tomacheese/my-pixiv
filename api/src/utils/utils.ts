@@ -3,7 +3,7 @@ import { Configuration } from '../config'
 import { WebSocket } from 'ws'
 
 export const PATH = {
-  TOKEN_FILE: process.env.PIXIVPY_TOKEN_FILE || '/data/token.json',
+  TOKEN_FILE: process.env.TOKEN_FILE || '/data/token.json',
   CONFIG_FILE: process.env.CONFIG_FILE || '/data/config.json',
   VIEWED_FILE: process.env.VIEWED_FILE || '/data/viewed.json',
   ITEM_MUTES_FILE: process.env.ITEM_MUTES_FILE || '/data/item_mutes.json',

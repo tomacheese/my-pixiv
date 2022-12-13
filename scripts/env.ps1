@@ -1,4 +1,4 @@
-$env:PIXIVPY_TOKEN_FILE = "../data/token.json"
+$env:TOKEN_FILE = "../data/token.json"
 $env:CONFIG_FILE = "../data/config.json"
 $env:VIEWED_FILE = "../data/viewed.json"
 $env:ITEM_MUTES_FILE = "../data/item_mutes.json"
