@@ -25,3 +25,4 @@ export * from './src/pixiv/pixivNovel';
 export * from './src/pixiv/pixivNovelSeries';
 export * from './src/pixiv/pixivUser';
 export * from './src/twitter/twitter';
+export * from './src/utils';

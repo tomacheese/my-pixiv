@@ -4,7 +4,6 @@ import {
   SearchNovelResponse,
   SearchMangaResponse,
   SearchIllustResponse,
-  Tag,
 } from 'my-pixiv-types'
 import { Filter, Target, TargetType } from '@/store/settings'
 import {
@@ -148,20 +147,17 @@ export class Fetcher {
               | SearchMangaResponse
               | SearchIllustResponse
           ) => {
-            const items = result.data.items
+            const items: PixivItem[] = result.data.items
             for (const item of items) {
               this.itemProcessor(item)
             }
             // フィルタリングを行う
             resolve(
-              (items as PixivItem[])
-                .filter((item: PixivItem) => !this.isFilterItem(target, item))
-                .filter((item: PixivItem) => !this.isMutedItem(item))
-                .filter(
-                  (item: PixivItem) =>
-                    item.total_bookmarks >= target.minLikeCount
-                )
-                .map((item: PixivItem) => {
+              items
+                .filter((item) => !this.isFilterItem(target, item))
+                .filter((item) => !this.isMutedItem(item))
+                .filter((item) => item.total_bookmarks >= target.minLikeCount)
+                .map((item) => {
                   return {
                     ...item,
                     searchTags: target.tag,
@@ -272,7 +268,7 @@ export class Fetcher {
         case 'TAG':
           if (
             item.tags.some(
-              (tag: Tag) =>
+              (tag) =>
                 tag.name.includes(filter.value) ||
                 (tag.translated_name &&
                   tag.translated_name.includes(filter.value))
@@ -290,7 +286,7 @@ export class Fetcher {
           return (
             item.title.includes(ignore) ||
             item.user.name.includes(ignore) ||
-            item.tags.some((tag: Tag) => tag.name.includes(ignore))
+            item.tags.some((tag) => tag.name.includes(ignore))
           )
         })
       : false

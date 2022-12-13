@@ -18,6 +18,7 @@ import {
   Tweet,
   SearchTweetsResponse,
   StatusesUserTimelineResponse,
+  filterNull,
 } from 'my-pixiv-types'
 import fs from 'fs'
 import { loadTwitterApi, PATH } from '@/utils/utils'
@@ -33,6 +34,7 @@ export class SearchTweet extends BaseWSRouter<
   SearchTweetResponse
 > {
   validate(): boolean {
+    // illust_idがあって、0以上の整数であること
     return !!this.data.illust_id && this.isVaildIllustId(this.data.illust_id)
   }
 
@@ -185,7 +187,7 @@ export class SearchTweet extends BaseWSRouter<
     const results = await Promise.all(promises)
     return this.sortSimilarity(
       this.filterMediaDuplication(
-        this.filterNull(results.filter((result) => !!result).flat())
+        filterNull(results.filter((result) => !!result).flat())
       )
     )
   }
@@ -232,19 +234,9 @@ export class SearchTweet extends BaseWSRouter<
     const results = await Promise.all(promises)
     return this.sortSimilarity(
       this.filterMediaDuplication(
-        this.filterNull(results.filter((result) => !!result).flat())
+        filterNull(results.filter((result) => !!result).flat())
       )
     )
-  }
-
-  /**
-   * 配列から null を除外する
-   *
-   * @param array 配列
-   * @returns nullを除外した配列
-   */
-  private filterNull<T>(array: (T | null)[]): T[] {
-    return array.filter((item) => !!item) as T[]
   }
 
   /**

@@ -189,7 +189,7 @@ export default Vue.extend({
               })
             }
           )
-          .catch((err: any) => {
+          .catch((err) => {
             this.items.push({
               id: item.id,
               type: item.type,

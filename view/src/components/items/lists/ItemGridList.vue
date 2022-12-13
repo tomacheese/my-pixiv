@@ -77,7 +77,6 @@
 
 <script lang="ts">
 import Vue from 'vue'
-import { PixivIllustItem, Tag } from 'my-pixiv-types'
 import MagicGrid from '@/components/utils/MagicGrid.vue'
 import ItemWrapper from '@/components/items/ItemWrapper.vue'
 import ItemLongPress from '@/components/items/ItemLongPress.vue'
@@ -180,16 +179,13 @@ export default Vue.extend({
       return item.is_bookmarked
     },
     isR18(item: PixivItem): boolean {
-      return item.tags.some((tag: Tag) => tag.name === 'R-18')
+      return item.tags.some((tag) => tag.name === 'R-18')
     },
     calcHeight(item: PixivItem): string {
       if (this.$accessor.settings.imageSizes.illustGridList === 'square_medium')
         return '240px'
       if (isPixivNovelItem(item)) return '338px'
-      return `${
-        ((item as PixivIllustItem).height / (item as PixivIllustItem).width) *
-        240
-      }px`
+      return `${(item.height / item.width) * 240}px`
     },
     getImageUrl(item: PixivItem): string {
       const size = this.$accessor.settings.imageSizes.illustGridList ?? 'medium'
