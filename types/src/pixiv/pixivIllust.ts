@@ -9,7 +9,7 @@ export interface MetaSinglePage {
 /** 複数イラスト詳細情報 */
 export interface MetaPages {
   /** 画像URL群 */
-  image_urls: ImageUrls
+  image_urls: Required<ImageUrls>
 }
 
 export interface PixivIllustItem {

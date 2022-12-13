@@ -171,6 +171,10 @@ export class Fetcher {
           item,
           metaPage.image_urls.square_medium
         )
+        metaPage.image_urls.original = this.convertImageUrl(
+          item,
+          metaPage.image_urls.original
+        )
       }
     }
   }
