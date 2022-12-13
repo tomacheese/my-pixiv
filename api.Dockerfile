@@ -30,6 +30,8 @@ WORKDIR /build/types
 
 RUN yarn generate
 
+ENV PATH $HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH
+
 # ----- common end ----- #
 
 # -- compile api
