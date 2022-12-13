@@ -47,7 +47,7 @@ export class Fetcher {
       )
   }
 
-  public async getFetchRecommended(more: boolean = false) {
+  public async getFetchRecommended(more = false) {
     if (this.$api.getReadyState() !== WebSocket.OPEN) {
       this.$api.reconnect()
     }
