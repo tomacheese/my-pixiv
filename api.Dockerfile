@@ -33,11 +33,10 @@ RUN yarn generate
 # ----- common end ----- #
 
 # -- compile api
+WORKDIR /build/api
 
-WORKDIR /build
-
-RUN yarn workspace my-pixiv-api compile && \
-  yarn workspace my-pixiv-api package
+RUN yarn compile && \
+  yarn package
 
 # ----- final image ----- #
 FROM node:18-alpine

@@ -39,10 +39,8 @@ WORKDIR /build/view
 COPY view/nuxt.config.ts nuxt.config.ts
 COPY view/src/ src/
 
-WORKDIR /build
-
-RUN yarn workspace my-pixiv build && \
-  yarn workspace my-pixiv generate
+RUN yarn build && \
+  yarn generate
 
 # ----- final image ----- #
 FROM nginx:1.23.2-alpine
