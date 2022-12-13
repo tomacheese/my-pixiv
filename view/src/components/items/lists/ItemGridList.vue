@@ -126,9 +126,17 @@ export default Vue.extend({
     },
     isExcludeLiked() {
       this.$accessor.settings.setExcludeLiked(this.isExcludeLiked)
+
+      this.$nextTick(() => {
+        ;(this.$refs['magic-grid'] as any).update()
+      })
     },
     isExcludeR18() {
       this.$accessor.settings.setExcludeR18(this.isExcludeR18)
+
+      this.$nextTick(() => {
+        ;(this.$refs['magic-grid'] as any).update()
+      })
     },
     items() {
       this.$nextTick(() => {
