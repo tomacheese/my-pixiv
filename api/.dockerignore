@@ -4,5 +4,4 @@ tests
 
 .eslintignore
 .eslintrc.yml
-jest.config.json
 test.json

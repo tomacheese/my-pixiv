@@ -14,7 +14,6 @@
     "start": "node ./dist/main.js",
     "compile": "tsc -p .",
     "compile:test": "tsc -p . --noEmit",
-    "test": "jest",
     "lint": "run-p -c lint:prettier lint:eslint lint:tsc",
     "lint:prettier": "prettier --check src",
     "lint:eslint": "eslint . --ext ts,tsx",
@@ -44,11 +43,7 @@
     "qs": "6.11.0",
     "ts-node": "10.9.1",
     "ts-node-dev": "2.0.0",
-    "yarn-run-all": "3.1.1",
-    "jest": "29.3.1",
-    "ts-jest": "29.0.3",
-    "@types/jest": "29.2.4",
-    "jest-extended": "3.2.0"
+    "yarn-run-all": "3.1.1"
   },
   "dependencies": {
     "typescript": "4.9.4",
