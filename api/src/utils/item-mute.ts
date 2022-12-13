@@ -4,6 +4,9 @@ import { PATH } from './utils'
 
 type ItemMuteJsonSchema = ItemMute[]
 
+/**
+ * アイテムミュート API
+ */
 export class ItemMuteApi {
   private mutes: ItemMute[]
   private static cache: {
@@ -11,14 +14,27 @@ export class ItemMuteApi {
     timestamp: number
   } | null = null
 
-  constructor(mutes: ItemMute[]) {
+  private constructor(mutes: ItemMute[]) {
     this.mutes = mutes
   }
 
+  /**
+   * アイテムがミュート済みかどうかを返す
+   *
+   * @param type ミュートの対象種別
+   * @param id アイテム ID
+   * @returns ミュート済みなら true
+   */
   isMuted(type: MuteTargetType, id: number): boolean {
     return this.mutes.some((mute) => mute.type === type && mute.id === id)
   }
 
+  /**
+   * アイテムをミュートする
+   *
+   * @param type ミュートの対象種別
+   * @param id アイテム ID
+   */
   add(type: MuteTargetType, id: number): void {
     if (this.isMuted(type, id)) {
       return
@@ -28,6 +44,12 @@ export class ItemMuteApi {
     this.save()
   }
 
+  /**
+   * アイテムのミュートを解除する
+   *
+   * @param type ミュートの対象種別
+   * @param id アイテム ID
+   */
   remove(type: MuteTargetType, id: number): void {
     this.mutes = this.mutes.filter(
       (mute) => !(mute.type === type && mute.id === id)
@@ -36,22 +58,38 @@ export class ItemMuteApi {
     this.save()
   }
 
+  /**
+   * ミュート済みのアイテムを返す
+   *
+   * @returns ミュート済みのアイテム
+   */
   get(): ItemMute[] {
     return this.mutes
   }
 
+  /**
+   * ミュート済みのアイテムを設定する
+   *
+   * @param mutes ミュート済みのアイテム
+   */
   set(mutes: ItemMute[]): void {
     this.mutes = mutes
 
     this.save()
   }
 
+  /**
+   * すべてのミュートを解除する
+   */
   clear(): void {
     this.mutes = []
 
     this.save()
   }
 
+  /**
+   * ミュート済みのアイテムを保存する
+   */
   save(): void {
     fs.writeFileSync(
       PATH.ITEM_MUTES_FILE,
@@ -64,6 +102,11 @@ export class ItemMuteApi {
     }
   }
 
+  /**
+   * インスタンスを生成する。インスタンスは1時間キャッシュされる。
+   *
+   * @returns インスタンス
+   */
   public static of() {
     // 1時間キャッシュ
     if (

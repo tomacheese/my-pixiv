@@ -17,10 +17,16 @@ export const PATH = {
     process.env.SHADOW_BAN_CACHE_DIR || '/cache/shadow-ban/',
 }
 
+/**
+ * 接続中の WebSocket クライアント
+ */
 export const websocketClients: {
   [key: string]: WebSocket
 } = {}
 
+/**
+ * 接続中の WebSocket クライアントを整理する
+ */
 export function organizeWebsocketClients() {
   const keys = Object.keys(websocketClients)
   for (const key of keys) {
@@ -31,6 +37,9 @@ export function organizeWebsocketClients() {
   }
 }
 
+/**
+ * Twitter API インスタンスキャッシュ
+ */
 const twitterCaches: {
   [key: string]: {
     twitterApi: TwitterApi | null
@@ -38,10 +47,17 @@ const twitterCaches: {
   }
 } = {}
 
+/**
+ * Twitter API インスタンスを取得する
+ *
+ * @param config Configuration インスタンス
+ * @param accountName アカウント名
+ * @returns TwitterApi インスタンス
+ */
 export async function loadTwitterApi(
   config: Configuration,
   accountName: string | null
-) {
+): Promise<TwitterApi> {
   if (!accountName) {
     accountName = 'NO_ACCOUNT'
   }

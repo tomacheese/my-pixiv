@@ -8,11 +8,15 @@ import {
   ShareAddViewedResponse,
 } from 'my-pixiv-types'
 
+/**
+ * 既読一覧取得 WebSocket API
+ */
 export class GetViewed extends BaseWSRouter<
   GetViewedRequest,
   GetViewedResponse
 > {
   validate(): boolean {
+    // 可変値無し
     return true
   }
 
@@ -24,11 +28,15 @@ export class GetViewed extends BaseWSRouter<
   }
 }
 
+/**
+ * 既読追加 WebSocket API
+ */
 export class AddViewed extends BaseWSRouter<
   AddViewedRequest,
   AddViewedResponse
 > {
   validate(): boolean {
+    // itemが存在し、そのなかにidとtypeが存在し、idが数値かつ0以上であること
     return (
       !!this.data.item &&
       !!this.data.item.id &&

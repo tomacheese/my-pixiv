@@ -3,6 +3,9 @@ import { BaseRouter } from '@/base-router'
 import fs from 'fs'
 import { Pixiv } from '@/pixiv/pixiv'
 
+/**
+ * 画像取得 REST API
+ */
 export class ImagesRouter extends BaseRouter {
   init(): void {
     this.fastify.register(

@@ -1,4 +1,4 @@
-import fastify from 'fastify'
+import fastify, { FastifyInstance } from 'fastify'
 import fastifyWebSocket from '@fastify/websocket'
 import { BaseRouter } from '@/base-router'
 import { RootRouter } from '@/routes/root'
@@ -7,7 +7,12 @@ import { WebSocketRouter } from './routes/websocket'
 import { Configuration } from './config'
 import { PATH } from './utils/utils'
 
-export function buildApp() {
+/**
+ * Fastify アプリケーションを構築する
+ *
+ * @returns Fastify アプリケーション
+ */
+export function buildApp(): FastifyInstance {
   const app = fastify()
   app.register(fastifyWebSocket)
 

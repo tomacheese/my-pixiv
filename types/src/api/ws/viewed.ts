@@ -1,7 +1,7 @@
 import { WebSocketBase } from './base'
 
 /**
- * 既読アイテムタイプ
+ * 既読アイテム種別
  */
 export type ViewedItemType = 'illust' | 'novel'
 
@@ -10,7 +10,7 @@ export type ViewedItemType = 'illust' | 'novel'
  */
 export interface ViewedItem {
   /**
-   * アイテムタイプ
+   * アイテム種別
    */
   type: ViewedItemType
 

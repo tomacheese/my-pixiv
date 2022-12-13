@@ -12,6 +12,9 @@ interface Config {
   password?: string
 }
 
+/**
+ * 設定
+ */
 export class Configuration {
   private filepath: string
   private config!: Config
@@ -22,6 +25,9 @@ export class Configuration {
     this.load()
   }
 
+  /**
+   * 設定ファイルを読み込む
+   */
   public load() {
     if (!fs.existsSync(this.filepath)) {
       throw new Error(`Config file not found: ${this.filepath}`)
@@ -49,6 +55,12 @@ export class Configuration {
     }
   }
 
+  /**
+   * 設定値を取得する
+   *
+   * @param key キー
+   * @returns 設定値
+   */
   public get<T extends keyof Config>(key: T): Config[T] {
     return this.config[key]
   }

@@ -8,8 +8,13 @@ import WebSocket from 'ws'
 import { Configuration } from './config'
 import { websocketClients } from './utils/utils'
 
+/**
+ * WebSocket APIの基底クラス
+ */
 export abstract class BaseWSRouter<
+  /** リクエストの型 */
   Req extends WebSocketRequest,
+  /** レスポンスの型 */
   Res extends WebSocketResponse
 > {
   private ws: WebSocket
@@ -26,10 +31,21 @@ export abstract class BaseWSRouter<
     this.data = request.data
   }
 
+  /**
+   * リクエストのバリデーションを行う
+   */
   abstract validate(): boolean
 
+  /**
+   * リクエストを処理する
+   */
   abstract execute(): Promise<void>
 
+  /**
+   * レスポンスを送信する
+   *
+   * @param data レスポンスのデータ
+   */
   protected send(data: Res['data']) {
     this.ws.send(
       JSON.stringify({
@@ -40,6 +56,11 @@ export abstract class BaseWSRouter<
     )
   }
 
+  /**
+   * エラーレスポンスを送信する
+   *
+   * @param message エラーメッセージ
+   */
   protected sendError(message: string) {
     this.ws.send(
       JSON.stringify({
@@ -52,6 +73,12 @@ export abstract class BaseWSRouter<
     )
   }
 
+  /**
+   * 接続している全てのクライアントにレスポンスを送信する
+   *
+   * @param type レスポンス種別
+   * @param data レスポンスデータ
+   */
   protected sendToAll<T extends WebSocketShareResponse>(
     type: T['type'],
     data: T['data']

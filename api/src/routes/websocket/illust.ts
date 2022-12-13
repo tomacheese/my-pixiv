@@ -16,16 +16,27 @@ import { dirname, join } from 'path'
 import fs from 'fs'
 import { RecommendedIllustOptions } from '@/pixiv/options'
 
+/**
+ * イラストキャッシュモデル
+ */
 interface CacheGetIllust {
   timestamp: number
   data: PixivIllustItem
 }
 
+/**
+ * イラスト検索キャッシュモデル
+ */
 interface CacheSearchIllust {
   timestamp: number
   data: PixivIllustItem[]
 }
 
+/**
+ * イラスト詳細取得 WebSocket API
+ *
+ * 結果は1時間キャッシュする。
+ */
 export class GetIllust extends BaseWSRouter<
   GetIllustRequest,
   GetIllustResponse
@@ -86,6 +97,11 @@ export class GetIllust extends BaseWSRouter<
   }
 }
 
+/**
+ * イラスト検索 WebSocket API
+ *
+ * 結果は1時間キャッシュする。
+ */
 export class SearchIllust extends BaseWSRouter<
   SearchIllustRequest,
   SearchIllustResponse
@@ -159,6 +175,9 @@ export class SearchIllust extends BaseWSRouter<
   }
 }
 
+/**
+ * おすすめイラスト取得 WebSocket API
+ */
 export class RecommendedIllust extends BaseWSRouter<
   RecommendedIllustRequest,
   RecommendedIllustResponse
@@ -200,6 +219,9 @@ export class RecommendedIllust extends BaseWSRouter<
   }
 }
 
+/**
+ * イラストのお気に入り追加 WebSocket API
+ */
 export class AddIllustLike extends BaseWSRouter<
   AddIllustLikeRequest,
   AddIllustLikeResponse

@@ -16,16 +16,27 @@ import { dirname, join } from 'path'
 import { PATH } from '@/utils/utils'
 import { RecommendedIllustOptions } from '@/pixiv/options'
 
+/**
+ * マンガキャッシュモデル
+ */
 interface CacheGetManga {
   timestamp: number
   data: PixivIllustItem
 }
 
+/**
+ * マンガ検索キャッシュモデル
+ */
 interface CacheSearchManga {
   timestamp: number
   data: PixivIllustItem[]
 }
 
+/**
+ * マンガ詳細取得 WebSocket API
+ *
+ * 結果は1時間キャッシュする。
+ */
 export class GetManga extends BaseWSRouter<GetMangaRequest, GetMangaResponse> {
   validate() {
     // manga_idが存在し、数値かつ0以上であること
@@ -81,6 +92,11 @@ export class GetManga extends BaseWSRouter<GetMangaRequest, GetMangaResponse> {
   }
 }
 
+/**
+ * マンガ検索 WebSocket API
+ *
+ * 結果は1時間キャッシュする。
+ */
 export class SearchManga extends BaseWSRouter<
   SearchMangaRequest,
   SearchMangaResponse
@@ -154,6 +170,9 @@ export class SearchManga extends BaseWSRouter<
   }
 }
 
+/**
+ * おすすめマンガ取得 WebSocket API
+ */
 export class RecommendedManga extends BaseWSRouter<
   RecommendedMangaRequest,
   RecommendedMangaResponse
@@ -196,6 +215,9 @@ export class RecommendedManga extends BaseWSRouter<
   }
 }
 
+/**
+ * マンガのお気に入り追加 WebSocket API
+ */
 export class AddMangaLike extends BaseWSRouter<
   AddMangaLikeRequest,
   AddMangaLikeResponse

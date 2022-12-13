@@ -73,6 +73,9 @@ const endpoints: {
   ping: PingPong,
 }
 
+/**
+ * WebSocket API
+ */
 export class WebSocketRouter extends BaseRouter {
   private wsKey: string | undefined
 

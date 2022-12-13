@@ -1,6 +1,9 @@
 import { FastifyReply, FastifyRequest } from 'fastify'
 import { BaseRouter } from '@/base-router'
 
+/**
+ * ルート REST API
+ */
 export class RootRouter extends BaseRouter {
   init(): void {
     this.fastify.register(

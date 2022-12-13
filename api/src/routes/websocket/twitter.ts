@@ -25,6 +25,9 @@ import axios from 'axios'
 import { dirname, join } from 'path'
 import jimp from 'jimp'
 
+/**
+ * イラストからツイートを検索 WebSocket API
+ */
 export class SearchTweet extends BaseWSRouter<
   SearchTweetRequest,
   SearchTweetResponse
@@ -77,6 +80,13 @@ export class SearchTweet extends BaseWSRouter<
     })
   }
 
+  /**
+   * イラストからTwitterアカウントを探す
+   *
+   * @param pixiv Pixivインスタンス
+   * @param illust イラスト情報
+   * @returns Twitterスクリーンネームの配列
+   */
   private async getIllustScreenNames(pixiv: Pixiv, illust: PixivIllustItem) {
     const screenNames = []
 
@@ -102,6 +112,14 @@ export class SearchTweet extends BaseWSRouter<
       .filter((screenName, index, self) => self.indexOf(screenName) === index)
   }
 
+  /**
+   * 画像ツイートを探す。まずは検索から探し、検索に一つもひっかからなかった場合はユーザーのツイートから探す
+   *
+   * @param screenName スクリーンネーム
+   * @param postedAt 投稿日時
+   * @param imagePath 画像のパス
+   * @returns ツイートの配列
+   */
   private async getTweets(
     screenName: string,
     postedAt: Date,
@@ -125,6 +143,14 @@ export class SearchTweet extends BaseWSRouter<
     return userTweets
   }
 
+  /**
+   * 検索APIで画像ツイートを探す
+   *
+   * @param screenName スクリーンネーム
+   * @param postedAt 投稿日時
+   * @param imagePath 画像のパス
+   * @returns ツイートの配列
+   */
   private async searchTweets(
     screenName: string,
     postedAt: Date,
@@ -164,6 +190,14 @@ export class SearchTweet extends BaseWSRouter<
     )
   }
 
+  /**
+   * ユーザーのツイートから画像ツイートを探す
+   *
+   * @param screenName スクリーンネーム
+   * @param postedAt 投稿日時
+   * @param imagePath 画像のパス
+   * @returns ツイートの配列
+   */
   private async huntingUserTweets(
     screenName: string,
     postedAt: Date,
@@ -203,10 +237,22 @@ export class SearchTweet extends BaseWSRouter<
     )
   }
 
+  /**
+   * 配列から null を除外する
+   *
+   * @param array 配列
+   * @returns nullを除外した配列
+   */
   private filterNull<T>(array: (T | null)[]): T[] {
     return array.filter((item) => !!item) as T[]
   }
 
+  /**
+   * 重複する画像を除外する
+   *
+   * @param results ツイート配列
+   * @returns 重複を除外したツイート配列
+   */
   private filterMediaDuplication(
     results: SearchTweetResult[]
   ): SearchTweetResult[] {
@@ -218,6 +264,12 @@ export class SearchTweet extends BaseWSRouter<
     )
   }
 
+  /**
+   * 類似度の高い順にソートする
+   *
+   * @param results ツイート配列
+   * @returns 類似度の高い順にソートしたツイート配列
+   */
   private sortSimilarity(results: SearchTweetResult[]): SearchTweetResult[] {
     return results.sort((a, b) => {
       if (!a || !b) {
@@ -227,6 +279,14 @@ export class SearchTweet extends BaseWSRouter<
     })
   }
 
+  /**
+   * ツイートを処理し、画像を取得し、類似度を計算する
+   *
+   * @param tweet ツイート
+   * @param imagePath 画像のパス
+   * @param identity データ元
+   * @returns 画像の配列
+   */
   private async analysisTweet(
     tweet: Tweet,
     imagePath: string,
@@ -283,6 +343,14 @@ export class SearchTweet extends BaseWSRouter<
     return tweets
   }
 
+  /**
+   * Twitterから画像をダウンロードする
+   *
+   * @param url 画像のURL
+   * @param tweetId ツイート ID
+   * @param imageNum 画像番号
+   * @returns 画像のパス
+   */
   private async downloadImage(url: string, tweetId: string, imageNum: number) {
     const res = await axios.get(url, {
       responseType: 'arraybuffer',
@@ -297,6 +365,13 @@ export class SearchTweet extends BaseWSRouter<
     return path
   }
 
+  /**
+   * 画像の類似度を計算する。類似度計算には画像の差のパーセンテージと画像の異なるピクセル数を使用する。
+   *
+   * @param imagePath 画像のパス
+   * @param tweetImagePath ツイート画像のパス
+   * @returns 類似度 (0 ~ 1)
+   */
   private async calculateSimilarity(imagePath: string, tweetImagePath: string) {
     // https://www.codedrome.com/comparing-images-node-jimp/
 
@@ -306,19 +381,32 @@ export class SearchTweet extends BaseWSRouter<
 
     // 画像の差のパーセンテージを求める。1 が完全一致、0 が完全に異なる
     const diff = jimp.diff(image, tweetImage)
-    // 画像の距離(異なるビット数)を求める。0 が完全一致、1 が完全に異なる
+    // 画像の距離(異なるピクセル数)を求める。0 が完全一致、1 が完全に異なる
     const distance = jimp.distance(image, tweetImage)
 
     // 差分の割合を求める。画像差パーセンテージと距離の差を掛け合わせることで、双方の影響を受けるようにする
     return diff.percent * (1 - distance)
   }
 
+  /**
+   * Date を Twitter の Snowflake 形式に変換する
+   *
+   * @param date Date
+   * @returns Snowflake
+   */
   private dateToSnowflake(date: Date) {
     // https://pronama.jp/2015/02/18/generate-twitter-status-id/
     // timestamp を求め 22bit 上位へシフトする
     return (BigInt(date.getTime() - 1288834974657) << BigInt(22)).toString()
   }
 
+  /**
+   * 正規表現にマッチした文字列を配列で返す
+   *
+   * @param regex 正規表現
+   * @param text テキスト
+   * @returns マッチした文字列の配列
+   */
   private getRegexMatches(regex: RegExp, text: string) {
     const matches = []
     let match = regex.exec(text)
@@ -336,11 +424,15 @@ export class SearchTweet extends BaseWSRouter<
   }
 }
 
+/**
+ * シャドウバンされているかどうかを確認 WebSocket API
+ */
 export class CheckShadowBan extends BaseWSRouter<
   CheckShadowBanRequest,
   CheckShadowBanResponse
 > {
   validate(): boolean {
+    // screen_name が空でないこと
     return !!this.data.screen_name && this.data.screen_name.length > 0
   }
 
@@ -360,11 +452,16 @@ export class CheckShadowBan extends BaseWSRouter<
   }
 }
 
+/**
+ * ツイートをいいねしているかどうかを確認 WebSocket API
+ */
 export class GetTweetsLike extends BaseWSRouter<
   GetTweetsLikeRequest,
   GetTweetsLikeResponse
 > {
   validate(): boolean {
+    // account が空でないこと
+    // tweet_ids が配列で、空でないこと
     return (
       !!this.data.account &&
       this.data.account.length > 0 &&
@@ -398,11 +495,16 @@ export class GetTweetsLike extends BaseWSRouter<
   }
 }
 
+/**
+ * ツイートをいいねする WebSocket API
+ */
 export class AddTweetLike extends BaseWSRouter<
   AddTweetLikeRequest,
   AddTweetLikeResponse
 > {
   validate(): boolean {
+    // account が空でないこと
+    // tweet_id が空でないこと
     return (
       !!this.data.account &&
       this.data.account.length > 0 &&
@@ -425,11 +527,16 @@ export class AddTweetLike extends BaseWSRouter<
   }
 }
 
+/**
+ * ツイートのいいねを解除する WebSocket API
+ */
 export class RemoveTweetLike extends BaseWSRouter<
   RemoveTweetLikeRequest,
   RemoveTweetLikeResponse
 > {
   validate(): boolean {
+    // account が空でないこと
+    // tweet_id が空でないこと
     return (
       !!this.data.account &&
       this.data.account.length > 0 &&

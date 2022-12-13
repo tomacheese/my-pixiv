@@ -5,13 +5,22 @@ import { dirname, join } from 'path'
 import fs from 'fs'
 import { loadPixiv } from '@/pixiv/pixiv'
 
+/**
+ * ユーザーキャッシュモデル
+ */
 interface CacheGetUser {
   timestamp: number
   data: PixivUserItem
 }
 
+/**
+ * ユーザー詳細取得 WebSocket API
+ *
+ * 結果は1時間キャッシュする。
+ */
 export class GetUser extends BaseWSRouter<GetUserRequest, GetUserResponse> {
   validate(): boolean {
+    // user_idが存在し、数値かつ0以上であること
     return !!this.data.user_id && this.isVaildUserId(this.data.user_id)
   }
 

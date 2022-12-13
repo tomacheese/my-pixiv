@@ -11,6 +11,9 @@ import {
   ShareRemoveItemMuteResponse,
 } from 'my-pixiv-types'
 
+/**
+ * ミュートアイテム取得 WebSocket API
+ */
 export class GetItemMute extends BaseWSRouter<
   GetItemMuteRequest,
   GetItemMuteResponse
@@ -28,11 +31,15 @@ export class GetItemMute extends BaseWSRouter<
   }
 }
 
+/**
+ * ミュートアイテム追加 WebSocket API
+ */
 export class AddItemMute extends BaseWSRouter<
   AddItemMuteRequest,
   AddItemMuteResponse
 > {
   validate(): boolean {
+    // type, id が必要。id は数値かつ1以上である必要がある
     return (
       !!this.data &&
       !!this.data.type &&
@@ -58,11 +65,15 @@ export class AddItemMute extends BaseWSRouter<
   }
 }
 
+/**
+ * ミュートアイテム削除 WebSocket API
+ */
 export class RemoveItemMute extends BaseWSRouter<
   RemoveItemMuteRequest,
   RemoveItemMuteResponse
 > {
   validate(): boolean {
+    /// type, id が必要。id は数値かつ1以上である必要がある
     return (
       !!this.data &&
       !!this.data.type &&

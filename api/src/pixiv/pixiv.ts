@@ -34,6 +34,9 @@ interface RequestOptions {
   data?: Record<string, any>
 }
 
+/**
+ * pixiv API
+ */
 export class Pixiv {
   private static clientId = 'MOBrBDS8blbauoSck0ZfDbtuzpyT'
   private static clientSecret = 'lsACyCD94FhDUtGTXi3QzcFE2uU1hqtDaKeqrdwj'
@@ -47,6 +50,13 @@ export class Pixiv {
   readonly refreshToken: string
   readonly axios: AxiosInstance
 
+  /**
+   * コンストラクタ。外部からインスタンス化できないので、of メソッドを使うこと。
+   *
+   * @param userId ユーザー ID
+   * @param accessToken アクセストークン
+   * @param refreshToken リフレッシュトークン
+   */
   private constructor(
     userId: string,
     accessToken: string,
@@ -69,6 +79,12 @@ export class Pixiv {
     })
   }
 
+  /**
+   * リフレッシュトークンからインスタンスを生成する。
+   *
+   * @param refreshToken リフレッシュトークン
+   * @returns Pixiv インスタンス
+   */
   public static async of(refreshToken: string) {
     // @see https://github.com/upbit/pixivpy/blob/master/pixivpy3/api.py#L120
 
@@ -112,32 +128,24 @@ export class Pixiv {
     return new Pixiv(options.userId, options.accessToken, options.refreshToken)
   }
 
-  private static hash(time: string) {
-    const hash = crypto.createHash('md5')
-    return hash.update(time + this.hashSecret).digest('hex')
-  }
-
-  private request<T>(options: RequestOptions): Promise<AxiosResponse<T>> {
-    if (options.method === 'GET') {
-      return this.axios.get<T>(options.path, { params: options.params })
-    }
-    if (options.method === 'POST') {
-      return this.axios.post<T>(options.path, qs.stringify(options.data), {
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-      })
-    }
-    throw new Error('Invalid method')
-  }
-
+  /**
+   * 画像をダウンロードする。
+   *
+   * @param itemType アイテムの種類
+   * @param itemId アイテムの ID
+   * @param url 画像の URL
+   * @returns 画像のファイルパス (ダウンロードに失敗した場合は存在しない可能性あり)
+   */
   public static async downloadImage(
     itemType: string,
     itemId: string,
     url: string
   ): Promise<string> {
+    // 画像は変更されないことを前提に恒久的にキャッシュする
     const extension = url.split('.').pop() || null
 
+    // オリジナルサイズの場合は img-original が含まれる
+    // それ以外の場合は 600x600 のようなサイズが含まれる
     let size
     if (url.includes('img-original')) {
       size = 'original'
@@ -192,6 +200,12 @@ export class Pixiv {
     return path
   }
 
+  /**
+   * イラストの詳細情報を取得する。
+   *
+   * @param options オプション
+   * @returns レスポンス
+   */
   public async getIllustDetail(options: GetIllustDetailOptions) {
     const params = {
       illust_id: options.illustId,
@@ -204,6 +218,12 @@ export class Pixiv {
     })
   }
 
+  /**
+   * イラストを検索する。
+   *
+   * @param options オプション
+   * @returns レスポンス
+   */
   public async searchIllust(options: SearchIllustOptions) {
     const params = {
       word: options.word, // required
@@ -223,6 +243,12 @@ export class Pixiv {
     })
   }
 
+  /**
+   * おすすめイラストを取得する。
+   *
+   * @param options オプション
+   * @returns レスポンス
+   */
   public async recommendedIllust(options: RecommendedIllustOptions) {
     const params = {
       content_type: options.contentType,
@@ -247,6 +273,12 @@ export class Pixiv {
     })
   }
 
+  /**
+   * イラストをブックマークする。
+   *
+   * @param options オプション
+   * @returns レスポンス
+   */
   public async illustBookmarkAdd(options: IllustBookmarkAddOptions) {
     const data = {
       illust_id: options.illustId,
@@ -261,6 +293,12 @@ export class Pixiv {
     })
   }
 
+  /**
+   * 小説の詳細情報を取得する。
+   *
+   * @param options オプション
+   * @returns レスポンス
+   */
   public async getNovelDetail(options: GetNovelDetailOptions) {
     const params = {
       novel_id: options.novelId,
@@ -273,6 +311,12 @@ export class Pixiv {
     })
   }
 
+  /**
+   * 小説を検索する。
+   *
+   * @param options オプション
+   * @returns レスポンス
+   */
   public async searchNovel(options: SearchNovelOptions) {
     const params = {
       word: options.word, // required
@@ -294,6 +338,12 @@ export class Pixiv {
     })
   }
 
+  /**
+   * おすすめ小説を取得する。
+   *
+   * @param options オプション
+   * @returns レスポンス
+   */
   public async recommendedNovel(options: RecommendedNovelOptions = {}) {
     const params = {
       include_ranking_label: options.includeRankingLabel || true,
@@ -312,6 +362,12 @@ export class Pixiv {
     })
   }
 
+  /**
+   * 小説シリーズの詳細情報を取得する。
+   *
+   * @param options オプション
+   * @returns レスポンス
+   */
   public async getNovelSeries(options: GetNovelSeriesOptions) {
     const params = {
       series_id: options.seriesId,
@@ -326,6 +382,12 @@ export class Pixiv {
     })
   }
 
+  /**
+   * ユーザーの詳細情報を取得する。
+   *
+   * @param options オプション
+   * @returns レスポンス
+   */
   public async getUserDetail(options: GetUserDetailOptions) {
     const params = {
       user_id: options.userId,
@@ -339,6 +401,12 @@ export class Pixiv {
     })
   }
 
+  /**
+   * クエリストリングをパースする。
+   *
+   * @param url URL
+   * @returns パースしたクエリストリングオブジェクト
+   */
   public static parseQueryString(url: string) {
     let query = url
     if (url.indexOf('?') !== -1) {
@@ -347,8 +415,42 @@ export class Pixiv {
 
     return qs.parse(query)
   }
+
+  /**
+   * MD5ハッシュを生成する。
+   *
+   * @param str 文字列
+   * @returns ハッシュ
+   */
+  private static hash(str: string) {
+    const hash = crypto.createHash('md5')
+    return hash.update(str + this.hashSecret).digest('hex')
+  }
+
+  /**
+   * リクエストを送信する。
+   *
+   * @param options オプション
+   * @returns レスポンス
+   */
+  private request<T>(options: RequestOptions): Promise<AxiosResponse<T>> {
+    if (options.method === 'GET') {
+      return this.axios.get<T>(options.path, { params: options.params })
+    }
+    if (options.method === 'POST') {
+      return this.axios.post<T>(options.path, qs.stringify(options.data), {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+      })
+    }
+    throw new Error('Invalid method')
+  }
 }
 
+/**
+ * Pixivインスタンスのキャッシュ
+ */
 const cache: {
   pixiv: Pixiv | null
   timestamp: number
@@ -357,6 +459,11 @@ const cache: {
   timestamp: 0,
 }
 
+/**
+ * Pixivインスタンスを取得する。インスタンスは10分間キャッシュされる。
+ *
+ * @returns Pixivインスタンス
+ */
 export async function loadPixiv() {
   // 10分以内に呼ばれたらキャッシュを返す
   if (cache.pixiv && cache.timestamp + 10 * 60 * 1000 > Date.now()) {

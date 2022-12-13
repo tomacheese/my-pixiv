@@ -17,21 +17,35 @@ import { dirname, join } from 'path'
 import { PATH } from '@/utils/utils'
 import { RecommendedNovelOptions } from '@/pixiv/options'
 
+/**
+ * 小説キャッシュモデル
+ */
 interface CacheGetNovel {
   timestamp: number
   data: PixivNovelItem
 }
 
+/**
+ * 小説シリーズキャッシュモデル
+ */
 interface CacheGetNovelSeries {
   timestamp: number
   data: PixivNovelSeriesItem
 }
 
+/**
+ * 小説検索キャッシュモデル
+ */
 interface CacheSearchNovel {
   timestamp: number
   data: PixivNovelItem[]
 }
 
+/**
+ * 小説詳細取得 WebSocket API
+ *
+ * 結果は1時間キャッシュする。
+ */
 export class GetNovel extends BaseWSRouter<GetNovelRequest, GetNovelResponse> {
   validate() {
     // novel_idが存在し、数値かつ0以上であること
@@ -83,6 +97,11 @@ export class GetNovel extends BaseWSRouter<GetNovelRequest, GetNovelResponse> {
   }
 }
 
+/**
+ * 小説検索 WebSocket API
+ *
+ * 結果は1時間キャッシュする。
+ */
 export class SearchNovel extends BaseWSRouter<
   SearchNovelRequest,
   SearchNovelResponse
@@ -156,6 +175,9 @@ export class SearchNovel extends BaseWSRouter<
   }
 }
 
+/**
+ * おすすめ小説取得 WebSocket API
+ */
 export class RecommendedNovel extends BaseWSRouter<
   RecommendedNovelRequest,
   RecommendedNovelResponse
@@ -194,6 +216,11 @@ export class RecommendedNovel extends BaseWSRouter<
   }
 }
 
+/**
+ * 小説シリーズ取得 WebSocket API
+ *
+ * 結果は1時間キャッシュする。
+ */
 export class GetNovelSeries extends BaseWSRouter<
   GetNovelSeriesRequest,
   GetNovelSeriesResponse

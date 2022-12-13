@@ -4,6 +4,9 @@ import { PATH } from './utils'
 
 type ViewedItemJsonSchema = ViewedItem[]
 
+/**
+ * 既読 API
+ */
 export class ViewedApi {
   private vieweds: ViewedItem[]
   private static cache: {
@@ -11,16 +14,29 @@ export class ViewedApi {
     timestamp: number
   } | null = null
 
-  constructor(vieweds: ViewedItem[]) {
+  private constructor(vieweds: ViewedItem[]) {
     this.vieweds = vieweds
   }
 
+  /**
+   * アイテムが既読かどうかを返す
+   *
+   * @param type 既読アイテム種別
+   * @param id アイテム ID
+   * @returns 既読なら true
+   */
   isViewed(type: ViewedItemType, id: number): boolean {
     return this.vieweds.some(
       (viewed) => viewed.type === type && viewed.id === id
     )
   }
 
+  /**
+   * アイテムを既読にする
+   *
+   * @param item 既読アイテム
+   * @returns 既読なら true
+   */
   add(item: ViewedItem): void {
     if (this.isViewed(item.type, item.id)) {
       return
@@ -30,6 +46,12 @@ export class ViewedApi {
     this.save()
   }
 
+  /**
+   * アイテムの既読を解除する
+   *
+   * @param type 既読アイテム種別
+   * @param id アイテム ID
+   */
   remove(type: ViewedItemType, id: number): void {
     this.vieweds = this.vieweds.filter(
       (viewed) => !(viewed.type === type && viewed.id === id)
@@ -38,6 +60,12 @@ export class ViewedApi {
     this.save()
   }
 
+  /**
+   * 既読アイテムを取得する
+   *
+   * @param type 既読アイテム種別
+   * @returns 既読アイテム
+   */
   get(type?: ViewedItemType): ViewedItem[] {
     if (!type) {
       return this.vieweds
@@ -45,18 +73,29 @@ export class ViewedApi {
     return this.vieweds.filter((viewed) => viewed.type === type)
   }
 
+  /**
+   * 既読アイテムを設定する
+   *
+   * @param vieweds 既読アイテム
+   */
   set(vieweds: ViewedItem[]): void {
     this.vieweds = vieweds
 
     this.save()
   }
 
+  /**
+   * すべての既読を解除する
+   */
   clear(): void {
     this.vieweds = []
 
     this.save()
   }
 
+  /**
+   * 既読情報を保存する
+   */
   save(): void {
     fs.writeFileSync(
       PATH.VIEWED_FILE,
@@ -69,6 +108,11 @@ export class ViewedApi {
     }
   }
 
+  /**
+   * インスタンスを生成する
+   *
+   * @returns 既読 API インスタンス
+   */
   public static of() {
     // 1時間キャッシュ
     if (

@@ -9,6 +9,12 @@ interface OldViewed {
 
 type ViewedJson = OldViewed | ViewedItem[]
 
+/**
+ * 古い形式(v2)の既読情報かどうかを返す
+ *
+ * @param json JSON データ
+ * @returns 古い形式なら true
+ */
 const isOldViewed = (json: ViewedJson): json is OldViewed => {
   return (
     (json as OldViewed).illust !== undefined &&
@@ -16,6 +22,9 @@ const isOldViewed = (json: ViewedJson): json is OldViewed => {
   )
 }
 
+/**
+ * 古い既読情報ファイルをマイグレーションする (v2 -> v3)
+ */
 export function migrateViewed() {
   console.log('migrateViewed()')
   const path = PATH.VIEWED_FILE
