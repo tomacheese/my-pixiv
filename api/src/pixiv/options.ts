@@ -1,15 +1,21 @@
+/** 検索対象 */
 export type SearchTargets =
   | 'partial_match_for_tags'
   | 'exact_match_for_tags'
   | 'title_and_caption'
   | 'keyword'
+/** ソート */
 export type SearchSorts = 'date_desc' | 'date_asc' | 'popular_desc'
+/** 対象期間 */
 export type SearchIllustDurations =
   | 'within_last_day'
   | 'within_last_week'
   | 'within_last_month'
+/** OSフィルタ */
 export type Filters = 'for_ios' | 'for_android'
+/** コンテンツタイプ */
 export type ContentType = 'illust' | 'manga'
+/** 公開範囲 */
 export type BookmarkRestrict = 'public' | 'private'
 
 /**
