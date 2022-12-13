@@ -109,31 +109,143 @@ interface User {
   translator_type: string
 }
 
+/**
+ * ツイート
+ */
 export interface Tweet {
+  /**
+   * ツイートの作成日時
+   */
   created_at: string
+
+  /**
+   * ツイートのID
+   */
   id: number
+
+  /**
+   * ツイートのID (文字列)
+   */
   id_str: string
+
+  /**
+   * ツイートの本文
+   *
+   * 切り捨てられている可能性がある。tweet_mode=extendedで取得すると、切り捨てられない
+   */
   text?: string
-  full_text: string
+
+  /**
+   * ツイートの本文
+   *
+   * tweet_mode=extendedの場合に取得可能
+   */
+  full_text?: string
+
+  /**
+   * ツイートの本文が切り捨てられたかどうか
+   */
   truncated: boolean
+
+  /**
+   * ツイートのエンティティ
+   */
   entities: StatusEntities
+
+  /**
+   * ツイートの投稿元情報 (aタグ)
+   */
   source: string
+
+  /**
+   * リプライ先のツイートID
+   */
   in_reply_to_status_id?: any
+
+  /**
+   * リプライ先のツイートID (文字列)
+   */
   in_reply_to_status_id_str?: any
+
+  /**
+   * リプライ先のユーザーID
+   */
   in_reply_to_user_id?: any
+
+  /**
+   * リプライ先のユーザーID (文字列)
+   */
   in_reply_to_user_id_str?: any
+
+  /**
+   * リプライ先のユーザー名
+   */
   in_reply_to_screen_name?: any
+
+  /**
+   * 投稿者情報
+   */
   user: User
+
+  /**
+   * Geoデータ (lat, long)
+   */
   geo?: any
+
+  /**
+   * 場所データ (long. lat)
+   */
   coordinates?: any
+
+  /**
+   * 場所情報
+   */
   place?: any
+
+  /**
+   * ツイートのコントリビューター
+   */
   contributors?: any
+
+  /**
+   * 引用ツイートであるか
+   */
   is_quote_status: boolean
+
+  /**
+   * リツイート数
+   */
   retweet_count: number
+
+  /**
+   * いいね数
+   */
   favorite_count: number
+
+  /**
+   * いいねしているか
+   */
   favorited: boolean
+
+  /**
+   * リツイートしているか
+   */
   retweeted: boolean
+
+  /**
+   * センシティブなツイートか
+   */
   possibly_sensitive: boolean
+
+  /**
+   * ?
+   *
+   * @see https://twittercommunity.com/t/what-is-possibly-sensitive-appealable/76328
+   */
   possibly_sensitive_appealable: boolean
+
+  /**
+   * ツイートの言語
+   */
   lang: string
 }

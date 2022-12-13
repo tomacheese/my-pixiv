@@ -5,6 +5,7 @@ import { WebSocketBase } from './base'
 export interface GetIllustRequest extends WebSocketBase {
   type: 'getIllust'
   data: {
+    /** イラスト ID */
     illust_id: number
   }
 }
@@ -12,16 +13,18 @@ export interface GetIllustRequest extends WebSocketBase {
 /** イラスト取得レスポンスモデル */
 export interface GetIllustResponse extends WebSocketBase {
   type: 'getIllust'
-  data: {
-    item: PixivIllustItem
-  }
+  /** pixiv イラストアイテム */
+  data: PixivIllustItem
 }
 
 /** イラスト検索リクエストモデル */
 export interface SearchIllustRequest extends WebSocketBase {
   type: 'searchIllust'
   data: {
+    /** 検索ワード */
     word: string
+
+    /** 検索するアイテム数（1検索で30件。この値を30で割った分検索が実行される） */
     search_item_count: number
   }
 }
@@ -30,6 +33,9 @@ export interface SearchIllustRequest extends WebSocketBase {
 export interface SearchIllustResponse extends WebSocketBase {
   type: 'searchIllust'
   data: {
+    /**
+     * 検索結果のイラストアイテム
+     */
     items: PixivIllustItem[]
   }
 }
@@ -38,6 +44,9 @@ export interface SearchIllustResponse extends WebSocketBase {
 export interface RecommendedIllustRequest extends WebSocketBase {
   type: 'recommendedIllust'
   data: {
+    /**
+     * 次のページの URL
+     */
     next_url?: string
   }
 }
@@ -46,7 +55,14 @@ export interface RecommendedIllustRequest extends WebSocketBase {
 export interface RecommendedIllustResponse extends WebSocketBase {
   type: 'recommendedIllust'
   data: {
+    /**
+     * おすすめイラストアイテム
+     */
     items: PixivIllustItem[]
+
+    /**
+     * 次のページの URL
+     */
     next_url: string
   }
 }
@@ -55,6 +71,9 @@ export interface RecommendedIllustResponse extends WebSocketBase {
 export interface AddIllustLikeRequest extends WebSocketBase {
   type: 'addIllustLike'
   data: {
+    /**
+     * イラスト ID
+     */
     illust_id: number
   }
 }
@@ -62,7 +81,4 @@ export interface AddIllustLikeRequest extends WebSocketBase {
 /** イラストお気に入り追加レスポンスモデル */
 export interface AddIllustLikeResponse extends WebSocketBase {
   type: 'addIllustLike'
-  data: {
-    status: 'OK'
-  }
 }

@@ -5,6 +5,9 @@ import {
   PixivUserProfileWorkspace,
 } from '../../pixivUser'
 
+/**
+ * GET /v1/user/detail のレスポンス
+ */
 export interface GetUserDetailApiResponse {
   user: PixivUserItem
   profile: PixivUserProfile

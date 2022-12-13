@@ -211,9 +211,7 @@ export class AddMangaLike extends BaseWSRouter<
     await pixiv.illustBookmarkAdd({
       illustId: this.data.manga_id,
     })
-    this.send({
-      status: 'OK',
-    })
+    this.send({})
   }
 
   isVaildIllustId(rawIllustId: any) {

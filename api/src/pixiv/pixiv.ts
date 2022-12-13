@@ -224,11 +224,6 @@ export class Pixiv {
   }
 
   public async recommendedIllust(options: RecommendedIllustOptions) {
-    const path =
-      options.requireAuth === undefined || options.requireAuth === true
-        ? `/v1/illust/recommended`
-        : `/v1/illust/recommended-nologin`
-
     const params = {
       content_type: options.contentType,
       include_ranking_label: options.includeRankingLabel || true,
@@ -247,7 +242,7 @@ export class Pixiv {
 
     return this.request<RecommendedIllustApiResponse>({
       method: 'GET',
-      path,
+      path: '/v1/illust/recommended',
       params,
     })
   }
@@ -300,11 +295,6 @@ export class Pixiv {
   }
 
   public async recommendedNovel(options: RecommendedNovelOptions = {}) {
-    const path =
-      options.requireAuth === undefined || options.requireAuth === true
-        ? `/v1/novel/recommended`
-        : `/v1/novel/recommended-nologin` // 未チェック
-
     const params = {
       include_ranking_label: options.includeRankingLabel || true,
       filter: options.filter || 'for_ios',
@@ -317,7 +307,7 @@ export class Pixiv {
 
     return this.request<RecommendedNovelApiResponse>({
       method: 'GET',
-      path,
+      path: '/v1/novel/recommended',
       params,
     })
   }

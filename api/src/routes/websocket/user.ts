@@ -27,9 +27,7 @@ export class GetUser extends BaseWSRouter<GetUserRequest, GetUserResponse> {
         fs.readFileSync(cachePath, 'utf-8')
       )
       if (cache.timestamp + 3600 * 1000 > Date.now()) {
-        this.send({
-          item: cache.data,
-        })
+        this.send(cache.data)
         return
       }
     }
@@ -54,9 +52,7 @@ export class GetUser extends BaseWSRouter<GetUserRequest, GetUserResponse> {
     fs.mkdirSync(dirname(cachePath), { recursive: true })
     fs.writeFileSync(cachePath, JSON.stringify(cache))
 
-    this.send({
-      item: data,
-    })
+    this.send(data)
   }
 
   getCachePath() {

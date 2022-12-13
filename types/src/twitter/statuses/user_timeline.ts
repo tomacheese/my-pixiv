@@ -1,3 +1,6 @@
 import { Tweet } from '../twitter'
 
-export type TwitterUserTimelineResponse = Tweet[]
+/**
+ * GET /statuses/user_timeline.json のレスポンス
+ */
+export type StatusesUserTimelineResponse = Tweet[]

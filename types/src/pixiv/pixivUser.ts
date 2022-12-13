@@ -1,15 +1,20 @@
-export interface PixivUserItem {
-  id: number
-  name: string
-  account: string
-  profile_image_urls: {
-    medium: string
-  }
+import { PixivUser } from './pixivCommon'
+
+/**
+ * pixiv ユーザーアイテム
+ */
+export type PixivUserItem = PixivUser & {
+  /**
+   * 自己紹介
+   *
+   * 改行は \r\n っぽい。
+   */
   comment: string
-  is_followed: boolean
-  is_access_blocking_user: boolean
 }
 
+/**
+ * pixiv ユーザープロフィール
+ */
 export interface PixivUserProfile {
   webpage: string
   gender: string

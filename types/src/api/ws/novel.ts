@@ -6,6 +6,9 @@ import { WebSocketBase } from './base'
 export interface GetNovelRequest extends WebSocketBase {
   type: 'getNovel'
   data: {
+    /**
+     * 小説 ID
+     */
     novel_id: number
   }
 }
@@ -13,16 +16,25 @@ export interface GetNovelRequest extends WebSocketBase {
 /** 小説取得レスポンスモデル */
 export interface GetNovelResponse extends WebSocketBase {
   type: 'getNovel'
-  data: {
-    item: PixivNovelItem
-  }
+
+  /**
+   * pixiv 小説アイテム
+   */
+  data: PixivNovelItem
 }
 
 /** 小説検索リクエストモデル */
 export interface SearchNovelRequest extends WebSocketBase {
   type: 'searchNovel'
   data: {
+    /**
+     * 検索ワード
+     */
     word: string
+
+    /**
+     * 検索するアイテム数（1検索で30件。この値を30で割った分検索が実行される）
+     */
     search_item_count: number
   }
 }
@@ -31,6 +43,9 @@ export interface SearchNovelRequest extends WebSocketBase {
 export interface SearchNovelResponse extends WebSocketBase {
   type: 'searchNovel'
   data: {
+    /**
+     * 検索結果の小説アイテム
+     */
     items: PixivNovelItem[]
   }
 }
@@ -39,6 +54,9 @@ export interface SearchNovelResponse extends WebSocketBase {
 export interface RecommendedNovelRequest extends WebSocketBase {
   type: 'recommendedNovel'
   data: {
+    /**
+     * 次のページの URL
+     */
     next_url?: string
   }
 }
@@ -47,7 +65,14 @@ export interface RecommendedNovelRequest extends WebSocketBase {
 export interface RecommendedNovelResponse extends WebSocketBase {
   type: 'recommendedNovel'
   data: {
+    /**
+     * おすすめ小説アイテム
+     */
     items: PixivNovelItem[]
+
+    /**
+     * 次のページの URL
+     */
     next_url: string
   }
 }
@@ -56,6 +81,9 @@ export interface RecommendedNovelResponse extends WebSocketBase {
 export interface GetNovelSeriesRequest extends WebSocketBase {
   type: 'getNovelSeries'
   data: {
+    /**
+     * 小説シリーズ ID
+     */
     series_id: number
   }
 }
@@ -63,7 +91,9 @@ export interface GetNovelSeriesRequest extends WebSocketBase {
 /** 小説シリーズ取得レスポンスモデル */
 export interface GetNovelSeriesResponse extends WebSocketBase {
   type: 'getNovelSeries'
-  data: {
-    item: PixivNovelSeriesItem
-  }
+
+  /**
+   * pixiv 小説シリーズアイテム
+   */
+  data: PixivNovelSeriesItem
 }

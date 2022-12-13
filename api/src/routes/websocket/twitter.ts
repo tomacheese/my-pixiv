@@ -16,8 +16,8 @@ import {
   ShadowBanResult,
   StatusLookupResponse,
   Tweet,
-  TwitterSearchResponse as SearchTweetsResponse,
-  TwitterUserTimelineResponse as StatusesUserTimelineResponse,
+  SearchTweetsResponse,
+  StatusesUserTimelineResponse,
 } from 'my-pixiv-types'
 import fs from 'fs'
 import { loadTwitterApi, PATH } from '@/utils/utils'
@@ -143,6 +143,7 @@ export class SearchTweet extends BaseWSRouter<
     ].join(' ')
 
     const twitterApi = await loadTwitterApi(this.config, null)
+    // 3日間の間に100件以上ツイートしている場合は漏れてしまうので、今後検討
     const tweets = await twitterApi.v1.get<SearchTweetsResponse>(
       'search/tweets.json',
       {
@@ -229,7 +230,7 @@ export class SearchTweet extends BaseWSRouter<
   private async analysisTweet(
     tweet: Tweet,
     imagePath: string,
-    identity: string
+    identity: 'search' | 'user_timeline'
   ): Promise<SearchTweetResult[] | null> {
     if (!tweet.entities.media) {
       return null

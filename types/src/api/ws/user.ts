@@ -5,6 +5,9 @@ import { WebSocketBase } from './base'
 export interface GetUserRequest extends WebSocketBase {
   type: 'getUser'
   data: {
+    /**
+     * ユーザー ID
+     */
     user_id: number
   }
 }
@@ -12,7 +15,9 @@ export interface GetUserRequest extends WebSocketBase {
 /** ユーザー取得レスポンスモデル */
 export interface GetUserResponse extends WebSocketBase {
   type: 'getUser'
-  data: {
-    item: PixivUserItem
-  }
+
+  /**
+   * pixiv ユーザーアイテム
+   */
+  data: PixivUserItem
 }

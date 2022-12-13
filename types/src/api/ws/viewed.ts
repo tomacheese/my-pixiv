@@ -1,10 +1,27 @@
 import { WebSocketBase } from './base'
 
+/**
+ * 既読アイテムタイプ
+ */
 export type ViewedItemType = 'illust' | 'novel'
 
+/**
+ * 既読アイテム
+ */
 export interface ViewedItem {
+  /**
+   * アイテムタイプ
+   */
   type: ViewedItemType
+
+  /**
+   * 対象のアイテム ID
+   */
   id: number
+
+  /**
+   * 追加日時 (ISO 8601)
+   */
   addedAt: string
 }
 
@@ -17,6 +34,9 @@ export interface GetViewedRequest extends WebSocketBase {
 export interface GetViewedResponse extends WebSocketBase {
   type: 'getViewed'
   data: {
+    /**
+     * 既読アイテムリスト
+     */
     items: ViewedItem[]
   }
 }
@@ -25,6 +45,9 @@ export interface GetViewedResponse extends WebSocketBase {
 export interface AddViewedRequest extends WebSocketBase {
   type: 'addViewed'
   data: {
+    /**
+     * 既読アイテム
+     */
     item: ViewedItem
   }
 }
@@ -38,6 +61,9 @@ export interface AddViewedResponse extends WebSocketBase {
 export interface ShareAddViewedResponse extends WebSocketBase {
   type: 'shareAddViewed'
   data: {
+    /**
+     * 既読アイテム
+     */
     item: ViewedItem
   }
 }

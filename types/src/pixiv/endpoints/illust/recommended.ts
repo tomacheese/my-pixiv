@@ -1,5 +1,8 @@
 import { PixivIllustItem } from '../../pixivIllust'
 
+/**
+ * GET /v1/illust/recommended のレスポンス
+ */
 export interface RecommendedIllustApiResponse {
   illusts: PixivIllustItem[]
   ranking_illusts: unknown[]

@@ -178,9 +178,9 @@ export default Vue.extend({
                 | GetUserResponse
                 | GetNovelSeriesResponse
             ) => {
-              const details = isPixivNovelSeriesItem(res.data.item)
-                ? res.data.item.novel_series_detail
-                : res.data.item
+              const details = isPixivNovelSeriesItem(res.data)
+                ? res.data.novel_series_detail
+                : res.data
 
               this.items.push({
                 id: item.id,

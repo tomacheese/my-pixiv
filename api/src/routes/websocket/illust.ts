@@ -47,9 +47,7 @@ export class GetIllust extends BaseWSRouter<
         fs.readFileSync(cachePath, 'utf-8')
       )
       if (cache.timestamp + 3600 * 1000 > Date.now()) {
-        this.send({
-          item: cache.data,
-        })
+        this.send(cache.data)
         return
       }
     }
@@ -74,9 +72,7 @@ export class GetIllust extends BaseWSRouter<
     fs.mkdirSync(dirname(cachePath), { recursive: true })
     fs.writeFileSync(cachePath, JSON.stringify(cache))
 
-    this.send({
-      item: data,
-    })
+    this.send(data)
   }
 
   getCachePath() {
@@ -219,9 +215,7 @@ export class AddIllustLike extends BaseWSRouter<
     await pixiv.illustBookmarkAdd({
       illustId: this.data.illust_id,
     })
-    this.send({
-      status: 'OK',
-    })
+    this.send({})
   }
 
   isVaildIllustId(rawIllustId: any) {

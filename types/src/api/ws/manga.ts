@@ -8,6 +8,9 @@ type PixivItem = PixivIllustItem | PixivNovelItem
 export interface GetMangaRequest extends WebSocketBase {
   type: 'getManga'
   data: {
+    /**
+     * マンガ ID
+     */
     manga_id: number
   }
 }
@@ -16,6 +19,9 @@ export interface GetMangaRequest extends WebSocketBase {
 export interface GetMangaResponse extends WebSocketBase {
   type: 'getManga'
   data: {
+    /**
+     * pixiv マンガアイテム (イラストと構造はおなじ)
+     */
     item: PixivIllustItem
   }
 }
@@ -24,7 +30,14 @@ export interface GetMangaResponse extends WebSocketBase {
 export interface SearchMangaRequest extends WebSocketBase {
   type: 'searchManga'
   data: {
+    /**
+     * 検索ワード
+     */
     word: string
+
+    /**
+     * 検索するアイテム数（1検索で30件。この値を30で割った分検索が実行される）
+     */
     search_item_count: number
   }
 }
@@ -33,6 +46,9 @@ export interface SearchMangaRequest extends WebSocketBase {
 export interface SearchMangaResponse extends WebSocketBase {
   type: 'searchManga'
   data: {
+    /**
+     * 検索結果のマンガアイテム
+     */
     items: PixivIllustItem[]
   }
 }
@@ -41,6 +57,9 @@ export interface SearchMangaResponse extends WebSocketBase {
 export interface RecommendedMangaRequest extends WebSocketBase {
   type: 'recommendedManga'
   data: {
+    /**
+     * 次のページの URL
+     */
     next_url?: string
   }
 }
@@ -49,7 +68,14 @@ export interface RecommendedMangaRequest extends WebSocketBase {
 export interface RecommendedMangaResponse extends WebSocketBase {
   type: 'recommendedManga'
   data: {
+    /**
+     * おすすめマンガアイテム
+     */
     items: PixivItem[]
+
+    /**
+     * 次のページの URL
+     */
     next_url: string
   }
 }
@@ -58,6 +84,9 @@ export interface RecommendedMangaResponse extends WebSocketBase {
 export interface AddMangaLikeRequest extends WebSocketBase {
   type: 'addMangaLike'
   data: {
+    /**
+     * マンガ ID
+     */
     manga_id: number
   }
 }

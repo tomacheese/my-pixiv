@@ -24,6 +24,7 @@ export interface ImageUrls {
  * プロフィール画像URL群
  */
 export interface ProfileImageUrls {
+  /** 中サイズ */
   medium: string
 }
 

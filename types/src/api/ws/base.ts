@@ -92,14 +92,6 @@ export type WebSocketEndPoint = {
     request: RemoveItemMuteRequest
     response: RemoveItemMuteResponse
   }
-  shareAddItemMute: {
-    request: AddItemMuteRequest
-    response: ShareAddItemMuteResponse
-  }
-  shareRemoveItemMute: {
-    request: RemoveItemMuteRequest
-    response: ShareRemoveItemMuteResponse
-  }
   // manga.ts
   getManga: {
     request: GetMangaRequest

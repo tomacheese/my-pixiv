@@ -12,6 +12,9 @@ export interface MetaPages {
   image_urls: Required<ImageUrls>
 }
 
+/**
+ * pixiv イラストアイテム
+ */
 export interface PixivIllustItem {
   /**
    * 作品 ID

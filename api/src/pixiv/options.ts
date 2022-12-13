@@ -28,7 +28,6 @@ export interface GetIllustDetailOptions {
 }
 
 export interface RecommendedIllustOptions {
-  requireAuth?: boolean
   contentType: ContentType
   includeRankingLabel?: boolean
   filter?: Filters
@@ -64,7 +63,6 @@ export interface SearchNovelOptions {
 }
 
 export interface RecommendedNovelOptions {
-  requireAuth?: boolean
   includeRankingLabel?: boolean
   filter?: Filters
   offset?: number

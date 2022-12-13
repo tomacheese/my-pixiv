@@ -1,5 +1,8 @@
 import { ImageUrls, Tag, PixivUser, Series } from './pixivCommon'
 
+/**
+ * pixiv 小説アイテム
+ */
 export interface PixivNovelItem {
   /**
    * 作品 ID
