@@ -13,8 +13,11 @@ import {
   isSeriesItem,
   PixivItem,
   PixivItemWithSearchTag,
-} from '@/types/pixivItem'
+} from '@/types/pixiv-item'
 
+/**
+ * アイテム取得クラス
+ */
 export class Fetcher {
   private $config: NuxtRuntimeConfig
   private $api: Context['$api']
@@ -22,6 +25,15 @@ export class Fetcher {
   private readonly targetType: TargetType
   private readonly globalFilter: Filter[]
   private recommendedNextUrl: string | null = null
+
+  /**
+   * コンストラクタ
+   *
+   * @param $config NuxtRuntimeConfig
+   * @param $api WebSocket API
+   * @param $accessor Vuex アクセサ
+   * @param targetType 対象種別
+   */
   public constructor(
     $config: NuxtRuntimeConfig,
     $api: Context['$api'],
@@ -35,6 +47,12 @@ export class Fetcher {
     this.targetType = targetType
   }
 
+  /**
+   * アイテムの重複を除去してソートする。ソートは新しい順
+   *
+   * @param items アイテム
+   * @returns 重複を除去してソートしたアイテム
+   */
   public sortItems(items: PixivItemWithSearchTag[]): PixivItemWithSearchTag[] {
     return items
       .filter((item) => item)
@@ -47,6 +65,12 @@ export class Fetcher {
       )
   }
 
+  /**
+   * おすすめアイテムを取得する
+   *
+   * @param more 追加取得するか
+   * @returns おすすめアイテム
+   */
   public async getFetchRecommended(more = false) {
     if (this.$api.getReadyState() !== WebSocket.OPEN) {
       this.$api.reconnect()
@@ -76,6 +100,11 @@ export class Fetcher {
       .filter((item) => !this.isMutedItem(item))
   }
 
+  /**
+   * あとで見るアイテムを取得する
+   *
+   * @returns あとで見るアイテム
+   */
   public getFetchLater() {
     const items = this.$accessor.settings.later
 
@@ -89,10 +118,21 @@ export class Fetcher {
       )
   }
 
+  /**
+   * さらに読み込むアイテムがあるか
+   *
+   * @returns さらに読み込むアイテムがあるか
+   */
   public isLoadMoreAvailable() {
     return this.recommendedNextUrl !== null
   }
 
+  /**
+   * アイテムを取得するPromiseを取得する
+   *
+   * @param target 対象
+   * @returns アイテムを取得するPromise
+   */
   public getFetchItemPromise(target: Target) {
     return new Promise<PixivItemWithSearchTag[]>((resolve, reject) => {
       if (this.$api.getReadyState() !== WebSocket.OPEN) {
@@ -134,6 +174,12 @@ export class Fetcher {
     })
   }
 
+  /**
+   * 対象種別に応じたAPIメソッドを取得する
+   *
+   * @param targetType 対象種別
+   * @returns APIメソッド
+   */
   private getApiMethod(targetType: TargetType) {
     switch (targetType) {
       case 'ILLUST':
@@ -145,6 +191,13 @@ export class Fetcher {
     }
   }
 
+  /**
+   * アイテムを処理する。画像をmy-pixiv API経由で取得するようにURLを変換する
+   *
+   * アイテムは参照渡しで変更される
+   *
+   * @param item アイテム
+   */
   private itemProcessor(item: PixivItem) {
     item.image_urls.large = this.convertImageUrl(item, item.image_urls.large)
     item.image_urls.medium = this.convertImageUrl(item, item.image_urls.medium)
@@ -179,6 +232,13 @@ export class Fetcher {
     }
   }
 
+  /**
+   * 画像URLを変換する
+   *
+   * @param item アイテム
+   * @param url 画像URL
+   * @returns 変換後の画像URL
+   */
   private convertImageUrl(item: PixivItem, url: string) {
     return [
       `${this.$config.baseURL}api`,
@@ -188,6 +248,13 @@ export class Fetcher {
     ].join('/')
   }
 
+  /**
+   * フィルター対象かどうか
+   *
+   * @param target 検索ターゲット情報
+   * @param item アイテム
+   * @returns フィルター対象であれば true
+   */
   private isFilterItem(target: Target | null, item: PixivItem) {
     // グローバルフィルター
     for (const filter of this.globalFilter) {
@@ -229,7 +296,13 @@ export class Fetcher {
       : false
   }
 
-  public isMutedItem(item: PixivItem) {
+  /**
+   * アイテムがミュート対象かどうか
+   *
+   * @param item アイテム
+   * @returns ミュート対象であれば true
+   */
+  public isMutedItem(item: PixivItem): boolean {
     return this.$accessor.itemMute.items.some((mutedItem) => {
       switch (mutedItem.type) {
         case 'ILLUST':

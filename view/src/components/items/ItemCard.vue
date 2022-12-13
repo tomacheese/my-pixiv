@@ -70,7 +70,7 @@ import {
   isPixivNovelItem,
   PixivItem,
   PixivItemWithSearchTag,
-} from '@/types/pixivItem'
+} from '@/types/pixiv-item'
 
 export default Vue.extend({
   components: { ItemLongPress },

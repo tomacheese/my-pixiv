@@ -102,7 +102,7 @@ import {
   isPixivNovelSeriesItem,
   isPixivUserItem,
   PixivItem,
-} from '@/types/pixivItem'
+} from '@/types/pixiv-item'
 
 const targetsMap: {
   [key in MuteTargetType]: string

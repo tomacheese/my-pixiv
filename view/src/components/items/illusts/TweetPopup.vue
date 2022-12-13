@@ -99,7 +99,7 @@ import {
 } from 'my-pixiv-types'
 import { openTwitterTweet, openTwitterUser } from '@/utils/twitter'
 import { WebSocketAPIError } from '@/plugins/websocket'
-import { PixivItem } from '@/types/pixivItem'
+import { PixivItem } from '@/types/pixiv-item'
 
 export interface TweetPopupProp {
   screen_names: string[]

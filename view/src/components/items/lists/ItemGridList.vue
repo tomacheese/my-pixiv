@@ -81,7 +81,7 @@ import { PixivIllustItem, Tag } from 'my-pixiv-types'
 import MagicGrid from '@/components/utils/MagicGrid.vue'
 import ItemWrapper from '@/components/items/ItemWrapper.vue'
 import ItemLongPress from '@/components/items/ItemLongPress.vue'
-import { isPixivNovelItem, PixivItem } from '@/types/pixivItem'
+import { isPixivNovelItem, PixivItem } from '@/types/pixiv-item'
 
 export default Vue.extend({
   components: { MagicGrid, ItemWrapper, ItemLongPress },

@@ -52,7 +52,7 @@
 import Vue from 'vue'
 import { openPixivIllust } from '@/utils/pixiv'
 import { WebSocketAPIError } from '@/plugins/websocket'
-import { PixivItem } from '@/types/pixivItem'
+import { PixivItem } from '@/types/pixiv-item'
 
 export type TweetStatus =
   | 'LOADING'

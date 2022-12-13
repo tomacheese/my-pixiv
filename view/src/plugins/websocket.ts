@@ -18,6 +18,9 @@ import { ItemMuteAPI } from './websocket/item-mute'
 import { ViewedAPI } from './websocket/viewed'
 import { PingAPI } from './websocket/ping'
 
+/**
+ * my-pixiv WebSocket Utils
+ */
 export class WSUtils {
   protected ws!: WebSocket
 
@@ -27,13 +30,13 @@ export class WSUtils {
     }
   }
 
-  public send(data: WebSocketRequest) {
-    if (!this.ws) {
-      throw new Error('WebSocket is not initialized')
-    }
-    this.ws.send(JSON.stringify(data))
-  }
-
+  /**
+   * リクエストを送信する
+   *
+   * @param type リクエストタイプ
+   * @param data リクエストデータ
+   * @returns レスポンス
+   */
   public request<Req extends WebSocketRequest, Res extends WebSocketResponse>(
     type: Req['type'],
     data: Req['data']
@@ -85,13 +88,21 @@ export class WebSocketAPI {
   private pingInterval: NodeJS.Timer | null = null
   public lastCloseEvent: CloseEvent | null = null
 
+  /** my-pixiv WebSocket Illust API */
   public illust!: IllustAPI
+  /** my-pixiv WebSocket Manga API */
   public manga!: MangaAPI
+  /** my-pixiv WebSocket Novel API */
   public novel!: NovelAPI
+  /** my-pixiv WebSocket User API */
   public user!: UserAPI
+  /** my-pixiv WebSocket Twitter API */
   public twitter!: TwitterAPI
+  /** my-pixiv WebSocket ItemMute API */
   public itemMute!: ItemMuteAPI
+  /** my-pixiv WebSocket Viewed API */
   public viewed!: ViewedAPI
+  /** my-pixiv WebSocket Ping API */
   public ping!: PingAPI
 
   constructor(context: Context) {
@@ -107,6 +118,11 @@ export class WebSocketAPI {
     this.connect(`${protocol}://${domain}api/ws`)
   }
 
+  /**
+   * WebSocket の接続状態を取得する
+   *
+   * @returns WebSocket の接続状態
+   */
   public getReadyState():
     | WebSocket['OPEN']
     | WebSocket['CONNECTING']
@@ -115,10 +131,21 @@ export class WebSocketAPI {
     return this.ws.readyState
   }
 
+  /**
+   * WebSocket インスタンスを取得する
+   *
+   * @returns WebSocket インスタンス
+   */
   public getWS(): WebSocket {
     return this.ws
   }
 
+  /**
+   * WebSocket を再接続する。
+   *
+   * - 接続中の場合は無視される
+   * - 接続済みの場合は切断され再接続される
+   */
   public reconnect() {
     if (this.ws.readyState === WebSocket.CONNECTING) {
       return
@@ -129,6 +156,11 @@ export class WebSocketAPI {
     this.connect()
   }
 
+  /**
+   * WebSocket を接続する
+   *
+   * @param url 接続先 URL。指定しない場合は現在の接続先を再利用する
+   */
   private connect(url?: string) {
     if (!url && !this.ws) {
       throw new Error('url is required')
@@ -156,7 +188,7 @@ export class WebSocketAPI {
   private onOpen() {
     console.log('[WebSocket] connected')
 
-    // 定期的にpingを送信
+    // 30秒ごとにpingを送信
     if (this.pingInterval) {
       clearInterval(this.pingInterval)
     }
@@ -242,6 +274,9 @@ export class WebSocketAPI {
   }
 }
 
+/**
+ * WebSocket API エラー
+ */
 export class WebSocketAPIError extends Error {
   constructor(e: string, public data: WebSocketError) {
     super(e)
@@ -279,6 +314,11 @@ const websocketPlugin: Plugin = (context, inject) => {
   inject('api', api)
 }
 
+/**
+ * WebSocket API を取得する
+ *
+ * @returns WebSocket API
+ */
 export function getAPI() {
   return api
 }

@@ -133,7 +133,7 @@ import {
   isPixivIllustItem,
   isPixivNovelItem,
   isSeriesItem,
-} from '@/types/pixivItem'
+} from '@/types/pixiv-item'
 
 type SnackBarType =
   | 'ADDED_LATER'

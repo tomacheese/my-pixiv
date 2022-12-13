@@ -1,11 +1,17 @@
 import { ImageUrls } from 'my-pixiv-types'
 import { actionTree, getterTree, mutationTree } from 'typed-vuex'
-import { isPixivIllustItem, PixivItem } from '@/types/pixivItem'
+import { isPixivIllustItem, PixivItem } from '@/types/pixiv-item'
 
+/**
+ * 対象種別
+ */
 export type TargetType = 'ILLUST' | 'MANGA' | 'NOVEL'
 
 export type ViewType = 'PAGINATION' | 'VIRTUAL_SCROLL' | 'GRID_LIST'
 
+/**
+ * 検索ターゲット情報
+ */
 export interface Target {
   targetType: TargetType[]
   tag: string[]
@@ -14,19 +20,31 @@ export interface Target {
   searchItemCount: number
 }
 
+/**
+ * フィルター
+ */
 export interface Filter {
   type: 'TITLE' | 'CAPTION' | 'TAG'
   value: string
 }
 
+/**
+ * 画像サイズ
+ */
 export interface ImageSizes {
   illustList: keyof ImageUrls
   illustGridList: keyof ImageUrls
   illustPopup: keyof ImageUrls
 }
 
+/**
+ * アクションボタンの位置
+ */
 export type ActionPosition = 'LEFT' | 'RIGHT'
 
+/**
+ * ツイート取得タイミング
+ */
 export type GetTweetTiming = 'POPUP_OPEN' | 'IMAGE_LOADED'
 
 interface Settings {

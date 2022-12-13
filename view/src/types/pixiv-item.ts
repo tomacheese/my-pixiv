@@ -7,12 +7,24 @@ import {
   NovelSeriesDetail,
 } from 'my-pixiv-types'
 
+/**
+ * イラストまたは小説のアイテム
+ */
 export type PixivItem = PixivIllustItem | PixivNovelItem
 
+/**
+ * イラストまたは小説のアイテムと検索タグ
+ */
 export type PixivItemWithSearchTag = PixivItem & {
   searchTags: string[]
 }
 
+/**
+ * オブジェクトが PixivItem かどうかを判定する
+ *
+ * @param item アイテム
+ * @returns PixivItem の場合は true
+ */
 export const isPixivItem = (item: any): item is PixivItem => {
   return (
     (item as PixivItem).id !== undefined &&
@@ -59,12 +71,24 @@ export const isPixivUserItem = (item: any): item is PixivUserItem => {
   )
 }
 
+/**
+ * シリーズかどうかを判定する
+ *
+ * @param series シリーズ
+ * @returns シリーズの場合は true
+ */
 export const isSeriesItem = (
   series: Series | unknown[] | null
 ): series is Series => {
   return series !== null && (series as Series).id !== undefined
 }
 
+/**
+ * アイテムが小説シリーズかどうかを判定する
+ *
+ * @param item アイテム
+ * @returns 小説シリーズの場合は true
+ */
 export const isPixivNovelSeriesItem = (
   item: any
 ): item is PixivNovelSeriesItem => {
@@ -77,6 +101,12 @@ export const isPixivNovelSeriesItem = (
   )
 }
 
+/**
+ * 小説シリーズ詳細かどうかを判定する
+ *
+ * @param item アイテム
+ * @returns 小説シリーズ詳細の場合は true
+ */
 export const isNovelSeriesDetail = (item: any): item is NovelSeriesDetail => {
   return (
     (item as NovelSeriesDetail).id !== undefined &&

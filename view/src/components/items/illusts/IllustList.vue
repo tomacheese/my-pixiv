@@ -41,7 +41,7 @@ import { TargetType, ViewType } from '@/store/settings'
 import VLoadProgress from '@/components/utils/VLoadProgress.vue'
 import ItemList from '@/components/items/lists/ItemList.vue'
 import IllustPopup from '@/components/items/illusts/IllustPopup.vue'
-import { PixivItem, PixivItemWithSearchTag } from '@/types/pixivItem'
+import { PixivItem, PixivItemWithSearchTag } from '@/types/pixiv-item'
 
 export default Vue.extend({
   name: 'IllustList',

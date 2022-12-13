@@ -30,7 +30,7 @@ import { ViewType } from '@/store/settings'
 import { openPixivNovel } from '@/utils/pixiv'
 import VLoadProgress from '@/components/utils/VLoadProgress.vue'
 import ItemList from '@/components/items/lists/ItemList.vue'
-import { PixivItem, PixivItemWithSearchTag } from '@/types/pixivItem'
+import { PixivItem, PixivItemWithSearchTag } from '@/types/pixiv-item'
 
 export default Vue.extend({
   name: 'NovelList',
