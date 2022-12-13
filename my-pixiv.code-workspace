@@ -13,10 +13,6 @@
       "path": "types"
     },
     {
-      "name": "nginx",
-      "path": "nginx"
-    },
-    {
       "name": "my-pixiv-v3",
       "path": "."
     }

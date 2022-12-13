@@ -5,12 +5,13 @@ import { RootRouter } from '@/routes/root'
 import { ImagesRouter } from './routes/images'
 import { WebSocketRouter } from './routes/websocket'
 import { Configuration } from './config'
+import { PATH } from './utils/utils'
 
 export function buildApp() {
   const app = fastify()
   app.register(fastifyWebSocket)
 
-  const configPath = process.env.CONFIG_FILE || './config.json'
+  const configPath = PATH.CONFIG_FILE
   const config = new Configuration(configPath)
 
   // routers

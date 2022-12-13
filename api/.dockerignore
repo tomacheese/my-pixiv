@@ -1,0 +1,8 @@
+dist
+node_modules
+tests
+
+.eslintignore
+.eslintrc.yml
+jest.config.json
+test.json

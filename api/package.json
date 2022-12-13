@@ -10,6 +10,7 @@
     "build": "ts-node -r tsconfig-paths/register ./src/main.ts",
     "build-test": "ts-node -r tsconfig-paths/register ./src/test.ts",
     "dev": "ts-node-dev -r tsconfig-paths/register ./src/main.ts",
+    "package": "ncc build ./dist/main.js -o output/",
     "start": "node ./dist/main.js",
     "compile": "tsc -p .",
     "compile:test": "tsc -p . --noEmit",
@@ -51,6 +52,7 @@
     "jest-extended": "3.2.0"
   },
   "dependencies": {
+    "@vercel/ncc": "0.36.0",
     "@fastify/websocket": "7.1.1",
     "fastify": "4.10.2",
     "twitter-api-v2": "1.12.9",
