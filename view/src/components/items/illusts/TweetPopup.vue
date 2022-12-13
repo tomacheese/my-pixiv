@@ -92,37 +92,18 @@
 
 <script lang="ts">
 import Vue from 'vue'
-import { PixivItem } from '@/types/pixivItem'
-import { openTwitterTweet, openTwitterUser } from '@/utils/twitter'
 import {
-  ShadowBanResult,
   TwitterAccountType,
-} from '@/plugins/websocket/twitter'
+  ShadowBanResult,
+  SearchTweetResult,
+} from 'my-pixiv-types'
+import { openTwitterTweet, openTwitterUser } from '@/utils/twitter'
 import { WebSocketAPIError } from '@/plugins/websocket'
-
-export interface User {
-  id: string
-  name: string
-  screen_name: string
-  profile_image_url: string
-}
-
-export interface TweetData {
-  id: string
-  text: string
-  media_url: string
-  user: User
-}
-
-export interface Tweet {
-  tweet: TweetData
-  similarity: number
-  identity: string
-}
+import { PixivItem } from '@/types/pixiv-item'
 
 export interface TweetPopupProp {
   screen_names: string[]
-  tweets: Tweet[]
+  tweets: SearchTweetResult[]
   error: string | null
 }
 
@@ -213,20 +194,20 @@ export default Vue.extend({
         return
       }
       this.$api.twitter.getTweetsLike('main', tweetIds).then((res) => {
-        this.liked.main = res.tweets
+        this.liked.main = res.data.tweets
           .filter((tweet) => tweet.liked)
           .map((tweet) => tweet.id)
       })
       this.$api.twitter.getTweetsLike('sub', tweetIds).then((res) => {
-        this.liked.sub = res.tweets
+        this.liked.sub = res.data.tweets
           .filter((tweet) => tweet.liked)
           .map((tweet) => tweet.id)
       })
     },
-    getUserText(user: User): string {
+    getUserText(user: SearchTweetResult['tweet']['user']): string {
       return `${user.name} (@${user.screen_name})`
     },
-    open(tweet: Tweet) {
+    open(tweet: SearchTweetResult) {
       this.loading = true
       openTwitterTweet(
         this.$accessor,
@@ -240,7 +221,10 @@ export default Vue.extend({
     close() {
       this.$emit('close-popup')
     },
-    getHeartColor(tweet: Tweet, account: TwitterAccountType): string {
+    getHeartColor(
+      tweet: SearchTweetResult,
+      account: TwitterAccountType
+    ): string {
       if (!this.item) {
         return 'grey'
       }
@@ -249,7 +233,7 @@ export default Vue.extend({
       }
       return ''
     },
-    getSimilarityColor(tweet: Tweet) {
+    getSimilarityColor(tweet: SearchTweetResult) {
       if (tweet.similarity === 0) {
         return 'green'
       }
@@ -258,7 +242,7 @@ export default Vue.extend({
       }
       return 'red'
     },
-    toggleLike(tweet: Tweet, account: TwitterAccountType) {
+    toggleLike(tweet: SearchTweetResult, account: TwitterAccountType) {
       if (!this.item) {
         return
       }
@@ -268,7 +252,11 @@ export default Vue.extend({
       }
       this.requestLike(tweet, account, !isLiked)
     },
-    requestLike(tweet: Tweet, account: TwitterAccountType, isAdd: boolean) {
+    requestLike(
+      tweet: SearchTweetResult,
+      account: TwitterAccountType,
+      isAdd: boolean
+    ) {
       this.likeLoading = true
       if (this.$api.getReadyState() !== WebSocket.OPEN) {
         this.$api.reconnect()
@@ -290,7 +278,7 @@ export default Vue.extend({
         .catch((err) => {
           if (err instanceof WebSocketAPIError) {
             this.$nuxt.$emit('snackbar', {
-              message: `Likeに失敗: ${err.data.message}`,
+              message: `Likeに失敗: ${err.data.error.message}`,
               color: 'error',
             })
             return

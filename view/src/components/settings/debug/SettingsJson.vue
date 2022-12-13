@@ -65,8 +65,12 @@ export default Vue.extend({
         return
       }
       this.viewedsText = JSON.stringify(this.$accessor.viewed.allVieweds)
-      this.viewed.illusts = this.$accessor.viewed.illusts.length
-      this.viewed.novels = this.$accessor.viewed.novels.length
+      this.viewed.illusts = this.$accessor.viewed.items.filter(
+        (item) => item.type === 'illust'
+      ).length
+      this.viewed.novels = this.$accessor.viewed.items.filter(
+        (item) => item.type === 'novel'
+      ).length
     },
   },
 })

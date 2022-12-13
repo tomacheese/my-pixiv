@@ -55,9 +55,9 @@
 
 <script lang="ts">
 import Vue from 'vue'
-import { PixivItem } from '@/types/pixivItem'
 import ItemWrapper from '@/components/items/ItemWrapper.vue'
 import ItemCard from '@/components/items/ItemCard.vue'
+import { PixivItem } from '@/types/pixiv-item'
 
 export default Vue.extend({
   components: {

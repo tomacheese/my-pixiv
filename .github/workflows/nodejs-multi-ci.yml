@@ -20,7 +20,7 @@ jobs:
       matrix:
         os: [ubuntu-latest]
         node: [16]
-        directory: [view]
+        directory: [view, api]
 
     steps:
       - name: 🛎 Checkout
@@ -40,21 +40,18 @@ jobs:
           generate=$(cat package.json | jq '.scripts | has("generate")')
           package=$(cat package.json | jq '.scripts | has("package")')
           lint=$(cat package.json | jq '.scripts | has("lint")')
-          test=$(cat package.json | jq '.scripts | has("test")')
 
           echo "compile: $compile"
           echo "build: $build"
           echo "generate: $generate"
           echo "package: $package"
           echo "lint: $lint"
-          echo "test: $test"
 
           echo "compile=$compile" >> $GITHUB_OUTPUT
           echo "build=$build" >> $GITHUB_OUTPUT
           echo "generate=$generate" >> $GITHUB_OUTPUT
           echo "package=$package" >> $GITHUB_OUTPUT
           echo "lint=$lint" >> $GITHUB_OUTPUT
-          echo "test=$test" >> $GITHUB_OUTPUT
 
       - name: 🛠 Get yarn cache directory path
         id: yarn-cache-dir-path
@@ -94,11 +91,6 @@ jobs:
         run: |
           yarn build
           yarn generate
-
-      - name: 🧪 Run tests
-        if: steps.package-json.outputs.test == 'true'
-        working-directory: ${{ matrix.directory }}
-        run: yarn test
 
       - name: Check exists dist directory
         id: check-dist

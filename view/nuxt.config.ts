@@ -1,9 +1,27 @@
 import fs from 'fs'
 import { execSync } from 'child_process'
+import { networkInterfaces } from 'os'
 import { NuxtConfig } from '@nuxt/types'
 
-const baseURL =
-  process.env.NODE_ENV === 'production' ? '/' : 'http://192.168.0.101:8000/'
+function getIpAddress() {
+  const nets = networkInterfaces()
+  const net = nets.en0?.find((v) => v.family === 'IPv4')
+  return net ? net.address : null
+}
+
+const hostname = getIpAddress() || 'localhost'
+
+const host = process.env.HOST || hostname
+const port = process.env.PORT || 3000
+
+const apiHost = process.env.API_HOST || hostname
+const apiPort = process.env.API_PORT || 8000
+const apiProtocol = process.env.API_PROTOCOL || 'http'
+const apiBaseURL = `${apiProtocol}://${apiHost}:${apiPort}/`
+
+console.log(`API base URL: ${apiBaseURL}`)
+
+const baseURL = process.env.NODE_ENV === 'production' ? '/' : apiBaseURL
 
 execSync(
   'npx npm-license-crawler --dependencies --production --onlyDirectDependencies --omitVersion --json ./src/licenses.json'
@@ -82,10 +100,10 @@ const config: NuxtConfig = {
   css: ['@/assets/scroll.css'],
 
   plugins: [
-    { src: '@/plugins/settings.ts', ssr: false },
-    { src: '@/plugins/websocket.ts', ssr: false },
-    { src: '@/plugins/fetcher.ts', ssr: false },
-    { src: '@/plugins/workbox.ts', mode: 'client' },
+    { src: 'plugins/settings.ts', ssr: false },
+    { src: 'plugins/websocket.ts', ssr: false },
+    { src: 'plugins/fetcher.ts', ssr: false },
+    { src: 'plugins/workbox.ts', mode: 'client' },
   ],
 
   components: false,
@@ -121,12 +139,14 @@ const config: NuxtConfig = {
   },
 
   server: {
-    host: '0.0.0.0',
+    host,
+    port,
   },
 
   build: {
     parallel: true,
     cache: true,
+    postcss: false,
   },
 }
 export default config

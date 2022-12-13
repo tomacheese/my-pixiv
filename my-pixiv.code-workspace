@@ -1,19 +1,21 @@
 {
   "folders": [
     {
+      "name": "api",
+      "path": "api"
+    },
+    {
       "name": "view",
       "path": "view"
     },
     {
-      "name": "api",
-      "path": "api"
+      "name": "types",
+      "path": "types"
     },
     {
       "name": "my-pixiv",
       "path": "."
     }
   ],
-  "settings": {
-    "task.allowAutomaticTasks": "on"
-  }
+  "settings": {}
 }

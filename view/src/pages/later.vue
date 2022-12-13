@@ -30,9 +30,9 @@
 <script lang="ts">
 import Vue from 'vue'
 import { TargetType } from '@/store/settings'
-import { isPixivIllustItem, isPixivNovelItem } from '@/types/pixivItem'
 import IllustList from '@/components/items/illusts/IllustList.vue'
 import NovelList from '@/components/items/novels/NovelList.vue'
+import { isPixivIllustItem, isPixivNovelItem } from '@/types/pixiv-item'
 
 export default Vue.extend({
   name: 'LaterPage',

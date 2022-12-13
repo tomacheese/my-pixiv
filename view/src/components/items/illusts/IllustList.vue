@@ -36,12 +36,12 @@
 
 <script lang="ts">
 import Vue from 'vue'
-import { PixivItem, PixivItemWithSearchTag } from '@/types/pixivItem'
 import { Fetcher } from '@/plugins/fetcher'
 import { TargetType, ViewType } from '@/store/settings'
 import VLoadProgress from '@/components/utils/VLoadProgress.vue'
 import ItemList from '@/components/items/lists/ItemList.vue'
 import IllustPopup from '@/components/items/illusts/IllustPopup.vue'
+import { PixivItem, PixivItemWithSearchTag } from '@/types/pixiv-item'
 
 export default Vue.extend({
   name: 'IllustList',
@@ -118,7 +118,9 @@ export default Vue.extend({
 
     // 既読情報は検索結果画面のみで使用
     if (!this.recommended && !this.later) {
-      this.vieweds = this.$accessor.viewed.illusts
+      this.vieweds = this.$accessor.viewed.items
+        .filter((item) => item.type === 'illust')
+        .map((item) => item.id)
     } else {
       this.vieweds = undefined
     }

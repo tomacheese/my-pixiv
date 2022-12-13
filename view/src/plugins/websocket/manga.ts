@@ -1,55 +1,14 @@
-import { BaseRequest, BaseResponse, WSUtils } from '../websocket'
-import { PixivItem } from '@/types/pixivItem'
-import { PixivIllustItem } from '@/types/pixivIllust'
-
-/** マンガ取得リクエストモデル */
-export interface GetMangaRequest extends BaseRequest {
-  type: 'getManga'
-  manga_id: number
-}
-
-/** マンガ取得レスポンスモデル */
-export interface GetMangaResponse extends BaseResponse {
-  type: 'getManga'
-  item: PixivIllustItem
-}
-
-/** マンガ検索リクエストモデル */
-export interface SearchMangaRequest extends BaseRequest {
-  type: 'searchManga'
-  word: string
-  search_item_count: number
-}
-
-/** マンガ検索レスポンスモデル */
-export interface SearchMangaResponse extends BaseResponse {
-  type: 'searchManga'
-  items: PixivIllustItem[]
-}
-
-/** おすすめマンガ取得リクエストモデル */
-export interface RecommendedMangaRequest extends BaseRequest {
-  type: 'recommendedManga'
-  next_url: string | null
-}
-
-/** おすすめマンガ取得レスポンスモデル */
-export interface RecommendedMangaResponse extends BaseResponse {
-  type: 'recommendedManga'
-  items: PixivItem[]
-  next_url: string
-}
-
-/** マンガお気に入り追加リクエストモデル */
-export interface AddMangaLikeRequest extends BaseRequest {
-  type: 'addMangaLike'
-  manga_id: number
-}
-
-/** マンガお気に入り追加レスポンスモデル */
-export interface AddMangaLikeResponse extends BaseResponse {
-  type: 'addMangaLike'
-}
+import {
+  GetMangaResponse,
+  GetMangaRequest,
+  SearchMangaResponse,
+  SearchMangaRequest,
+  RecommendedMangaResponse,
+  RecommendedMangaRequest,
+  AddMangaLikeResponse,
+  AddMangaLikeRequest,
+} from 'my-pixiv-types'
+import { WSUtils } from '../websocket'
 
 /**
  * my-pixiv WebSocket Manga API
@@ -94,12 +53,10 @@ export class MangaAPI {
   /**
    * おすすめマンガを取得する
    *
-   * @param nextUrl 次のページのURL。初回はnullを指定する
+   * @param nextUrl 次のページのURL。初回は指定しない
    * @returns おすすめマンガレスポンス
    */
-  public recommended(
-    nextUrl: string | null
-  ): Promise<RecommendedMangaResponse> {
+  public recommended(nextUrl?: string): Promise<RecommendedMangaResponse> {
     return this.utils.request<
       RecommendedMangaRequest,
       RecommendedMangaResponse

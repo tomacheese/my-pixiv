@@ -50,9 +50,9 @@
 
 <script lang="ts">
 import Vue from 'vue'
-import { PixivItem } from '@/types/pixivItem'
 import { openPixivIllust } from '@/utils/pixiv'
 import { WebSocketAPIError } from '@/plugins/websocket'
+import { PixivItem } from '@/types/pixiv-item'
 
 export type TweetStatus =
   | 'LOADING'
@@ -158,7 +158,7 @@ export default Vue.extend({
         .catch((error) => {
           if (error instanceof WebSocketAPIError) {
             this.$nuxt.$emit('snackbar', {
-              message: `Likeに失敗: ${error.data.message}`,
+              message: `Likeに失敗: ${error.data.error.message}`,
               color: 'error',
             })
             return

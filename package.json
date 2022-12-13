@@ -1,0 +1,14 @@
+{
+  "name": "my-pixiv",
+  "private": true,
+  "workspaces": {
+    "packages": [
+      "types",
+      "api",
+      "view"
+    ],
+    "nohoist": [
+      "**"
+    ]
+  }
+}

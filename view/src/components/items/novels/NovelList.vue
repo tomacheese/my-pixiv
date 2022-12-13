@@ -25,12 +25,12 @@
 
 <script lang="ts">
 import Vue from 'vue'
-import { PixivItem, PixivItemWithSearchTag } from '@/types/pixivItem'
 import { Fetcher } from '@/plugins/fetcher'
 import { ViewType } from '@/store/settings'
 import { openPixivNovel } from '@/utils/pixiv'
 import VLoadProgress from '@/components/utils/VLoadProgress.vue'
 import ItemList from '@/components/items/lists/ItemList.vue'
+import { PixivItem, PixivItemWithSearchTag } from '@/types/pixiv-item'
 
 export default Vue.extend({
   name: 'NovelList',
@@ -87,7 +87,9 @@ export default Vue.extend({
 
     // 既読情報は検索結果画面のみで使用
     if (!this.recommended && !this.later) {
-      this.vieweds = this.$accessor.viewed.novels
+      this.vieweds = this.$accessor.viewed.items
+        .filter((item) => item.type === 'novel')
+        .map((item) => item.id)
     } else {
       this.vieweds = undefined
     }

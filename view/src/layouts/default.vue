@@ -107,6 +107,8 @@ export default Vue.extend({
     if (this.selected === -1) {
       this.selected = 0
     }
+
+    this.$accessor.viewed.migration()
   },
 })
 </script>

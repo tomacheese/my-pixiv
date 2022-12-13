@@ -1,3 +1,11 @@
+/**
+ * URLスキームを開く。指定したタイムアウトまでに開けなかった場合は Web URL を開く。
+ *
+ * @param schemeUrl URLスキーム
+ * @param webUrl Web URL
+ * @param timeout タイムアウト時間
+ * @returns Promise
+ */
 export function openUrlScheme(
   schemeUrl: string,
   webUrl: string,

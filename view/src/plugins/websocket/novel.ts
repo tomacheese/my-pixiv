@@ -1,43 +1,14 @@
-import { BaseRequest, BaseResponse, WSUtils } from '../websocket'
-import { PixivNovelItem } from '@/types/pixivNovel'
-
-/** 小説取得リクエストモデル */
-export interface GetNovelRequest extends BaseRequest {
-  type: 'getNovel'
-  novel_id: number
-}
-
-/** 小説取得レスポンスモデル */
-export interface GetNovelResponse extends BaseResponse {
-  type: 'getNovel'
-  item: PixivNovelItem
-}
-
-/** 小説検索リクエストモデル */
-export interface SearchNovelRequest extends BaseRequest {
-  type: 'searchNovel'
-  word: string
-  search_item_count: number
-}
-
-/** 小説検索レスポンスモデル */
-export interface SearchNovelResponse extends BaseResponse {
-  type: 'searchNovel'
-  items: PixivNovelItem[]
-}
-
-/** おすすめ小説取得リクエストモデル */
-export interface RecommendedNovelRequest extends BaseRequest {
-  type: 'recommendedNovel'
-  next_url: string | null
-}
-
-/** おすすめ小説取得レスポンスモデル */
-export interface RecommendedNovelResponse extends BaseResponse {
-  type: 'recommendedNovel'
-  items: PixivNovelItem[]
-  next_url: string
-}
+import {
+  GetNovelResponse,
+  GetNovelRequest,
+  SearchNovelResponse,
+  SearchNovelRequest,
+  GetNovelSeriesResponse,
+  GetNovelSeriesRequest,
+  RecommendedNovelResponse,
+  RecommendedNovelRequest,
+} from 'my-pixiv-types'
+import { WSUtils } from '../websocket'
 
 /**
  * my-pixiv WebSocket Novel API
@@ -80,14 +51,27 @@ export class NovelAPI {
   }
 
   /**
+   * 小説シリーズを取得する
+   *
+   * @param seriesId 小説シリーズID
+   * @returns 小説シリーズ取得レスポンス
+   */
+  public getSeries(seriesId: number): Promise<GetNovelSeriesResponse> {
+    return this.utils.request<GetNovelSeriesRequest, GetNovelSeriesResponse>(
+      'getNovelSeries',
+      {
+        series_id: seriesId,
+      }
+    )
+  }
+
+  /**
    * おすすめ小説を取得する
    *
-   * @param nextUrl 次のページのURL。初回はnullを指定する
+   * @param nextUrl 次のページのURL。初回は指定しない
    * @returns おすすめ小説レスポンス
    */
-  public recommended(
-    nextUrl: string | null
-  ): Promise<RecommendedNovelResponse> {
+  public recommended(nextUrl?: string): Promise<RecommendedNovelResponse> {
     return this.utils.request<
       RecommendedNovelRequest,
       RecommendedNovelResponse

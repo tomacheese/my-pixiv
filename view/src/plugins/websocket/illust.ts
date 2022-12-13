@@ -1,54 +1,14 @@
-import { BaseRequest, BaseResponse, WSUtils } from '../websocket'
-import { PixivIllustItem } from '@/types/pixivIllust'
-
-/** イラスト取得リクエストモデル */
-export interface GetIllustRequest extends BaseRequest {
-  type: 'getIllust'
-  illust_id: number
-}
-
-/** イラスト取得レスポンスモデル */
-export interface GetIllustResponse extends BaseResponse {
-  type: 'getIllust'
-  item: PixivIllustItem
-}
-
-/** イラスト検索リクエストモデル */
-export interface SearchIllustRequest extends BaseRequest {
-  type: 'searchIllust'
-  word: string
-  search_item_count: number
-}
-
-/** イラスト検索レスポンスモデル */
-export interface SearchIllustResponse extends BaseResponse {
-  type: 'searchIllust'
-  items: PixivIllustItem[]
-}
-
-/** おすすめイラスト取得リクエストモデル */
-export interface RecommendedIllustRequest extends BaseRequest {
-  type: 'recommendedIllust'
-  next_url: string | null
-}
-
-/** おすすめイラスト取得レスポンスモデル */
-export interface RecommendedIllustResponse extends BaseResponse {
-  type: 'recommendedIllust'
-  items: PixivIllustItem[]
-  next_url: string
-}
-
-/** イラストお気に入り追加リクエストモデル */
-export interface AddIllustLikeRequest extends BaseRequest {
-  type: 'addIllustLike'
-  illust_id: number
-}
-
-/** イラストお気に入り追加レスポンスモデル */
-export interface AddIllustLikeResponse extends BaseResponse {
-  type: 'addIllustLike'
-}
+import {
+  AddIllustLikeRequest,
+  AddIllustLikeResponse,
+  GetIllustRequest,
+  GetIllustResponse,
+  RecommendedIllustRequest,
+  RecommendedIllustResponse,
+  SearchIllustRequest,
+  SearchIllustResponse,
+} from 'my-pixiv-types'
+import { WSUtils } from '../websocket'
 
 /**
  * my-pixiv WebSocket Illust API
@@ -96,12 +56,10 @@ export class IllustAPI {
   /**
    * おすすめイラストを取得する
    *
-   * @param nextUrl 次のページのURL。初回はnullを指定する
+   * @param nextUrl 次のページのURL。初回は指定しない
    * @returns おすすめイラストレスポンス
    */
-  public recommended(
-    nextUrl: string | null
-  ): Promise<RecommendedIllustResponse> {
+  public recommended(nextUrl?: string): Promise<RecommendedIllustResponse> {
     return this.utils.request<
       RecommendedIllustRequest,
       RecommendedIllustResponse

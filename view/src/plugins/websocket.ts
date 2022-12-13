@@ -1,147 +1,26 @@
 import { Context, Plugin } from '@nuxt/types'
 import {
-  AddIllustLikeRequest,
-  AddIllustLikeResponse,
-  GetIllustRequest,
-  GetIllustResponse,
-  IllustAPI,
-  RecommendedIllustRequest,
-  RecommendedIllustResponse,
-  SearchIllustRequest,
-  SearchIllustResponse,
-} from './websocket/illust'
-import {
-  AddTweetLikeRequest,
-  AddTweetLikeResponse,
-  CheckShadowBanRequest,
-  CheckShadowBanResponse,
-  GetTweetsLikeRequest,
-  GetTweetsLikeResponse,
-  RemoveTweetLikeRequest,
-  RemoveTweetLikeResponse,
-  SearchTweetRequest,
-  SearchTweetResponse,
-  TwitterAPI,
-} from './websocket/twitter'
-import {
-  SearchMangaRequest,
-  RecommendedMangaRequest,
-  SearchMangaResponse,
-  RecommendedMangaResponse,
-  MangaAPI,
-  GetMangaRequest,
-  GetMangaResponse,
-  AddMangaLikeRequest,
-  AddMangaLikeResponse,
-} from './websocket/manga'
-import {
-  SearchNovelRequest,
-  RecommendedNovelRequest,
-  SearchNovelResponse,
-  RecommendedNovelResponse,
-  NovelAPI,
-  GetNovelResponse,
-  GetNovelRequest,
-} from './websocket/novel'
-import { GetUserRequest, GetUserResponse, UserAPI } from './websocket/user'
-import {
-  GetItemMuteRequest,
-  AddItemMuteRequest,
-  RemoveItemMuteRequest,
-  GetItemMuteResponse,
-  AddItemMuteResponse,
-  RemoveItemMuteResponse,
-  ItemMuteAPI,
+  isWebSocketError,
   ShareAddItemMuteResponse,
-  ShareRemoveItemMuteResponse,
-} from './websocket/item-mute'
-import {
-  AddViewedRequest,
-  AddViewedResponse,
-  GetViewedRequest,
-  GetViewedResponse,
   ShareAddViewedResponse,
-  ViewedAPI,
-} from './websocket/viewed'
-import {
-  GetNovelSeriesRequest,
-  GetNovelSeriesResponse,
-  NovelSeriesAPI,
-} from './websocket/novel-series'
-import { PingAPI, PingRequest, PingResponse } from './websocket/ping'
+  ShareRemoveItemMuteResponse,
+  WebSocketError,
+  WebSocketRequest,
+  WebSocketResponse,
+  WebSocketShareResponse,
+} from 'my-pixiv-types'
+import { IllustAPI } from './websocket/illust'
+import { TwitterAPI } from './websocket/twitter'
+import { MangaAPI } from './websocket/manga'
+import { NovelAPI } from './websocket/novel'
+import { UserAPI } from './websocket/user'
+import { ItemMuteAPI } from './websocket/item-mute'
+import { ViewedAPI } from './websocket/viewed'
+import { PingAPI } from './websocket/ping'
 
-export interface BaseRequest {
-  type: string
-}
-
-export interface BaseResponse {
-  status: boolean
-  rid: number
-  type: string
-}
-
-interface BaseErrorResponse {
-  status: false
-  rid: number
-  type: string
-  code?: number
-  message: string
-}
-
-type BaseResponseWithError = BaseResponse | BaseErrorResponse
-
-export type Request =
-  | GetIllustRequest
-  | SearchIllustRequest
-  | RecommendedIllustRequest
-  | AddIllustLikeRequest
-  | GetMangaRequest
-  | SearchMangaRequest
-  | RecommendedMangaRequest
-  | AddMangaLikeRequest
-  | GetNovelRequest
-  | SearchNovelRequest
-  | RecommendedNovelRequest
-  | GetNovelSeriesRequest
-  | GetUserRequest
-  | SearchTweetRequest
-  | CheckShadowBanRequest
-  | GetTweetsLikeRequest
-  | AddTweetLikeRequest
-  | RemoveTweetLikeRequest
-  | GetItemMuteRequest
-  | AddItemMuteRequest
-  | RemoveItemMuteRequest
-  | GetViewedRequest
-  | AddViewedRequest
-  | PingRequest
-export type Response =
-  | GetIllustResponse
-  | SearchIllustResponse
-  | RecommendedIllustResponse
-  | AddIllustLikeResponse
-  | GetMangaResponse
-  | SearchMangaResponse
-  | RecommendedMangaResponse
-  | AddMangaLikeResponse
-  | GetNovelResponse
-  | SearchNovelResponse
-  | RecommendedNovelResponse
-  | GetNovelSeriesResponse
-  | GetUserResponse
-  | SearchTweetResponse
-  | CheckShadowBanResponse
-  | GetTweetsLikeResponse
-  | AddTweetLikeResponse
-  | RemoveTweetLikeResponse
-  | GetItemMuteResponse
-  | AddItemMuteResponse
-  | RemoveItemMuteResponse
-  | GetViewedResponse
-  | AddViewedResponse
-  | ShareAddViewedResponse
-  | PingResponse
-
+/**
+ * my-pixiv WebSocket Utils
+ */
 export class WSUtils {
   protected ws!: WebSocket
 
@@ -151,34 +30,31 @@ export class WSUtils {
     }
   }
 
-  public send(data: Request) {
-    if (!this.ws) {
-      throw new Error('WebSocket is not initialized')
-    }
-    this.ws.send(JSON.stringify(data))
-  }
-
-  public request<Req extends Request, Res extends Response>(
+  /**
+   * リクエストを送信する
+   *
+   * @param type リクエストタイプ
+   * @param data リクエストデータ
+   * @returns レスポンス
+   */
+  public request<Req extends WebSocketRequest, Res extends WebSocketResponse>(
     type: Req['type'],
-    params: Omit<Req, 'type'>
+    data: Req['data']
   ): Promise<Res> {
     if (!this.ws) {
       throw new Error('WebSocket is not initialized')
     }
     const rid = Date.now() / Math.random()
     return new Promise<Res>((resolve, reject) => {
-      const event = (data: MessageEvent) => {
-        const response = JSON.parse(data.data) as BaseResponseWithError
+      const event = (message: MessageEvent) => {
+        const response = JSON.parse(message.data) as
+          | WebSocketResponse
+          | WebSocketError
         if (response.type !== type || response.rid !== rid) {
           return
         }
-        if (!response.status) {
-          reject(
-            new WebSocketAPIError(
-              'Request failed',
-              response as BaseErrorResponse
-            )
-          )
+        if (isWebSocketError(response)) {
+          reject(new WebSocketAPIError('Request failed', response))
           return
         }
         resolve(response as Res)
@@ -186,16 +62,16 @@ export class WSUtils {
       this.ws.addEventListener('message', event)
 
       setTimeout(() => {
-        reject(new Error('timeout'))
+        reject(new Error(`timeout (${type}#${rid})`))
         this.ws.removeEventListener('message', event)
       }, 30000)
 
       if (this.ws.readyState === WebSocket.CONNECTING) {
         this.ws.addEventListener('open', () => {
-          this.ws.send(JSON.stringify({ rid, type, ...params }))
+          this.ws.send(JSON.stringify({ rid, type, data }))
         })
       } else {
-        this.ws.send(JSON.stringify({ rid, type, ...params }))
+        this.ws.send(JSON.stringify({ rid, type, data }))
       }
     })
   }
@@ -212,14 +88,21 @@ export class WebSocketAPI {
   private pingInterval: NodeJS.Timer | null = null
   public lastCloseEvent: CloseEvent | null = null
 
+  /** my-pixiv WebSocket Illust API */
   public illust!: IllustAPI
+  /** my-pixiv WebSocket Manga API */
   public manga!: MangaAPI
+  /** my-pixiv WebSocket Novel API */
   public novel!: NovelAPI
-  public novelSeries!: NovelSeriesAPI
+  /** my-pixiv WebSocket User API */
   public user!: UserAPI
+  /** my-pixiv WebSocket Twitter API */
   public twitter!: TwitterAPI
+  /** my-pixiv WebSocket ItemMute API */
   public itemMute!: ItemMuteAPI
+  /** my-pixiv WebSocket Viewed API */
   public viewed!: ViewedAPI
+  /** my-pixiv WebSocket Ping API */
   public ping!: PingAPI
 
   constructor(context: Context) {
@@ -235,6 +118,11 @@ export class WebSocketAPI {
     this.connect(`${protocol}://${domain}api/ws`)
   }
 
+  /**
+   * WebSocket の接続状態を取得する
+   *
+   * @returns WebSocket の接続状態
+   */
   public getReadyState():
     | WebSocket['OPEN']
     | WebSocket['CONNECTING']
@@ -243,17 +131,36 @@ export class WebSocketAPI {
     return this.ws.readyState
   }
 
+  /**
+   * WebSocket インスタンスを取得する
+   *
+   * @returns WebSocket インスタンス
+   */
   public getWS(): WebSocket {
     return this.ws
   }
 
+  /**
+   * WebSocket を再接続する。
+   *
+   * - 接続中の場合は無視される
+   * - 接続済みの場合は切断され再接続される
+   */
   public reconnect() {
+    if (this.ws.readyState === WebSocket.CONNECTING) {
+      return
+    }
     if (this.ws.readyState === WebSocket.OPEN) {
       this.ws.close()
     }
     this.connect()
   }
 
+  /**
+   * WebSocket を接続する
+   *
+   * @param url 接続先 URL。指定しない場合は現在の接続先を再利用する
+   */
   private connect(url?: string) {
     if (!url && !this.ws) {
       throw new Error('url is required')
@@ -271,7 +178,6 @@ export class WebSocketAPI {
     this.illust = new IllustAPI(this.ws)
     this.manga = new MangaAPI(this.ws)
     this.novel = new NovelAPI(this.ws)
-    this.novelSeries = new NovelSeriesAPI(this.ws)
     this.user = new UserAPI(this.ws)
     this.twitter = new TwitterAPI(this.ws)
     this.itemMute = new ItemMuteAPI(this.ws)
@@ -282,7 +188,7 @@ export class WebSocketAPI {
   private onOpen() {
     console.log('[WebSocket] connected')
 
-    // 定期的にpingを送信
+    // 30秒ごとにpingを送信
     if (this.pingInterval) {
       clearInterval(this.pingInterval)
     }
@@ -298,12 +204,10 @@ export class WebSocketAPI {
 
     // ViewedとItemMuteの同期
     if (this.$accessor.settings.isAutoSyncVieweds) {
-      Promise.all([this.viewed.get('illust'), this.viewed.get('novel')])
-        .then(([illust, novel]) => {
-          this.$accessor.viewed.setAllVieweds({
-            illusts: illust.item_ids,
-            novels: novel.item_ids,
-          })
+      this.viewed
+        .get()
+        .then((response) => {
+          this.$accessor.viewed.setItems(response.data.items)
           console.log('[WebSocket] Viewed synced')
         })
         .catch((e) => {
@@ -314,7 +218,7 @@ export class WebSocketAPI {
       this.itemMute
         .get()
         .then((mutes) => {
-          this.$accessor.itemMute.setAllMutes(mutes)
+          this.$accessor.itemMute.setAllMutes(mutes.data)
           console.log('[WebSocket] ItemMute synced')
         })
         .catch((e) => {
@@ -343,8 +247,10 @@ export class WebSocketAPI {
   }
 
   private onMessage(event: MessageEvent) {
-    const data = JSON.parse(event.data.toString()) as BaseResponseWithError
-    if (!data.status) {
+    const data = JSON.parse(event.data.toString()) as
+      | WebSocketShareResponse
+      | WebSocketError
+    if (isWebSocketError(data)) {
       return
     }
 
@@ -368,8 +274,11 @@ export class WebSocketAPI {
   }
 }
 
+/**
+ * WebSocket API エラー
+ */
 export class WebSocketAPIError extends Error {
-  constructor(e: string, public data: BaseErrorResponse) {
+  constructor(e: string, public data: WebSocketError) {
     super(e)
     this.name = new.target.name
 
@@ -405,6 +314,11 @@ const websocketPlugin: Plugin = (context, inject) => {
   inject('api', api)
 }
 
+/**
+ * WebSocket API を取得する
+ *
+ * @returns WebSocket API
+ */
 export function getAPI() {
   return api
 }

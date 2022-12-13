@@ -16,7 +16,7 @@
           v-model="id"
           label="ミュート対象のアイテムID"
           placeholder="例: 1234567890"
-          :rules="[(v) => !!v || '必須項目です']"
+          :rules="idRules"
           @blur="checkUrl()"
         ></v-text-field>
       </div>
@@ -87,20 +87,22 @@
 <script lang="ts">
 import Vue from 'vue'
 import {
+  MuteTargetType,
+  PixivUserItem,
+  NovelSeriesDetail,
+  GetIllustResponse,
+  GetNovelResponse,
+  GetUserResponse,
+  GetNovelSeriesResponse,
+} from 'my-pixiv-types'
+import { MuteItem } from '@/store/itemMute'
+import {
   isNovelSeriesDetail,
   isPixivItem,
   isPixivNovelSeriesItem,
   isPixivUserItem,
   PixivItem,
-} from '@/types/pixivItem'
-import { MuteItem } from '@/store/itemMute'
-import { GetIllustResponse } from '@/plugins/websocket/illust'
-import { GetNovelResponse } from '@/plugins/websocket/novel'
-import { GetUserResponse } from '@/plugins/websocket/user'
-import { MuteTargetType } from '@/plugins/websocket/item-mute'
-import { PixivUserItem } from '@/types/pixivUser'
-import { GetNovelSeriesResponse } from '@/plugins/websocket/novel-series'
-import { NovelSeriesDetail } from '@/types/pixivNovelSeries'
+} from '@/types/pixiv-item'
 
 const targetsMap: {
   [key in MuteTargetType]: string
@@ -125,6 +127,7 @@ export default Vue.extend({
     pageCount: number
     items: MuteItemWithDetails[]
     isAutoSyncMutes: boolean
+    idRules: ((v: string) => string | true)[]
   } {
     return {
       id: '',
@@ -140,6 +143,7 @@ export default Vue.extend({
       pageCount: 1,
       items: [],
       isAutoSyncMutes: false,
+      idRules: [(v) => !!v || '必須項目です'],
     }
   },
   mounted() {
@@ -165,8 +169,7 @@ export default Vue.extend({
           this.$api.reconnect()
         }
         const apiMethod = this.getApiMethod(item.type)
-        apiMethod
-          .get(item.id)
+        apiMethod(item.id)
           .then(
             (
               res:
@@ -175,9 +178,9 @@ export default Vue.extend({
                 | GetUserResponse
                 | GetNovelSeriesResponse
             ) => {
-              const details = isPixivNovelSeriesItem(res.item)
-                ? res.item.novel_series_detail
-                : res.item
+              const details = isPixivNovelSeriesItem(res.data)
+                ? res.data.novel_series_detail
+                : res.data
 
               this.items.push({
                 id: item.id,
@@ -298,13 +301,13 @@ export default Vue.extend({
     getApiMethod(type: MuteTargetType) {
       switch (type) {
         case 'ILLUST':
-          return this.$api.illust
+          return this.$api.illust.get.bind(this.$api.illust)
         case 'NOVEL':
-          return this.$api.novel
+          return this.$api.novel.get.bind(this.$api.novel)
         case 'USER':
-          return this.$api.user
+          return this.$api.user.get.bind(this.$api.user)
         case 'NOVEL_SERIES':
-          return this.$api.novelSeries
+          return this.$api.novel.getSeries.bind(this.$api.novel)
       }
     },
     getTypeName(type: MuteTargetType): string {

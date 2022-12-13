@@ -1,6 +1,6 @@
 import { actionTree, getterTree, mutationTree } from 'typed-vuex'
+import { MuteTargetType } from 'my-pixiv-types'
 import { getAPI } from '@/plugins/websocket'
-import { MuteTargetType } from '@/plugins/websocket/item-mute'
 
 export interface MuteItem {
   type: MuteTargetType

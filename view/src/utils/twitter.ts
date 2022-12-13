@@ -1,6 +1,14 @@
 import { openUrlScheme } from './utils'
 import { accessorType } from '@/store'
 
+/**
+ * ツイートを Twitter アプリを開く。アプリがインストールされていない場合はブラウザで開く。
+ *
+ * @param $accessor Vuex アクセサー
+ * @param screenName ユーザー名
+ * @param tweetId ツイート ID
+ * @returns Promise
+ */
 export function openTwitterTweet(
   $accessor: typeof accessorType,
   screenName: string,
@@ -13,6 +21,13 @@ export function openTwitterTweet(
   )
 }
 
+/**
+ * ユーザーを Twitter アプリを開く。アプリがインストールされていない場合はブラウザで開く。
+ *
+ * @param $accessor Vuex アクセサー
+ * @param screenName ユーザー名
+ * @returns Promise
+ */
 export function openTwitterUser(
   $accessor: typeof accessorType,
   screenName: string

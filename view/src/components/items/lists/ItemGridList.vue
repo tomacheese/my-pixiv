@@ -15,7 +15,7 @@
         ></v-switch>
       </v-col>
       <v-col>
-        <v-switch v-model="isExcludeR18" label="R18を非表示"></v-switch>
+        <v-switch v-model="isExcludeR18" label="R-18を非表示"></v-switch>
       </v-col>
     </v-row>
     <v-card v-if="getItems().length === 0 && !loading">
@@ -77,10 +77,10 @@
 
 <script lang="ts">
 import Vue from 'vue'
-import { isPixivNovelItem, PixivItem } from '@/types/pixivItem'
 import MagicGrid from '@/components/utils/MagicGrid.vue'
 import ItemWrapper from '@/components/items/ItemWrapper.vue'
 import ItemLongPress from '@/components/items/ItemLongPress.vue'
+import { isPixivNovelItem, PixivItem } from '@/types/pixiv-item'
 
 export default Vue.extend({
   components: { MagicGrid, ItemWrapper, ItemLongPress },
@@ -125,9 +125,17 @@ export default Vue.extend({
     },
     isExcludeLiked() {
       this.$accessor.settings.setExcludeLiked(this.isExcludeLiked)
+
+      this.$nextTick(() => {
+        ;(this.$refs['magic-grid'] as any).update()
+      })
     },
     isExcludeR18() {
       this.$accessor.settings.setExcludeR18(this.isExcludeR18)
+
+      this.$nextTick(() => {
+        ;(this.$refs['magic-grid'] as any).update()
+      })
     },
     items() {
       this.$nextTick(() => {

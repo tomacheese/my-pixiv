@@ -1,6 +1,13 @@
 import { openUrlScheme } from './utils'
 import { accessorType } from '@/store'
 
+/**
+ * イラストを Pixiv アプリを開く。アプリがインストールされていない場合はブラウザで開く。
+ *
+ * @param $accessor Vuex アクセサー
+ * @param illustId イラスト ID
+ * @returns Promise
+ */
 export function openPixivIllust(
   $accessor: typeof accessorType,
   illustId: number
@@ -12,6 +19,13 @@ export function openPixivIllust(
   )
 }
 
+/**
+ * 小説を Pixiv アプリを開く。アプリがインストールされていない場合はブラウザで開く。
+ *
+ * @param $accessor Vuex アクセサー
+ * @param novelId 小説 ID
+ * @returns Promise
+ */
 export function openPixivNovel(
   $accessor: typeof accessorType,
   novelId: number

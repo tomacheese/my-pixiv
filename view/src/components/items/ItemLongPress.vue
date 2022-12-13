@@ -126,14 +126,14 @@
 
 <script lang="ts">
 import Vue from 'vue'
+import { MuteTargetType } from 'my-pixiv-types'
+import VLongPress from '@/components/utils/VLongPress.vue'
 import {
+  PixivItem,
   isPixivIllustItem,
   isPixivNovelItem,
   isSeriesItem,
-  PixivItem,
-} from '@/types/pixivItem'
-import { MuteTargetType } from '@/plugins/websocket/item-mute'
-import VLongPress from '@/components/utils/VLongPress.vue'
+} from '@/types/pixiv-item'
 
 type SnackBarType =
   | 'ADDED_LATER'

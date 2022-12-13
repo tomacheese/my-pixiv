@@ -1,41 +1,13 @@
 import { Context } from '@nuxt/types'
-import { BaseRequest, BaseResponse, WSUtils } from '../websocket'
-
-type ViewedItemType = 'illust' | 'novel'
-
-export interface ViewedItem {
-  type: ViewedItemType
-  id: number
-}
-
-/** 既読取得リクエストモデル */
-export interface GetViewedRequest extends BaseRequest {
-  type: 'getViewed'
-  item_type: ViewedItemType
-}
-
-/** 既読取得レスポンスモデル */
-export interface GetViewedResponse extends BaseResponse {
-  type: 'getViewed'
-  item_ids: number[]
-}
-
-/** 既読追加リクエストモデル */
-export interface AddViewedRequest extends BaseRequest {
-  type: 'addViewed'
-  item: ViewedItem
-}
-
-/** 既読追加レスポンスモデル */
-export interface AddViewedResponse extends BaseResponse {
-  type: 'addViewed'
-}
-
-/** アイテムミュート追加シェアレスポンスモデル */
-export interface ShareAddViewedResponse extends BaseResponse {
-  type: 'shareAddViewed'
-  item: ViewedItem
-}
+import {
+  GetViewedResponse,
+  GetViewedRequest,
+  ViewedItem,
+  AddViewedResponse,
+  AddViewedRequest,
+  ShareAddViewedResponse,
+} from 'my-pixiv-types'
+import { WSUtils } from '../websocket'
 
 /**
  * my-pixiv WebSocket Viewed Sharing API
@@ -51,12 +23,10 @@ export class ViewedAPI {
    *
    * @returns 既読追加レスポンス
    */
-  public get(itemType: ViewedItemType): Promise<GetViewedResponse> {
+  public get(): Promise<GetViewedResponse> {
     return this.utils.request<GetViewedRequest, GetViewedResponse>(
       'getViewed',
-      {
-        item_type: itemType,
-      }
+      {}
     )
   }
 
@@ -85,17 +55,17 @@ export class ViewedAPI {
     $accessor: Context['$accessor'],
     res: ShareAddViewedResponse
   ): void {
-    if (!$accessor.settings) return
-    switch (res.item.type) {
+    if (!$accessor.settings.isAutoSyncVieweds) return
+    switch (res.data.item.type) {
       case 'illust':
         $accessor.viewed.addIllust({
-          itemId: res.item.id,
+          itemId: res.data.item.id,
           isSync: false,
         })
         break
       case 'novel':
         $accessor.viewed.addNovel({
-          itemId: res.item.id,
+          itemId: res.data.item.id,
           isSync: false,
         })
         break
