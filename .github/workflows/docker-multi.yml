@@ -23,8 +23,8 @@ jobs:
     strategy:
       matrix:
         target:
-          - '{ imageName: "tomacheese/my-pixiv", file: "view.Dockerfile" }'
-          - '{ imageName: "tomacheese/my-pixiv-api", file: "api.Dockerfile" }'
+          - '{ imageName: "ghcr.io/tomacheese/my-pixiv", file: "view.Dockerfile" }'
+          - '{ imageName: "ghcr.io/tomacheese/my-pixiv-api", file: "api.Dockerfile" }'
 
     steps:
       - name: Check out the repo
