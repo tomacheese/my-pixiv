@@ -1,6 +1,6 @@
 {
   "name": "my-pixiv-api",
-  "version": "1.0.0",
+  "version": "3.0.0",
   "description": "pixiv client for myself",
   "main": "dist/main.js",
   "repository": "git@github.com:tomacheese/my-pixiv.git",
