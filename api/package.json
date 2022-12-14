@@ -51,7 +51,7 @@
     "@vercel/ncc": "0.36.0",
     "@fastify/websocket": "7.1.1",
     "fastify": "4.10.2",
-    "twitter-api-v2": "1.12.9",
+    "twitter-api-v2": "1.12.10",
     "jimp": "0.16.2"
   }
 }
