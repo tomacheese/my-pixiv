@@ -52,6 +52,7 @@ jobs:
     steps:
       - name: Create GitHub deployment
         uses: chrnorm/deployment-action@v2.0.1
+        if: github.event.pull_request.merged == true
         id: deployment
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
