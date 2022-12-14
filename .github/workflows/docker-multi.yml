@@ -1,39 +1,71 @@
-# 任意のレジストリに複数の Docker image を公開orビルドする。
-# master/mainのプッシュ時、プルリクの作成・更新時、リリース時に動作する。
-
 name: Docker
 
 on:
-  push:
-    branches:
-      - main
-      - master
   pull_request_target:
     branches:
       - main
       - master
-  release:
-    types:
-      - published
 
 env:
   REGISTRY: ghcr.io
   DOCKER_USERNAME: ${{ github.actor }}
   DOCKER_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
-  PLATFORMS: linux/amd64,linux/arm64
 
 jobs:
-  job:
-    name: Docker build (${{ fromJson(matrix.target).file }})
+  calc-version:
+    name: Calculate next version
     runs-on: ubuntu-latest
+
+    outputs:
+      tag: ${{ steps.tag_version.outputs.new_tag }}
+      changelog: ${{ steps.tag_version.outputs.changelog }}
+
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Bump version and push tag
+        id: tag-version
+        uses: mathieudutour/github-tag-action@v6.1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          default_bump: 'minor'
+          custom_release_rules: 'feat:minor:✨ Features,fix:patch:🐛 Fixes,docs:patch:📰 Docs,chore:patch:🎨 Chore,pref:patch:🎈 Performance improvements,refactor:patch:🧹 Refactoring,build:patch:🔍 Build,ci:patch:🔍 CI,revert:patch:⏪ Revert,style:patch:🧹 Style,test:patch:👀 Test'
+          dry_run: ${{ github.event.pull_request.merged == false }}
+
+  build:
+    name: Docker build (${{ fromJson(matrix.target).file }}, ${{ matrix.platform }})
+    runs-on: ubuntu-latest
+    needs: calc-version
 
     strategy:
       matrix:
         target:
-          - '{ imageName: "tomacheese/my-pixiv", file: "view.Dockerfile" }'
-          - '{ imageName: "tomacheese/my-pixiv-api", file: "api.Dockerfile" }'
+          - '{ imageName: "tomacheese/my-pixiv", file: "view.Dockerfile", packageName: "my-pixiv" }'
+          - '{ imageName: "tomacheese/my-pixiv-api", file: "api.Dockerfile", packageName: "my-pixiv-api" }'
+        platform:
+          - linux/amd64
+          - linux/arm64
 
     steps:
+      - name: Create GitHub deployment
+        uses: chrnorm/deployment-action@v2.0.1
+        id: deployment
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          environment: "${{ fromJson(matrix.target).imageName }}:${{ matrix.platform }}"
+          environment-url: https://github.com/${{ github.repository }}/pkgs/container/${{ fromJson(matrix.target).packageName }}
+
+      - name: Update deployment status (in_progress)
+        uses: chrnorm/deployment-status@v2.0.1
+        if: github.event.pull_request.merged == true
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          state: in_progress
+          deployment_id: ${{ steps.deployment.outputs.deployment_id }}
+
       - name: Check out the repo
         uses: actions/checkout@v3
         with:
@@ -46,7 +78,7 @@ jobs:
         uses: docker/setup-buildx-action@v2
 
       - name: Login to ${{ env.REGISTRY }}
-        if: github.event_name == 'release'
+        if: github.event.pull_request.merged == true
         uses: docker/login-action@v2.1.0
         with:
           registry: ${{ env.REGISTRY }}
@@ -54,10 +86,9 @@ jobs:
           password: ${{ env.DOCKER_PASSWORD }}
 
       - name: package.json update version
-        if: github.event_name == 'release'
         run: |
-          sed -r -i "1,/version/s/\"version\": \".+\"/\"version\": \"${{ github.event.release.tag_name }}\"/" view/package.json
-          sed -r -i "1,/version/s/\"version\": \".+\"/\"version\": \"${{ github.event.release.tag_name }}\"/" api/package.json
+          sed -r -i "1,/version/s/\"version\": \".+\"/\"version\": \"${{ needs.calc-version.outputs.tag }}\"/" view/package.json
+          sed -r -i "1,/version/s/\"version\": \".+\"/\"version\": \"${{ needs.calc-version.outputs.tag }}\"/" api/package.json
           git diff
 
       - name: Extract metadata (tags, labels) for Docker
@@ -78,9 +109,44 @@ jobs:
         with:
           context: .
           file: ${{ fromJson(matrix.target).file }}
-          push: ${{ github.event_name == 'release' }}
-          platforms: ${{ env.PLATFORMS }}
+          push: ${{ github.event.pull_request.merged == true }}
+          platforms: ${{ matrix.platform }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+      - name: Update deployment status (in_progress)
+        uses: chrnorm/deployment-status@v2.0.1
+        if: ${{ success() && github.event.pull_request.merged == true }}
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          state: success
+          deployment_id: ${{ steps.deployment.outputs.deployment_id }}
+
+      - name: Update deployment status (failure)
+        if: ${{ failure() && github.event.pull_request.merged == true }}
+        uses: chrnorm/deployment-status@v2.0.1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          state: failure
+          deployment_id: ${{ steps.deployment.outputs.deployment_id }}
+
+  release:
+    name: Release ${{ needs.calc-version.outputs.tag }}
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.event.pull_request.merged == true
+
+    steps:
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ needs.calc-version.outputs.tag }}
+          release_name: ${{ needs.calc-version.outputs.tag }}
+          body: ${{ needs.calc-version.outputs.changelog }}
+          draft: false
+          prerelease: false
