@@ -57,6 +57,11 @@ jobs:
           - linux/arm64
 
     steps:
+      - name: Remove platform prefix
+        id: platform
+        run:
+          echo "shortPlatform=`echo ${{ matrix.platform }} | sed -r -e 's/^[^\/]+\///'`" >> $GITHUB_OUTPUT
+
       - name: Create GitHub deployment
         uses: chrnorm/deployment-action@v2.0.1
         if: github.event.pull_request.merged == true
@@ -64,7 +69,7 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           ref: ${{ needs.calc-version.outputs.tag }}
-          environment: '${{ fromJson(matrix.target).packageName }}:${{ matrix.platform }}'
+          environment: '${{ fromJson(matrix.target).packageName }}:${{ steps.platform.outputs.shortPlatform }}'
           environment-url: https://github.com/${{ github.repository }}/pkgs/container/${{ fromJson(matrix.target).packageName }}
 
       - name: Update deployment status (in_progress)
@@ -113,11 +118,6 @@ jobs:
             type=semver,pattern=v{{major}}.{{minor}}
             type=sha
             type=raw,value=latest,enable={{is_default_branch}}
-
-      - name: Remove platform prefix
-        id: platform
-        run:
-          echo "shortPlatform=`echo ${{ matrix.platform }} | sed -r -e 's/^[^\/]+\///'`" >> $GITHUB_OUTPUT
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v3.2.0
