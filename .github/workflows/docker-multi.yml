@@ -47,6 +47,7 @@ jobs:
     needs: calc-version
 
     strategy:
+      fail-fast: false
       matrix:
         target:
           - '{ imageName: "tomacheese/my-pixiv", file: "view.Dockerfile", packageName: "my-pixiv" }'
@@ -72,7 +73,7 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           state: in_progress
-          deployment_id: ${{ steps.deployment.outputs.deployment_id }}
+          deployment-id: ${{ steps.deployment.outputs.deployment_id }}
 
       - name: Check out the repo
         uses: actions/checkout@v3
@@ -125,7 +126,7 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      - name: Update deployment status (in_progress)
+      - name: Update deployment status (success)
         uses: chrnorm/deployment-status@v2.0.1
         if: ${{ success() && github.event.pull_request.merged == true }}
         with:
