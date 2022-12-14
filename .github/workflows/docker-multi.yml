@@ -112,12 +112,8 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ fromJson(matrix.target).imageName }}
           tags: |
-            type=ref,event=branch
-            type=ref,event=pr
-            type=semver,pattern=v{{version}}
-            type=semver,pattern=v{{major}}.{{minor}}
-            type=sha
-            type=raw,value=latest,enable={{is_default_branch}}
+            type=raw,value=${{ needs.calc-version.outputs.tag }}
+            type=raw,value=latest
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v3.2.0
