@@ -371,13 +371,18 @@ export class SearchTweet extends BaseWSRouter<
     const image = await jimp.read(imagePath)
     const tweetImage = await jimp.read(tweetImagePath)
 
-    // 画像の差のパーセンテージを求める。1 が完全一致、0 が完全に異なる
+    // 画像のサイズを揃える
+    image.resize(tweetImage.getWidth(), tweetImage.getHeight())
+
+    // 画像の差のパーセンテージを求める。0 が完全一致、1 が完全に異なる
     const diff = jimp.diff(image, tweetImage)
     // 画像の距離(異なるピクセル数)を求める。0 が完全一致、1 が完全に異なる
     const distance = jimp.distance(image, tweetImage)
 
+    console.log(diff.percent, distance)
+
     // 差分の割合を求める。画像差パーセンテージと距離の差を掛け合わせることで、双方の影響を受けるようにする
-    return diff.percent * (1 - distance)
+    return 1 - diff.percent * distance
   }
 
   /**

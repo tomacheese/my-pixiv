@@ -213,7 +213,7 @@ export default Vue.extend({
           this.tweets = {
             screen_names: response.data.screen_names,
             tweets: response.data.tweets.sort((a, b) => {
-              const similarity = a.similarity - b.similarity
+              const similarity = b.similarity - a.similarity
               if (similarity !== 0) {
                 return similarity
               }
@@ -222,7 +222,8 @@ export default Vue.extend({
             error: null,
           }
           this.checkShadowBan()
-          if (this.tweets.tweets.some((t) => t.similarity <= 5)) {
+          if (this.tweets.tweets.some((t) => t.similarity >= 0.95)) {
+            // 95%以上の類似度を持つツイートがあれば、合致ツイートとして扱う
             this.tweetStatus = 'EXACT_TWEET_FOUND'
             return
           }

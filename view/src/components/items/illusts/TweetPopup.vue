@@ -23,6 +23,13 @@
       </v-card-title>
       <v-card-text>
         <v-row>
+          <v-col v-if="data.tweets.length === 0" cols="12">
+            <v-card>
+              <v-card-text class="text-h5 text-center my-5"
+                >No tweets found</v-card-text
+              >
+            </v-card>
+          </v-col>
           <v-col v-for="(tweet, i) in data.tweets" :key="i" cols="12">
             <v-card @click="open(tweet)">
               <div class="d-flex flex-no-wrap justify-space-between">
@@ -34,7 +41,7 @@
                   <v-card-subtitle>
                     <v-chip>{{ tweet.identity }}</v-chip>
                     <v-chip class="ma-1" :color="getSimilarityColor(tweet)">{{
-                      tweet.similarity
+                      getReadableSimilarity(tweet)
                     }}</v-chip>
                   </v-card-subtitle>
 
@@ -234,13 +241,14 @@ export default Vue.extend({
       return ''
     },
     getSimilarityColor(tweet: SearchTweetResult) {
-      if (tweet.similarity === 0) {
-        return 'green'
+      // 大きい方が似ている
+      if (tweet.similarity > 0.95) {
+        return 'green' // 95%以上
       }
-      if (tweet.similarity <= 10) {
-        return 'blue'
+      if (tweet.similarity > 0.7) {
+        return 'blue' // 70%以上
       }
-      return 'red'
+      return 'red' // 70%未満
     },
     toggleLike(tweet: SearchTweetResult, account: TwitterAccountType) {
       if (!this.item) {
@@ -311,6 +319,11 @@ export default Vue.extend({
         return 'red'
       }
       return 'green'
+    },
+    getReadableSimilarity(tweet: SearchTweetResult) {
+      // e.g, 0.123456 -> 12.3%
+      const similarity = Math.round(tweet.similarity * 1000) / 10
+      return `${similarity}%`
     },
     openTwitter(screenName: string) {
       this.loading = true
