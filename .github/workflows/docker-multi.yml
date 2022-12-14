@@ -17,8 +17,8 @@ jobs:
     runs-on: ubuntu-latest
 
     outputs:
-      tag: ${{ steps.tag_version.outputs.new_tag }}
-      changelog: ${{ steps.tag_version.outputs.changelog }}
+      tag: ${{ steps.tag-version.outputs.new_tag }}
+      changelog: ${{ steps.tag-version.outputs.changelog }}
 
     steps:
       - name: Check out the repo
