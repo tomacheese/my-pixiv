@@ -29,8 +29,8 @@ jobs:
       - name: Check out the repo
         uses: actions/checkout@v3
         with:
-          # マージされていない時には github.event.pull_request.head.sha を使い、マージされた時には何も指定しない
-          ref: ${{ github.event.pull_request.merged == false && github.event.pull_request.head.sha || '' }}
+          # マージされていない時には github.event.pull_request.head.sha を使い、マージされた時にはmasterを使う
+          ref: ${{ github.event.pull_request.merged == false && github.event.pull_request.head.sha || 'refs/heads/master' }}
 
       - name: Bump version and push tag
         id: tag-version
@@ -78,8 +78,8 @@ jobs:
       - name: Check out the repo
         uses: actions/checkout@v3
         with:
-          # マージされていない時には github.event.pull_request.head.sha を使い、マージされた時には何も指定しない
-          ref: ${{ github.event.pull_request.merged == false && github.event.pull_request.head.sha || '' }}
+          # マージされていない時には github.event.pull_request.head.sha を使い、マージされた時にはmasterを使う
+          ref: ${{ github.event.pull_request.merged == false && github.event.pull_request.head.sha || 'refs/heads/master' }}
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
