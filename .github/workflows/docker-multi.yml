@@ -114,6 +114,11 @@ jobs:
             type=sha
             type=raw,value=latest,enable={{is_default_branch}}
 
+      - name: Remove platform prefix
+        id: platform
+        run:
+          echo "shortPlatform=`echo ${{ matrix.platform }} | sed -r -e 's/^[^\/]+\///'`" >> $GITHUB_OUTPUT
+
       - name: Build and push Docker image
         uses: docker/build-push-action@v3.2.0
         with:
@@ -123,8 +128,8 @@ jobs:
           platforms: ${{ matrix.platform }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: type=gha,scope=${{ fromJson(matrix.target).packageName }}-${{ steps.platform.outputs.shortPlatform }}
+          cache-to: type=gha,mode=max,scope=${{ fromJson(matrix.target).packageName }}-${{ steps.platform.outputs.shortPlatform }}
 
       - name: Update deployment status (success)
         uses: chrnorm/deployment-status@v2.0.1
