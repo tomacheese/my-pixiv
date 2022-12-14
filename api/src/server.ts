@@ -6,6 +6,7 @@ import { ImagesRouter } from './routes/images'
 import { WebSocketRouter } from './routes/websocket'
 import { Configuration } from './config'
 import { PATH } from './utils/utils'
+import { SettingsSyncWebSocketRouter } from './routes/settings-sync'
 
 /**
  * Fastify アプリケーションを構築する
@@ -24,6 +25,7 @@ export function buildApp(): FastifyInstance {
     new RootRouter(app, config),
     new ImagesRouter(app, config),
     new WebSocketRouter(app, config),
+    new SettingsSyncWebSocketRouter(app, config),
   ]
 
   routers.forEach((router) => {
