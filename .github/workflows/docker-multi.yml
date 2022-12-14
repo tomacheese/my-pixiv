@@ -62,7 +62,8 @@ jobs:
         id: deployment
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          environment: '${{ fromJson(matrix.target).imageName }}:${{ matrix.platform }}'
+          ref: needs.calc-version.outputs.tag
+          environment: '${{ fromJson(matrix.target).packageName }}:${{ matrix.platform }}'
           environment-url: https://github.com/${{ github.repository }}/pkgs/container/${{ fromJson(matrix.target).packageName }}
 
       - name: Update deployment status (in_progress)
