@@ -5,6 +5,11 @@ on:
     branches:
       - main
       - master
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - closed
 
 env:
   REGISTRY: ghcr.io
@@ -24,7 +29,8 @@ jobs:
       - name: Check out the repo
         uses: actions/checkout@v3
         with:
-          ref: ${{ github.event.pull_request.head.sha }}
+          # マージされていない時には github.event.pull_request.head.sha を使い、マージされた時には何も指定しない
+          ref: ${{ github.event.pull_request.merged == false && github.event.pull_request.head.sha || '' }}
 
       - name: Bump version and push tag
         id: tag-version
@@ -41,6 +47,7 @@ jobs:
     needs: calc-version
 
     strategy:
+      fail-fast: false
       matrix:
         target:
           - '{ imageName: "tomacheese/my-pixiv", file: "view.Dockerfile", packageName: "my-pixiv" }'
@@ -56,7 +63,8 @@ jobs:
         id: deployment
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          environment: "${{ fromJson(matrix.target).imageName }}:${{ matrix.platform }}"
+          ref: ${{ needs.calc-version.outputs.tag }}
+          environment: '${{ fromJson(matrix.target).packageName }}:${{ matrix.platform }}'
           environment-url: https://github.com/${{ github.repository }}/pkgs/container/${{ fromJson(matrix.target).packageName }}
 
       - name: Update deployment status (in_progress)
@@ -65,12 +73,13 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           state: in_progress
-          deployment_id: ${{ steps.deployment.outputs.deployment_id }}
+          deployment-id: ${{ steps.deployment.outputs.deployment_id }}
 
       - name: Check out the repo
         uses: actions/checkout@v3
         with:
-          ref: ${{ github.event.pull_request.head.sha }}
+          # マージされていない時には github.event.pull_request.head.sha を使い、マージされた時には何も指定しない
+          ref: ${{ github.event.pull_request.merged == false && github.event.pull_request.head.sha || '' }}
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
@@ -117,13 +126,13 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      - name: Update deployment status (in_progress)
+      - name: Update deployment status (success)
         uses: chrnorm/deployment-status@v2.0.1
         if: ${{ success() && github.event.pull_request.merged == true }}
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           state: success
-          deployment_id: ${{ steps.deployment.outputs.deployment_id }}
+          deployment-id: ${{ steps.deployment.outputs.deployment_id }}
 
       - name: Update deployment status (failure)
         if: ${{ failure() && github.event.pull_request.merged == true }}
@@ -131,7 +140,7 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           state: failure
-          deployment_id: ${{ steps.deployment.outputs.deployment_id }}
+          deployment-id: ${{ steps.deployment.outputs.deployment_id }}
 
   release:
     name: Release ${{ needs.calc-version.outputs.tag }}
