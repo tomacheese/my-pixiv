@@ -17,8 +17,8 @@ jobs:
     runs-on: ubuntu-latest
 
     outputs:
-      tag: ${{ steps.tag_version.outputs.new_tag }}
-      changelog: ${{ steps.tag_version.outputs.changelog }}
+      tag: ${{ steps.tag-version.outputs.new_tag }}
+      changelog: ${{ steps.tag-version.outputs.changelog }}
 
     steps:
       - name: Check out the repo
@@ -52,6 +52,7 @@ jobs:
     steps:
       - name: Create GitHub deployment
         uses: chrnorm/deployment-action@v2.0.1
+        if: github.event.pull_request.merged == true
         id: deployment
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
