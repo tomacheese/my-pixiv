@@ -16,6 +16,9 @@ env:
   DOCKER_USERNAME: ${{ github.actor }}
   DOCKER_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.merged == true && 'master' || github.event.pull_request.head.sha }}
+
 jobs:
   calc-version:
     name: Calculate next version
@@ -30,7 +33,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           # マージされていない時には github.event.pull_request.head.sha を使い、マージされた時にはmasterを使う
-          ref: ${{ github.event.pull_request.merged == false && github.event.pull_request.head.sha || 'refs/heads/master' }}
+          ref: ${{ github.event.pull_request.merged == true && 'master' || github.event.pull_request.head.sha }}
 
       - name: Bump version and push tag
         id: tag-version
