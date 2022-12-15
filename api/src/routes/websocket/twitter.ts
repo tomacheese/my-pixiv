@@ -473,7 +473,7 @@ export class GetTweetsLike extends BaseWSRouter<
     const tweetIds = this.data.tweet_ids
 
     const twitterApi = await loadTwitterApi(this.config, account)
-    const tweets = await twitterApi.get<StatusLookupResponse>(
+    const tweets = await twitterApi.v1.get<StatusLookupResponse>(
       'statuses/lookup.json',
       {
         id: tweetIds.join(','),
@@ -515,7 +515,7 @@ export class AddTweetLike extends BaseWSRouter<
     const tweetId = this.data.tweet_id
 
     const twitterApi = await loadTwitterApi(this.config, account)
-    await twitterApi.post('favorites/create.json', {
+    await twitterApi.v1.post('favorites/create.json', {
       id: tweetId,
     })
     this.send({
@@ -547,7 +547,7 @@ export class RemoveTweetLike extends BaseWSRouter<
     const tweetId = this.data.tweet_id
 
     const twitterApi = await loadTwitterApi(this.config, account)
-    await twitterApi.post('favorites/destroy.json', {
+    await twitterApi.v1.post('favorites/destroy.json', {
       id: tweetId,
     })
     this.send({
