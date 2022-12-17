@@ -1,36 +1,36 @@
 <template>
   <div>
-    <v-progress-linear v-if="data === null" indeterminate></v-progress-linear>
-    <v-card v-if="data !== null" :loading="loading">
-      <v-card-title v-if="data.error != null" class="text-h5">{{
-        data.error
+    <v-progress-linear v-if="isLoading" indeterminate></v-progress-linear>
+    <v-card :loading="loading">
+      <v-card-title v-if="error != null" class="text-h5">{{
+        error
       }}</v-card-title>
       <v-card-title>
         <v-chip
-          v-for="screen_name of data.screen_names"
-          :key="screen_name"
+          v-for="screenName of screenNames"
+          :key="screenName"
           class="ma-1"
-          :color="getAccountColor(screen_name)"
-          @click="openTwitter(screen_name)"
+          :color="getAccountColor(screenName)"
+          @click="openTwitter(screenName)"
           ><v-progress-circular
-            v-if="isCheckingShadowBan(screen_name)"
+            v-if="isCheckingShadowBan(screenName)"
             :size="20"
             indeterminate
             class="mr-2"
           ></v-progress-circular
-          >@{{ screen_name }}</v-chip
+          >@{{ screenName }}</v-chip
         >
       </v-card-title>
       <v-card-text>
         <v-row>
-          <v-col v-if="data.tweets.length === 0" cols="12">
+          <v-col v-if="tweets.length === 0" cols="12">
             <v-card>
               <v-card-text class="text-h5 text-center my-5"
                 >No tweets found</v-card-text
               >
             </v-card>
           </v-col>
-          <v-col v-for="(tweet, i) in data.tweets" :key="i" cols="12">
+          <v-col v-for="(tweet, i) in sortedTweets()" :key="i" cols="12">
             <v-card @click="open(tweet)">
               <div class="d-flex flex-no-wrap justify-space-between">
                 <div>
@@ -159,8 +159,18 @@ export default Vue.extend({
       required: false,
       default: null,
     },
-    data: {
-      type: Object as () => TweetPopupProp,
+    tweets: {
+      type: Array as () => SearchTweetResult[],
+      required: false,
+      default: null,
+    },
+    screenNames: {
+      type: Array as () => string[],
+      required: false,
+      default: () => [],
+    },
+    error: {
+      type: String,
       required: false,
       default: null,
     },
@@ -180,10 +190,19 @@ export default Vue.extend({
       },
     }
   },
+  computed: {
+    isLoading() {
+      return (
+        this.screenNames.length === 0 &&
+        this.tweets.length === 0 &&
+        this.error === null
+      )
+    },
+  },
   watch: {
     data: {
       handler() {
-        if (this.data == null) {
+        if (this.tweets == null) {
           return // loading
         }
         this.fetchTweetsLike()
@@ -193,10 +212,10 @@ export default Vue.extend({
   },
   methods: {
     fetchTweetsLike() {
-      if (this.data == null) {
+      if (this.tweets == null) {
         return
       }
-      const tweetIds = this.data.tweets.map((tweet) => tweet.tweet.id)
+      const tweetIds = this.tweets.map((tweet) => tweet.tweet.id)
       if (tweetIds.length === 0) {
         return
       }
@@ -209,6 +228,19 @@ export default Vue.extend({
         this.liked.sub = res.data.tweets
           .filter((tweet) => tweet.liked)
           .map((tweet) => tweet.id)
+      })
+    },
+    sortedTweets(): SearchTweetResult[] {
+      if (this.tweets == null) {
+        return []
+      }
+      const tweets = [...this.tweets]
+      return tweets.sort((a, b) => {
+        const similarity = b.similarity - a.similarity
+        if (similarity !== 0) {
+          return similarity
+        }
+        return Number(a.tweet.id) - Number(b.tweet.id)
       })
     },
     getUserText(user: SearchTweetResult['tweet']['user']): string {

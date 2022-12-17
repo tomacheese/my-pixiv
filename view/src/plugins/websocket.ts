@@ -31,7 +31,7 @@ export class WSUtils {
   }
 
   /**
-   * リクエストを送信する
+   * リクエストを送信して、単一のレスポンスを受け取る
    *
    * @param type リクエストタイプ
    * @param data リクエストデータ
@@ -74,6 +74,62 @@ export class WSUtils {
         this.ws.send(JSON.stringify({ rid, type, data }))
       }
     })
+  }
+
+  /**
+   * リクエストを送信して、複数のレスポンスを受け取る
+   *
+   * @param type リクエストタイプ
+   * @param data リクエストデータ
+   * @param callback レスポンスを受け取ったときに呼び出されるコールバック
+   * @param timeout タイムアウト時間(ms)
+   */
+  public requestMultiResponse<
+    Req extends WebSocketRequest,
+    Res extends WebSocketResponse
+  >(
+    type: Req['type'],
+    data: Req['data'],
+    callbackFunc: (response: Res) => void,
+    errorFunc: (error: Error) => void,
+    timeout = 30000
+  ) {
+    if (!this.ws) {
+      errorFunc(new Error('WebSocket is not initialized'))
+    }
+    const rid = Date.now() / Math.random()
+
+    let responsed = false
+
+    const event = (message: MessageEvent) => {
+      const response = JSON.parse(message.data) as
+        | WebSocketResponse
+        | WebSocketError
+      if (response.type !== type || response.rid !== rid) {
+        return
+      }
+      responsed = true
+      if (isWebSocketError(response)) {
+        errorFunc(new WebSocketAPIError('Request failed', response))
+      }
+      callbackFunc(response as Res)
+    }
+    this.ws.addEventListener('message', event)
+
+    setTimeout(() => {
+      this.ws.removeEventListener('message', event)
+      if (!responsed) {
+        errorFunc(new Error(`timeout (${type}#${rid})`))
+      }
+    }, timeout)
+
+    if (this.ws.readyState === WebSocket.CONNECTING) {
+      this.ws.addEventListener('open', () => {
+        this.ws.send(JSON.stringify({ rid, type, data }))
+      })
+    } else {
+      this.ws.send(JSON.stringify({ rid, type, data }))
+    }
   }
 }
 

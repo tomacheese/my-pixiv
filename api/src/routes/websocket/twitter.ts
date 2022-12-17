@@ -12,19 +12,18 @@ import {
   RemoveTweetLikeResponse,
   SearchTweetRequest,
   SearchTweetResponse,
-  SearchTweetResult,
   ShadowBanResult,
   StatusLookupResponse,
   Tweet,
   SearchTweetsResponse,
+  SearchTweetObject,
   StatusesUserTimelineResponse,
-  filterNull,
 } from 'my-pixiv-types'
 import fs from 'fs'
 import { loadTwitterApi, PATH } from '@/utils/utils'
 import axios from 'axios'
-import { dirname, join } from 'path'
 import jimp from 'jimp'
+import { dirname, join } from 'path'
 
 /**
  * イラストからツイートを検索 WebSocket API
@@ -67,129 +66,56 @@ export class SearchTweet extends BaseWSRouter<
       illustDetail.data.illust
     )
 
+    // スクリーンネームは判明したので返す
+    if (screenNames.length === 0) {
+      this.send({
+        responseType: 'error',
+        message: 'screen name not found',
+      })
+      return
+    }
+    this.send({
+      responseType: 'screen_names',
+      screen_names: screenNames,
+    })
+
     const postedAtRaw = illustDetail.data.illust.create_date
     const postedAt = new Date(postedAtRaw)
 
-    const tweets = await Promise.all(
-      screenNames.map((screenName) =>
-        this.getTweets(screenName, postedAt, path)
-      )
-    )
-
-    this.send({
-      screen_names: screenNames,
-      tweets: tweets.flat(),
+    screenNames.forEach((screenName) => {
+      this.getTweets(screenName, postedAt, path)
     })
   }
 
-  /**
-   * イラストからTwitterアカウントを探す
-   *
-   * @param pixiv Pixivインスタンス
-   * @param illust イラスト情報
-   * @returns Twitterスクリーンネームの配列
-   */
-  private async getIllustScreenNames(pixiv: Pixiv, illust: PixivIllustItem) {
-    const screenNames = []
-
-    // キャプションから探す
-    const regexUrl = /twitter.com\/(\w+)/g
-    const regexScreenName = /@(\w+)/g
-
-    const caption = illust.caption
-    screenNames.push(...this.getRegexMatches(regexUrl, caption))
-    screenNames.push(...this.getRegexMatches(regexScreenName, caption))
-
-    // プロフィールから探す
-    const userDetail = await pixiv.getUserDetail({
-      userId: illust.user.id,
-    })
-    if (userDetail.status === 200) {
-      screenNames.push(userDetail.data.profile.twitter_account)
-    }
-
-    // 重複を削除
-    return screenNames
-      .filter((screenName) => !!screenName)
-      .filter((screenName, index, self) => self.indexOf(screenName) === index)
-  }
-
-  /**
-   * 画像ツイートを探す。まずは検索から探し、検索に一つもひっかからなかった場合はユーザーのツイートから探す
-   *
-   * @param screenName スクリーンネーム
-   * @param postedAt 投稿日時
-   * @param imagePath 画像のパス
-   * @returns ツイートの配列
-   */
   private async getTweets(
     screenName: string,
     postedAt: Date,
     imagePath: string
   ) {
-    const searchResults = await this.searchTweets(
-      screenName,
-      postedAt,
-      imagePath
-    )
-    if (searchResults.length !== 0) {
-      return searchResults
+    const tweetsBySearch = await this.searchTweets(screenName, postedAt)
+    if (tweetsBySearch.length > 0) {
+      tweetsBySearch.forEach((tweet) => {
+        this.analysisTweet(tweet, imagePath)
+      })
+      return
     }
 
     // 検索APIでヒットしなかった場合、ユーザーのツイートから画像を探す
-    const userTweets = await this.huntingUserTweets(
+    const tweetsByUserTimeline = await this.huntingUserTweets(
       screenName,
-      postedAt,
-      imagePath
+      postedAt
     )
-    return userTweets
-  }
+    if (tweetsByUserTimeline.length > 0) {
+      tweetsByUserTimeline.forEach((tweet) => {
+        this.analysisTweet(tweet, imagePath)
+      })
+      return
+    }
 
-  /**
-   * 検索APIで画像ツイートを探す
-   *
-   * @param screenName スクリーンネーム
-   * @param postedAt 投稿日時
-   * @param imagePath 画像のパス
-   * @returns ツイートの配列
-   */
-  private async searchTweets(
-    screenName: string,
-    postedAt: Date,
-    imagePath: string
-  ): Promise<SearchTweetResult[]> {
-    const postedAtBefore3day = new Date(postedAt)
-    postedAtBefore3day.setDate(postedAtBefore3day.getDate() - 3)
-    const postedAtAfter3day = new Date(postedAt)
-    postedAtAfter3day.setDate(postedAtAfter3day.getDate() + 3)
-
-    const searchWord = [
-      `from:${screenName}`,
-      'filter:images',
-      `until:${postedAtAfter3day.toISOString().slice(0, 10)}`,
-      `since:${postedAtBefore3day.toISOString().slice(0, 10)}`,
-    ].join(' ')
-
-    const twitterApi = await loadTwitterApi(this.config, null)
-    // 3日間の間に100件以上ツイートしている場合は漏れてしまうので、今後検討
-    const tweets = await twitterApi.v1.get<SearchTweetsResponse>(
-      'search/tweets.json',
-      {
-        q: searchWord,
-        result_type: 'recent',
-        count: 100,
-      }
-    )
-
-    const promises = tweets.statuses.map((tweet) =>
-      this.analysisTweet(tweet, imagePath, 'search')
-    )
-    const results = await Promise.all(promises)
-    return this.sortSimilarity(
-      this.filterMediaDuplication(
-        filterNull(results.filter((result) => !!result).flat())
-      )
-    )
+    this.send({
+      responseType: 'error',
+      message: `@${screenName} tweet not found`,
+    })
   }
 
   /**
@@ -202,9 +128,8 @@ export class SearchTweet extends BaseWSRouter<
    */
   private async huntingUserTweets(
     screenName: string,
-    postedAt: Date,
-    imagePath: string
-  ): Promise<SearchTweetResult[]> {
+    postedAt: Date
+  ): Promise<SearchTweetObject[]> {
     const postedAtBefore3day = new Date(postedAt)
     postedAtBefore3day.setDate(postedAtBefore3day.getDate() - 3)
     const postedAtBefore3daySnowflake =
@@ -228,111 +153,42 @@ export class SearchTweet extends BaseWSRouter<
       }
     )
 
-    const promises = response.map((tweet) =>
-      this.analysisTweet(tweet, imagePath, 'user_timeline')
-    )
-    const results = await Promise.all(promises)
-    return this.sortSimilarity(
-      this.filterMediaDuplication(
-        filterNull(results.filter((result) => !!result).flat())
-      )
+    return this.filterMediaDuplication(
+      response.flatMap((tweet) => this.getMedia(tweet))
     )
   }
 
   /**
-   * 重複する画像を除外する
+   * Date を Twitter の Snowflake 形式に変換する
    *
-   * @param results ツイート配列
-   * @returns 重複を除外したツイート配列
+   * @param date Date
+   * @returns Snowflake
    */
-  private filterMediaDuplication(
-    results: SearchTweetResult[]
-  ): SearchTweetResult[] {
-    return results.filter(
-      (result, _, self) =>
-        result &&
-        self.filter((r) => r && r.tweet.media_url === result.tweet.media_url)
-          .length === 1
+  private dateToSnowflake(date: Date) {
+    // https://pronama.jp/2015/02/18/generate-twitter-status-id/
+    // timestamp を求め 22bit 上位へシフトする
+    return (BigInt(date.getTime() - 1288834974657) << BigInt(22)).toString()
+  }
+
+  private async analysisTweet(tweet: SearchTweetObject, imagePath: string) {
+    const tweetImagePath = await this.downloadImage(
+      tweet.media_url,
+      tweet.id,
+      tweet.num
     )
-  }
-
-  /**
-   * 類似度の高い順にソートする
-   *
-   * @param results ツイート配列
-   * @returns 類似度の高い順にソートしたツイート配列
-   */
-  private sortSimilarity(results: SearchTweetResult[]): SearchTweetResult[] {
-    return results.sort((a, b) => {
-      if (!a || !b) {
-        return 0
-      }
-      return b.similarity - a.similarity
-    })
-  }
-
-  /**
-   * ツイートを処理し、画像を取得し、類似度を計算する
-   *
-   * @param tweet ツイート
-   * @param imagePath 画像のパス
-   * @param identity データ元
-   * @returns 画像の配列
-   */
-  private async analysisTweet(
-    tweet: Tweet,
-    imagePath: string,
-    identity: 'search' | 'user_timeline'
-  ): Promise<SearchTweetResult[] | null> {
-    if (!tweet.entities.media) {
-      return null
-    }
-    // ツイートテキストは text か full_text に入っている
-    const text = tweet.text || tweet.full_text
-    if (!text) {
-      return null
-    }
-    // RT は除外
-    if (text.startsWith('RT @')) {
-      return null
+    if (!tweetImagePath) {
+      return
     }
 
-    const tweets: SearchTweetResult[] = []
-
-    const tweetId = tweet.id_str
-    let num = -1
-    for (const media of tweet.entities.media) {
-      num++
-      if (media.type !== 'photo') {
-        continue
-      }
-
-      const mediaUrl = media.media_url
-      const path = await this.downloadImage(mediaUrl, tweetId, num)
-      if (!path) {
-        continue
-      }
-
-      const similarity = await this.calculateSimilarity(imagePath, path)
-
-      tweets.push({
-        tweet: {
-          id: tweetId,
-          text,
-          media_url: mediaUrl,
-          user: {
-            id: tweet.user.id_str,
-            name: tweet.user.name,
-            screen_name: tweet.user.screen_name,
-            profile_image_url: tweet.user.profile_image_url_https,
-          },
-        },
+    const similarity = await this.calculateSimilarity(imagePath, tweetImagePath)
+    this.send({
+      responseType: 'tweet',
+      tweet: {
+        tweet,
         similarity,
-        identity,
-      })
-    }
-
-    return tweets
+        identity: 'search',
+      },
+    })
   }
 
   /**
@@ -379,22 +235,138 @@ export class SearchTweet extends BaseWSRouter<
     // 画像の距離(異なるピクセル数)を求める。0 が完全一致、1 が完全に異なる
     const distance = jimp.distance(image, tweetImage)
 
-    console.log(diff.percent, distance)
-
     // 差分の割合を求める。画像差パーセンテージと距離の差を掛け合わせることで、双方の影響を受けるようにする
     return 1 - diff.percent * distance
   }
 
   /**
-   * Date を Twitter の Snowflake 形式に変換する
+   * 検索APIで画像ツイートを探す
    *
-   * @param date Date
-   * @returns Snowflake
+   * @param screenName スクリーンネーム
+   * @param postedAt 投稿日時
+   * @returns ツイートの配列
    */
-  private dateToSnowflake(date: Date) {
-    // https://pronama.jp/2015/02/18/generate-twitter-status-id/
-    // timestamp を求め 22bit 上位へシフトする
-    return (BigInt(date.getTime() - 1288834974657) << BigInt(22)).toString()
+  private async searchTweets(
+    screenName: string,
+    postedAt: Date
+  ): Promise<SearchTweetObject[]> {
+    const postedAtBefore3day = new Date(postedAt)
+    postedAtBefore3day.setDate(postedAtBefore3day.getDate() - 3)
+    const postedAtAfter3day = new Date(postedAt)
+    postedAtAfter3day.setDate(postedAtAfter3day.getDate() + 3)
+
+    const searchWord = [
+      `from:${screenName}`,
+      'filter:images',
+      `until:${postedAtAfter3day.toISOString().slice(0, 10)}`,
+      `since:${postedAtBefore3day.toISOString().slice(0, 10)}`,
+    ].join(' ')
+
+    const twitterApi = await loadTwitterApi(this.config, null)
+    // 3日間の間に100件以上ツイートしている場合は漏れてしまうので、今後検討
+    const tweets = await twitterApi.v1.get<SearchTweetsResponse>(
+      'search/tweets.json',
+      {
+        q: searchWord,
+        result_type: 'recent',
+        count: 100,
+      }
+    )
+
+    return this.filterMediaDuplication(
+      tweets.statuses.flatMap((tweet) => this.getMedia(tweet))
+    )
+  }
+
+  private getMedia(tweet: Tweet): SearchTweetObject[] {
+    if (!tweet.entities.media) {
+      return []
+    }
+    // ツイートテキストは text か full_text に入っている
+    const text = tweet.text || tweet.full_text
+    if (!text) {
+      return []
+    }
+    // RT は除外
+    if (text.startsWith('RT @')) {
+      return []
+    }
+
+    const tweets: SearchTweetObject[] = []
+
+    const tweetId = tweet.id_str
+    let num = -1
+    for (const media of tweet.entities.media) {
+      num++
+      if (media.type !== 'photo') {
+        continue
+      }
+
+      const mediaUrl = media.media_url
+
+      tweets.push({
+        id: tweetId,
+        num,
+        text,
+        media_url: mediaUrl,
+        user: {
+          id: tweet.user.id_str,
+          name: tweet.user.name,
+          screen_name: tweet.user.screen_name,
+          profile_image_url: tweet.user.profile_image_url_https,
+        },
+      })
+    }
+
+    return tweets
+  }
+
+  /**
+   * 重複する画像を除外する
+   *
+   * @param results ツイート配列
+   * @returns 重複を除外したツイート配列
+   */
+  private filterMediaDuplication(
+    results: SearchTweetObject[]
+  ): SearchTweetObject[] {
+    return results.filter(
+      (result, _, self) =>
+        result &&
+        self.filter((r) => r && r.media_url === result.media_url).length === 1
+    )
+  }
+
+  /**
+   * イラストからTwitterアカウントを探す
+   *
+   * @param pixiv Pixivインスタンス
+   * @param illust イラスト情報
+   * @returns Twitterスクリーンネームの配列
+   */
+  private async getIllustScreenNames(pixiv: Pixiv, illust: PixivIllustItem) {
+    const screenNames = []
+
+    // キャプションから探す
+    const regexUrl = /twitter.com\/(\w+)/g
+    const regexScreenName = /@(\w+)/g
+
+    const caption = illust.caption
+    screenNames.push(...this.getRegexMatches(regexUrl, caption))
+    screenNames.push(...this.getRegexMatches(regexScreenName, caption))
+
+    // プロフィールから探す
+    const userDetail = await pixiv.getUserDetail({
+      userId: illust.user.id,
+    })
+    if (userDetail.status === 200) {
+      screenNames.push(userDetail.data.profile.twitter_account)
+    }
+
+    // 重複を削除
+    return screenNames
+      .filter((screenName) => !!screenName)
+      .filter((screenName, index, self) => self.indexOf(screenName) === index)
   }
 
   /**

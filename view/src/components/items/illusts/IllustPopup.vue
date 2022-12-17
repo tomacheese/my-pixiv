@@ -58,7 +58,9 @@
     <v-dialog v-model="isTweetOpened">
       <TweetPopup
         :item="item"
-        :data="tweets"
+        :tweets="tweets"
+        :screen-names="screenNames"
+        :error="error"
         :shadow-bans="shadowBans"
         @close-popup="close()"
       ></TweetPopup>
@@ -68,11 +70,15 @@
 
 <script lang="ts">
 import Vue from 'vue'
-import { PixivIllustItem, ShadowBanResult } from 'my-pixiv-types'
+import {
+  PixivIllustItem,
+  SearchTweetResponse,
+  SearchTweetResult,
+  ShadowBanResult,
+} from 'my-pixiv-types'
 import TweetPopup, {
   isCheckingShadowBan,
   isShadowBanned,
-  TweetPopupProp,
 } from './TweetPopup.vue'
 import IllustPopupActions, { TweetStatus } from './IllustPopupActions.vue'
 
@@ -99,7 +105,9 @@ export default Vue.extend({
     page: number
     isTweetOpened: boolean
     tweetStatus: TweetStatus
-    tweets: TweetPopupProp | null
+    screenNames: string[]
+    tweets: SearchTweetResult[] | null
+    error: string | null
     shadowBans: ShadowBanResult[]
   } {
     return {
@@ -108,7 +116,9 @@ export default Vue.extend({
       page: 1,
       isTweetOpened: false,
       tweetStatus: 'LOADING',
-      tweets: null,
+      screenNames: [],
+      tweets: [],
+      error: null,
       shadowBans: [],
     }
   },
@@ -128,7 +138,7 @@ export default Vue.extend({
       this.tweetStatus = 'LOADING'
       this.isLoadingImage = true
       setTimeout(() => {
-        this.getTweets()
+        this.fetchTweets()
       }, 1000)
 
       // イラストポップアップアクセス中は #illust-popup をつける
@@ -146,7 +156,7 @@ export default Vue.extend({
     this.page = 1
 
     if (this.$accessor.settings.getTweetTiming === 'POPUP_OPEN') {
-      this.getTweets()
+      this.fetchTweets()
     }
 
     // イラストポップアップアクセス中は #illust-popup をつける
@@ -196,9 +206,9 @@ export default Vue.extend({
       if (this.$accessor.settings.getTweetTiming !== 'IMAGE_LOADED') {
         return
       }
-      this.getTweets()
+      this.fetchTweets()
     },
-    getTweets() {
+    fetchTweets() {
       if (this.item == null) {
         return
       }
@@ -207,50 +217,54 @@ export default Vue.extend({
       if (this.$api.getReadyState() !== WebSocket.OPEN) {
         this.$api.reconnect()
       }
-      this.$api.twitter
-        .searchByIllust(this.item.id)
-        .then((response) => {
-          this.tweets = {
-            screen_names: response.data.screen_names,
-            tweets: response.data.tweets.sort((a, b) => {
-              const similarity = b.similarity - a.similarity
-              if (similarity !== 0) {
-                return similarity
-              }
-              return Number(a.tweet.id) - Number(b.tweet.id)
-            }),
-            error: null,
-          }
-          this.checkShadowBan()
-          if (this.tweets.tweets.some((t) => t.similarity >= 0.95)) {
-            // 95%以上の類似度を持つツイートがあれば、合致ツイートとして扱う
-            this.tweetStatus = 'EXACT_TWEET_FOUND'
-            return
-          }
-          if (this.tweets.tweets.length > 0) {
-            this.tweetStatus = 'TWEET_FOUND'
-            return
-          }
-          if (this.tweets.screen_names.length > 0) {
-            this.tweetStatus = 'ACCOUNT_FOUND'
-            return
-          }
+      this.screenNames = []
+      this.tweets = []
+      this.error = null
+      this.$api.twitter.searchByIllust(
+        this.item.id,
+        this.searchCallback.bind(this),
+        (error) => {
           this.tweetStatus = 'FAILED'
-        })
-        .catch((error) => {
-          this.tweetStatus = 'FAILED'
-          this.tweets = {
-            screen_names: [],
-            tweets: [],
-            error: String(error),
-          }
-        })
+          this.screenNames = []
+          this.tweets = []
+          this.error = String(error)
+        }
+      )
+    },
+    searchCallback(response: SearchTweetResponse) {
+      const data = response.data
+
+      if (data.responseType === 'screen_names') {
+        this.screenNames = data.screen_names
+        this.checkShadowBan()
+
+        if (this.screenNames.length > 0) {
+          this.tweetStatus = 'ACCOUNT_FOUND'
+        }
+      } else if (data.responseType === 'tweet') {
+        if (this.tweets === null) {
+          this.tweets = []
+        }
+        this.tweets.push(data.tweet)
+
+        if (this.tweets.some((t) => t.similarity >= 0.95)) {
+          // 95%以上の類似度を持つツイートがあれば、合致ツイートとして扱う
+          this.tweetStatus = 'EXACT_TWEET_FOUND'
+          return
+        }
+        if (this.tweets.length > 0) {
+          this.tweetStatus = 'TWEET_FOUND'
+        }
+      } else if (data.responseType === 'error') {
+        this.tweetStatus = 'FAILED'
+        this.error = data.message
+      }
     },
     checkShadowBan() {
-      if (this.tweets == null || this.tweets.screen_names.length === 0) {
+      if (this.screenNames.length === 0) {
         return
       }
-      for (const screenName of this.tweets.screen_names) {
+      for (const screenName of this.screenNames) {
         if (
           this.shadowBans.some(
             (result) => result.user.screen_name === screenName
@@ -272,18 +286,18 @@ export default Vue.extend({
       }
     },
     isShadowBanned(): boolean {
-      if (this.tweets == null) {
+      if (this.screenNames.length === 0) {
         return false
       }
-      return this.tweets.screen_names.some((screenName) => {
+      return this.screenNames.some((screenName) => {
         return isShadowBanned(this.shadowBans, screenName)
       })
     },
     isCheckingShadowBanned(): boolean {
-      if (this.tweets == null) {
+      if (this.screenNames.length === 0) {
         return false
       }
-      return this.tweets.screen_names.some((screenName) => {
+      return this.screenNames.some((screenName) => {
         return isCheckingShadowBan(this.shadowBans, screenName)
       })
     },
