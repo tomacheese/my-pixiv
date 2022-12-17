@@ -26,14 +26,22 @@ export class TwitterAPI {
    * イラストをもとにツイートを検索する
    *
    * @param illustId 検索するイラストID
+   * @param callbackFunc 検索結果を受け取るコールバック関数
+   * @param errorFunc 検索結果
    * @returns 検索結果
    */
-  public searchByIllust(illustId: number): Promise<SearchTweetResponse> {
-    return this.utils.request<SearchTweetRequest, SearchTweetResponse>(
+  public searchByIllust(
+    illustId: number,
+    callbackFunc: (response: SearchTweetResponse) => void,
+    errorFunc: (error: Error) => void
+  ): void {
+    this.utils.requestMultiResponse<SearchTweetRequest, SearchTweetResponse>(
       'searchTweet',
       {
         illust_id: illustId,
-      }
+      },
+      callbackFunc,
+      errorFunc
     )
   }
 

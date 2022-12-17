@@ -11,51 +11,58 @@ export interface SearchTweetRequest extends WebSocketBase {
   }
 }
 
-export interface SearchTweetResult {
+export interface SearchTweetObject {
   /**
-   * ツイート情報
+   * ツイート ID
    */
-  tweet: {
+  id: string
+
+  /**
+   * メディア番号
+   */
+  num: number
+
+  /**
+   * ツイート本文
+   */
+  text: string
+
+  /**
+   * 画像 URL
+   */
+  media_url: string
+
+  /**
+   * 投稿者情報
+   */
+  user: {
     /**
-     * ツイート ID
+     * ユーザー ID
      */
     id: string
 
     /**
-     * ツイート本文
+     * ユーザー名
      */
-    text: string
+    name: string
 
     /**
-     * 画像 URL
+     * スクリーンネーム
      */
-    media_url: string
+    screen_name: string
 
     /**
-     * 投稿者情報
+     * プロフィール画像 URL
      */
-    user: {
-      /**
-       * ユーザー ID
-       */
-      id: string
-
-      /**
-       * ユーザー名
-       */
-      name: string
-
-      /**
-       * スクリーンネーム
-       */
-      screen_name: string
-
-      /**
-       * プロフィール画像 URL
-       */
-      profile_image_url: string
-    }
+    profile_image_url: string
   }
+}
+
+export interface SearchTweetResult {
+  /**
+   * ツイート情報
+   */
+  tweet: SearchTweetObject
 
   /**
    * 類似度 (0 ~ 1)
@@ -68,20 +75,49 @@ export interface SearchTweetResult {
   identity: 'search' | 'user_timeline'
 }
 
+interface SearchTweetResponseScreenNameData {
+  /**
+   * レスポンスタイプ
+   */
+  responseType: 'screen_names'
+
+  /**
+   * 検索対象となったユーザーのスクリーンネーム群
+   */
+  screen_names: string[]
+}
+
+interface SearchTweetResponseTweetData {
+  /**
+   * レスポンスタイプ
+   */
+  responseType: 'tweet'
+
+  /**
+   * ツイート検索結果
+   */
+  tweet: SearchTweetResult
+}
+
+interface SearchTweetResponseError {
+  /**
+   * レスポンスタイプ
+   */
+  responseType: 'error'
+
+  /**
+   * エラーメッセージ
+   */
+  message: string
+}
+
 /** ツイート検索レスポンスモデル */
 export interface SearchTweetResponse extends WebSocketBase {
   type: 'searchTweet'
-  data: {
-    /**
-     * 検索対象となったユーザーのスクリーンネーム
-     */
-    screen_names: string[]
-
-    /**
-     * ツイート検索結果
-     */
-    tweets: SearchTweetResult[]
-  }
+  data:
+    | SearchTweetResponseScreenNameData
+    | SearchTweetResponseTweetData
+    | SearchTweetResponseError
 }
 
 /** シャドウバン確認リクエストモデル */
