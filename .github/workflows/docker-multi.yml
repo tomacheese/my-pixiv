@@ -126,16 +126,25 @@ jobs:
           sed -r -i "1,/version/s/\"version\": \".+\"/\"version\": \"${{ needs.calc-version.outputs.tag }}\"/" api/package.json
           git diff
 
+      - name: Set tag suffix value
+        id: tag
+        run: |
+          if [ "${{ fromJson(needs.calc-version.outputs.need-merge) }}" = "true" ]; then
+            echo "suffix=-${{ steps.platform.outputs.shortPlatform }}" >> $GITHUB_OUTPUT
+          else
+            echo "suffix=" >> $GITHUB_OUTPUT
+          fi
+
       - name: Extract metadata (tags, labels) for Docker
         id: meta
         uses: docker/metadata-action@v4.1.1
         with:
           images: ${{ env.REGISTRY }}/${{ fromJson(matrix.target).imageName }}
           tags: |
-            # need-mergeがtrueの時はshortPlatformを含めない (latest)
-            # need-mergeがfalseの時はshortPlatformを含める (latest-arm64)
-            type=raw,value=${{ needs.calc-version.outputs.tag }}${{ fromJson(needs.calc-version.outputs.need-merge) == 'true' && '' || '-' + steps.platform.outputs.shortPlatform }}
-            type=raw,value=latest${{ fromJson(needs.calc-version.outputs.need-merge) == 'true' && '' || '-' + steps.platform.outputs.shortPlatform }}
+            # need-mergeがtrueの時はshortPlatformを含める (latest-arm64)
+            # need-mergeがfalseの時はshortPlatformを含めない (latest)
+            type=raw,value=${{ needs.calc-version.outputs.tag }}${{ steps.tag.outputs.suffix }}
+            type=raw,value=latest${{ steps.tag.outputs.suffix }}
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v3.2.0
