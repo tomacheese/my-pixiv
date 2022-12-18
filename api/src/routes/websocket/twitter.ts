@@ -94,8 +94,13 @@ export class SearchTweet extends BaseWSRouter<
   ) {
     const tweetsBySearch = await this.searchTweets(screenName, postedAt)
     if (tweetsBySearch.length > 0) {
-      tweetsBySearch.forEach((tweet) => {
-        this.analysisTweet(tweet, imagePath)
+      await Promise.all(
+        tweetsBySearch.map((tweet) => {
+          return this.analysisTweet(tweet, imagePath)
+        })
+      )
+      this.send({
+        responseType: 'finish',
       })
       return
     }
@@ -106,8 +111,13 @@ export class SearchTweet extends BaseWSRouter<
       postedAt
     )
     if (tweetsByUserTimeline.length > 0) {
-      tweetsByUserTimeline.forEach((tweet) => {
-        this.analysisTweet(tweet, imagePath)
+      await Promise.all(
+        tweetsByUserTimeline.map((tweet) => {
+          return this.analysisTweet(tweet, imagePath)
+        })
+      )
+      this.send({
+        responseType: 'finish',
       })
       return
     }

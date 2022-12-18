@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-progress-linear v-if="isLoading" indeterminate></v-progress-linear>
+    <v-progress-linear v-if="isLoadingTweet" indeterminate></v-progress-linear>
     <v-card :loading="loading">
       <v-card-title v-if="error != null" class="text-h5">{{
         error
@@ -179,6 +179,11 @@ export default Vue.extend({
       required: false,
       default: () => [],
     },
+    isLoadingTweet: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
   },
   data(): TweetPopupData {
     return {
@@ -190,20 +195,11 @@ export default Vue.extend({
       },
     }
   },
-  computed: {
-    isLoading() {
-      return (
-        this.screenNames.length === 0 &&
-        this.tweets.length === 0 &&
-        this.error === null
-      )
-    },
-  },
   watch: {
-    data: {
+    isLoadingTweet: {
       handler() {
-        if (this.tweets == null) {
-          return // loading
+        if (this.isLoadingTweet) {
+          return
         }
         this.fetchTweetsLike()
       },
@@ -219,12 +215,19 @@ export default Vue.extend({
       if (tweetIds.length === 0) {
         return
       }
-      this.$api.twitter.getTweetsLike('main', tweetIds).then((res) => {
-        this.liked.main = res.data.tweets
-          .filter((tweet) => tweet.liked)
-          .map((tweet) => tweet.id)
-      })
-      this.$api.twitter.getTweetsLike('sub', tweetIds).then((res) => {
+      const notCheckedTweetIds = tweetIds.filter(
+        (tweetId) =>
+          !this.liked.main.includes(tweetId) &&
+          !this.liked.sub.includes(tweetId)
+      )
+      this.$api.twitter
+        .getTweetsLike('main', notCheckedTweetIds)
+        .then((res) => {
+          this.liked.main = res.data.tweets
+            .filter((tweet) => tweet.liked)
+            .map((tweet) => tweet.id)
+        })
+      this.$api.twitter.getTweetsLike('sub', notCheckedTweetIds).then((res) => {
         this.liked.sub = res.data.tweets
           .filter((tweet) => tweet.liked)
           .map((tweet) => tweet.id)

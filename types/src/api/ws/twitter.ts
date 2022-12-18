@@ -111,6 +111,13 @@ interface SearchTweetResponseError {
   message: string
 }
 
+interface SearchTweetResponseFinish {
+  /**
+   * レスポンスタイプ
+   */
+  responseType: 'finish'
+}
+
 /** ツイート検索レスポンスモデル */
 export interface SearchTweetResponse extends WebSocketBase {
   type: 'searchTweet'
@@ -118,6 +125,7 @@ export interface SearchTweetResponse extends WebSocketBase {
     | SearchTweetResponseScreenNameData
     | SearchTweetResponseTweetData
     | SearchTweetResponseError
+    | SearchTweetResponseFinish
 }
 
 /** シャドウバン確認リクエストモデル */
