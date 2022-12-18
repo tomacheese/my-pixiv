@@ -62,6 +62,7 @@
         :screen-names="screenNames"
         :error="error"
         :shadow-bans="shadowBans"
+        :is-loading-tweet="isLoadingTweet"
         @close-popup="close()"
       ></TweetPopup>
     </v-dialog>
@@ -102,6 +103,7 @@ export default Vue.extend({
   data(): {
     isLiked: boolean
     isLoadingImage: boolean
+    isLoadingTweet: boolean
     page: number
     isTweetOpened: boolean
     tweetStatus: TweetStatus
@@ -113,6 +115,7 @@ export default Vue.extend({
     return {
       isLiked: false,
       isLoadingImage: true,
+      isLoadingTweet: false,
       page: 1,
       isTweetOpened: false,
       tweetStatus: 'LOADING',
@@ -128,24 +131,27 @@ export default Vue.extend({
     },
   },
   watch: {
-    item() {
-      if (!this.item) {
-        return
-      }
-      this.isLiked = this.item.is_bookmarked
-      this.page = 1
+    item: {
+      handler() {
+        if (!this.item) {
+          return
+        }
+        this.isLiked = this.item.is_bookmarked
+        this.page = 1
 
-      this.tweetStatus = 'LOADING'
-      this.isLoadingImage = true
-      setTimeout(() => {
-        this.fetchTweets()
-      }, 1000)
+        this.tweetStatus = 'LOADING'
+        this.isLoadingImage = true
+        setTimeout(() => {
+          this.fetchTweets()
+        }, 1000)
 
-      // イラストポップアップアクセス中は #illust-popup をつける
-      if (window.location.hash !== '#illust-popup') {
-        history.pushState(null, '', location.href)
-        history.replaceState(null, '', '#illust-popup')
-      }
+        // イラストポップアップアクセス中は #illust-popup をつける
+        if (window.location.hash !== '#illust-popup') {
+          history.pushState(null, '', location.href)
+          history.replaceState(null, '', '#illust-popup')
+        }
+      },
+      immediate: true,
     },
   },
   mounted() {
@@ -212,6 +218,7 @@ export default Vue.extend({
       if (this.item == null) {
         return
       }
+      this.isLoadingTweet = true
       this.tweetStatus = 'LOADING'
       this.tweets = null
       if (this.$api.getReadyState() !== WebSocket.OPEN) {
@@ -245,6 +252,10 @@ export default Vue.extend({
         if (this.tweets === null) {
           this.tweets = []
         }
+        if (this.tweets.some((t) => t.tweet.id === data.tweet.tweet.id)) {
+          // 重複ツイートは無視する
+          return
+        }
         this.tweets.push(data.tweet)
 
         if (this.tweets.some((t) => t.similarity >= 0.95)) {
@@ -258,6 +269,8 @@ export default Vue.extend({
       } else if (data.responseType === 'error') {
         this.tweetStatus = 'FAILED'
         this.error = data.message
+      } else if (data.responseType === 'finish') {
+        this.isLoadingTweet = false
       }
     },
     checkShadowBan() {
