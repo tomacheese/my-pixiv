@@ -250,6 +250,9 @@ export default Vue.extend({
       return `${user.name} (@${user.screen_name})`
     },
     open(tweet: SearchTweetResult) {
+      if (!confirm('ツイートページを開きますか？')) {
+        return
+      }
       this.loading = true
       openTwitterTweet(
         this.$accessor,
@@ -361,6 +364,9 @@ export default Vue.extend({
       return `${similarity}%`
     },
     openTwitter(screenName: string) {
+      if (!confirm('Twitterのユーザーページを開きますか？')) {
+        return
+      }
       this.loading = true
       openTwitterUser(this.$accessor, screenName).then(() => {
         this.loading = false
