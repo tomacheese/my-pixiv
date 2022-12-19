@@ -176,7 +176,7 @@ jobs:
 
   # 各プラットフォームのlatestからlatestタグにマージしてイメージを作成
   merge-latest:
-    name: Merge latest
+    name: Merge latest (${{ fromJson(matrix.target).file }})
     runs-on: ubuntu-latest
     needs:
       - calc-version
@@ -205,12 +205,21 @@ jobs:
           # linux/amd64,linux/arm64 -> ${{ env.REGISTRY }}/tomacheese/my-pixiv:latest-amd64,${{ env.REGISTRY }}/tomacheese/my-pixiv:latest-arm64
           echo "images=`echo $PLATFORMS | sed -r 's#([a-z]+)\/([a-z0-9]+)#${{ env.REGISTRY }}\/${{ fromJson(matrix.target).imageName }}:latest-\2#g'`" >> $GITHUB_OUTPUT
 
-      - name: Create and push manifest images
+      - name: Create and push manifest images (latest)
         uses: Noelware/docker-manifest-action@v0.2.3
         # プラットフォームがひとつの場合はマージ処理を行わない
         if: ${{ needs.calc-version.outputs.need-merge == 'true' }}
         with:
           base-image: ${{ env.REGISTRY }}/${{ fromJson(matrix.target).imageName }}:latest
+          extra-images: ${{ steps.extra-images.outputs.images }}
+          push: true
+
+      - name: Create and push manifest images (version)
+        uses: Noelware/docker-manifest-action@v0.2.3
+        # プラットフォームがひとつの場合はマージ処理を行わない
+        if: ${{ needs.calc-version.outputs.need-merge == 'true' }}
+        with:
+          base-image: ${{ env.REGISTRY }}/${{ fromJson(matrix.target).imageName }}:${{ needs.calc-version.outputs.tag }}
           extra-images: ${{ steps.extra-images.outputs.images }}
           push: true
 
