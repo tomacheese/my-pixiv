@@ -23,7 +23,7 @@
       </v-card-title>
       <v-card-text>
         <v-row>
-          <v-col v-if="tweets.length === 0" cols="12">
+          <v-col v-if="tweets.length === 0 && !isLoadingTweet" cols="12">
             <v-card>
               <v-card-text class="text-h5 text-center my-5"
                 >No tweets found</v-card-text

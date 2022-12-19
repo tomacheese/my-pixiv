@@ -83,7 +83,12 @@ export class SearchTweet extends BaseWSRouter<
     const postedAt = new Date(postedAtRaw)
 
     screenNames.forEach((screenName) => {
-      this.getTweets(screenName, postedAt, path)
+      this.getTweets(screenName, postedAt, path).catch((e) => {
+        this.send({
+          responseType: 'error',
+          message: e.message,
+        })
+      })
     })
   }
 

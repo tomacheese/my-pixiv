@@ -235,6 +235,7 @@ export default Vue.extend({
           this.screenNames = []
           this.tweets = []
           this.error = String(error)
+          this.isLoadingTweet = false
         }
       )
     },
@@ -318,11 +319,6 @@ export default Vue.extend({
       this.isTweetOpened = false
       this.tweetStatus = 'FAILED'
       this.$emit('close-popup')
-
-      const hash = window.location.hash
-      if (hash === '#illust-popup') {
-        history.back()
-      }
     },
     changeFullScreen() {
       this.$emit('change-fullscreen')
