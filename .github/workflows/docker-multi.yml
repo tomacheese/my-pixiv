@@ -178,6 +178,7 @@ jobs:
   merge-latest:
     name: Merge latest (${{ fromJson(matrix.target).file }})
     runs-on: ubuntu-latest
+    if: github.event.pull_request.merged == true
     needs:
       - calc-version
       - build
