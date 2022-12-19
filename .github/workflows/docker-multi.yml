@@ -202,8 +202,8 @@ jobs:
       - name: Create extra-images list
         id: extra-images
         run: |
-          # linux/amd64,linux/arm64 -> ${{ env.REGISTRY }}/tomacheese/my-pixiv:latest-linux-amd64,${{ env.REGISTRY }}/tomacheese/my-pixiv:latest-linux-arm64
-          echo "images=`echo $PLATFORMS | sed -r 's#([a-z]+)\/([a-z0-9]+)#${{ env.REGISTRY }}\/${{ fromJson(matrix.target).imageName }}:latest-\1-\2#g'`" >> $GITHUB_OUTPUT
+          # linux/amd64,linux/arm64 -> ${{ env.REGISTRY }}/tomacheese/my-pixiv:latest-amd64,${{ env.REGISTRY }}/tomacheese/my-pixiv:latest-arm64
+          echo "images=`echo $PLATFORMS | sed -r 's#([a-z]+)\/([a-z0-9]+)#${{ env.REGISTRY }}\/${{ fromJson(matrix.target).imageName }}:latest-\2#g'`" >> $GITHUB_OUTPUT
 
       - name: Create and push manifest images
         uses: Noelware/docker-manifest-action@v0.2.3
