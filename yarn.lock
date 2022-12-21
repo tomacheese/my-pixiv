@@ -4777,10 +4777,10 @@ csstype@^3.1.0:
   resolved "https://registry.yarnpkg.com/csstype/-/csstype-3.1.1.tgz#841b532c45c758ee546a11d5bd7b7b473c8c30b9"
   integrity sha512-DJR/VvkAvSZW9bTouZue2sSxDwdTN92uHjqeKVm+0dAqdfNykRzQ95tay8aXMBAAPpUiq4Qcug2L7neoRh2Egw==
 
-ctix@1.8.0:
-  version "1.8.0"
-  resolved "https://registry.yarnpkg.com/ctix/-/ctix-1.8.0.tgz#06d478c0ab2b1d0c28d959720cb56d70ada9e863"
-  integrity sha512-Wrp7AZ4j0XhAnoCTMrHzVcsopdDG7cvnWb+gbNBraeN0LCroXL/JHwAFI6aoAartJgo5yDGwvVTSc76Z+KycXw==
+ctix@1.8.1:
+  version "1.8.1"
+  resolved "https://registry.yarnpkg.com/ctix/-/ctix-1.8.1.tgz#f47caf70b31d3bb0cfaac8c430ed297446836d67"
+  integrity sha512-LS6Se6wYENhOqpSMJA65RVowNnX2OXEzGIPyzhgkNhE7wq7FPldBHnIStUj5RIGo3bPr6poD4UBVJhpiyUWqpw==
   dependencies:
     chalk "^4.1.2"
     change-case "^4.1.2"
