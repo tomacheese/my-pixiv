@@ -357,7 +357,7 @@ export class Pixiv {
 
     return this.request<RecommendedNovelApiResponse>({
       method: 'GET',
-      path: '/v2/novel/recommended',
+      path: '/v1/novel/recommended',
       params,
     })
   }
