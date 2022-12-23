@@ -1,0 +1,31 @@
+name: Auto add reviewer
+
+on:
+  pull_request_target:
+    types:
+      - opened
+      - reopened
+    branches:
+      - main
+      - master
+
+jobs:
+  add-reviewer:
+    runs-on: ubuntu-latest
+    if: >-
+      ${{
+        github.actor != 'dependabot[bot]' &&
+        github.actor != 'renovate[bot]' &&
+        github.actor != 'github-actions[bot]' &&
+        github.actor != 'book000'
+      }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@master
+
+      - name: Add reviewer
+        run: |
+          gh pr edit ${{ github.event.pull_request.number }} --add-reviewer book000 || true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
