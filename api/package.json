@@ -25,7 +25,7 @@
   },
   "devDependencies": {
     "@types/js-yaml": "4.0.5",
-    "@types/node": "18.11.17",
+    "@types/node": "18.11.18",
     "@types/qs": "6.9.7",
     "@types/ws": "8.5.3",
     "@typescript-eslint/eslint-plugin": "5.47.0",
