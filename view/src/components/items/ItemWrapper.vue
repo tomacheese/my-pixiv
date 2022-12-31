@@ -30,6 +30,7 @@ export default Vue.extend({
   },
   watch: {
     item() {
+      // eslint-disable-next-line unicorn/prefer-query-selector
       const element = document.getElementById(this.observName)
       if (!element) {
         return
@@ -47,6 +48,7 @@ export default Vue.extend({
       if (value) {
         return
       }
+      // eslint-disable-next-line unicorn/prefer-query-selector
       const element = document.getElementById(this.observName)
       if (!element) {
         return
@@ -68,15 +70,17 @@ export default Vue.extend({
       if (!window) {
         return
       }
+      // eslint-disable-next-line unicorn/prefer-query-selector
       const element = document.getElementById(this.observName)
       if (!element) {
         return
       }
+      // eslint-disable-next-line unicorn/consistent-function-scoping
       const handler = (entries: { isIntersecting: boolean }[]) => {
         this.isIntersecting = entries[0].isIntersecting
       }
       const observer = new window.IntersectionObserver(handler, {
-        threshold: 1.0,
+        threshold: 1,
       })
       observer.observe(element)
     },

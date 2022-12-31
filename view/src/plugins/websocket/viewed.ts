@@ -49,26 +49,28 @@ export class ViewedAPI {
    * 既読追加シェアイベント(shareAddViewed)を受信したときの処理
    *
    * @param $accessor Vuexアクセサー
-   * @param res アイテムミュート追加シェアレスポンス
+   * @param response アイテムミュート追加シェアレスポンス
    */
   public onAddViewed(
     $accessor: Context['$accessor'],
-    res: ShareAddViewedResponse
+    response: ShareAddViewedResponse
   ): void {
     if (!$accessor.settings.isAutoSyncVieweds) return
-    switch (res.data.item.type) {
-      case 'illust':
+    switch (response.data.item.type) {
+      case 'illust': {
         $accessor.viewed.addIllust({
-          itemId: res.data.item.id,
+          itemId: response.data.item.id,
           isSync: false,
         })
         break
-      case 'novel':
+      }
+      case 'novel': {
         $accessor.viewed.addNovel({
-          itemId: res.data.item.id,
+          itemId: response.data.item.id,
           isSync: false,
         })
         break
+      }
     }
   }
 }

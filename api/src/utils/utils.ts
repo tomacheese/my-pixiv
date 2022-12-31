@@ -56,7 +56,7 @@ const twitterCaches: {
  */
 export async function loadTwitterApi(
   config: Configuration,
-  accountName: string | null
+  accountName?: string
 ): Promise<TwitterApi> {
   if (!accountName) {
     accountName = 'NO_ACCOUNT'
@@ -72,8 +72,10 @@ export async function loadTwitterApi(
   }
 
   const account =
-    accountName !== 'NO_ACCOUNT' ? config.get('accounts')[accountName] : null
-  if (account === undefined) {
+    accountName === 'NO_ACCOUNT'
+      ? undefined
+      : config.get('accounts')[accountName]
+  if (account === undefined && accountName !== 'NO_ACCOUNT') {
     throw new Error(`Account not found: ${accountName}`)
   }
   const twitterApi = new TwitterApi({

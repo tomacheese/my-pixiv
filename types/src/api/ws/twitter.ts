@@ -56,6 +56,11 @@ export interface SearchTweetObject {
      */
     profile_image_url: string
   }
+
+  /**
+   * ツイート日時
+   */
+  created_at: string
 }
 
 export interface SearchTweetResult {

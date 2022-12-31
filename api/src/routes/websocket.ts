@@ -16,7 +16,7 @@ import {
   RecommendedIllust,
   SearchIllust,
 } from './websocket/illust'
-import { GetItemMute, AddItemMute, RemoveItemMute } from './websocket/item_mute'
+import { GetItemMute, AddItemMute, RemoveItemMute } from './websocket/item-mute'
 import {
   GetManga,
   SearchManga,

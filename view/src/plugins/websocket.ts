@@ -24,7 +24,7 @@ import { PingAPI } from './websocket/ping'
 export class WSUtils {
   protected ws!: WebSocket
 
-  constructor(ws: WebSocket | null) {
+  constructor(ws: WebSocket) {
     if (ws) {
       this.ws = ws
     }
@@ -37,10 +37,10 @@ export class WSUtils {
    * @param data リクエストデータ
    * @returns レスポンス
    */
-  public request<Req extends WebSocketRequest, Res extends WebSocketResponse>(
-    type: Req['type'],
-    data: Req['data']
-  ): Promise<Res> {
+  public request<
+    Request_ extends WebSocketRequest,
+    Res extends WebSocketResponse
+  >(type: Request_['type'], data: Request_['data']): Promise<Res> {
     if (!this.ws) {
       throw new Error('WebSocket is not initialized')
     }
@@ -64,7 +64,7 @@ export class WSUtils {
       setTimeout(() => {
         reject(new Error(`timeout (${type}#${rid})`))
         this.ws.removeEventListener('message', event)
-      }, 30000)
+      }, 30_000)
 
       if (this.ws.readyState === WebSocket.CONNECTING) {
         this.ws.addEventListener('open', () => {
@@ -85,17 +85,17 @@ export class WSUtils {
    * @param timeout タイムアウト時間(ms)
    */
   public requestMultiResponse<
-    Req extends WebSocketRequest,
+    Request_ extends WebSocketRequest,
     Res extends WebSocketResponse
   >(
-    type: Req['type'],
-    data: Req['data'],
-    callbackFunc: (response: Res) => void,
-    errorFunc: (error: Error) => void,
-    timeout = 30000
+    type: Request_['type'],
+    data: Request_['data'],
+    callbackFunction: (response: Res) => void,
+    errorFunction: (error: Error) => void,
+    timeout = 30_000
   ) {
     if (!this.ws) {
-      errorFunc(new Error('WebSocket is not initialized'))
+      errorFunction(new Error('WebSocket is not initialized'))
     }
     const rid = Date.now() / Math.random()
 
@@ -110,16 +110,16 @@ export class WSUtils {
       }
       responsed = true
       if (isWebSocketError(response)) {
-        errorFunc(new WebSocketAPIError('Request failed', response))
+        errorFunction(new WebSocketAPIError('Request failed', response))
       }
-      callbackFunc(response as Res)
+      callbackFunction(response as Res)
     }
     this.ws.addEventListener('message', event)
 
     setTimeout(() => {
       this.ws.removeEventListener('message', event)
       if (!responsed) {
-        errorFunc(new Error(`timeout (${type}#${rid})`))
+        errorFunction(new Error(`timeout (${type}#${rid})`))
       }
     }, timeout)
 
@@ -141,8 +141,8 @@ export class WebSocketAPI {
   private $accessor!: Context['$accessor']
   private $error: Context['error']
 
-  private pingInterval: NodeJS.Timer | null = null
-  public lastCloseEvent: CloseEvent | null = null
+  private pingInterval?: NodeJS.Timer = undefined
+  public lastCloseEvent?: CloseEvent = undefined
 
   /** my-pixiv WebSocket Illust API */
   public illust!: IllustAPI
@@ -223,9 +223,9 @@ export class WebSocketAPI {
     }
 
     const password =
-      this.$accessor.auth.password !== ''
-        ? this.$accessor.auth.password
-        : undefined
+      this.$accessor.auth.password === ''
+        ? undefined
+        : this.$accessor.auth.password
     this.ws = new WebSocket(url ?? this.ws.url, password)
     this.ws.addEventListener('open', this.onOpen.bind(this))
     this.ws.addEventListener('close', this.onClose.bind(this))
@@ -253,7 +253,7 @@ export class WebSocketAPI {
         console.warn('[WebSocket] ping failed. reconnecting...')
         this.reconnect()
       })
-    }, 30000)
+    }, 30_000)
     this.ws.addEventListener('close', () => {
       this.pingInterval && clearInterval(this.pingInterval)
     })
@@ -266,8 +266,8 @@ export class WebSocketAPI {
           this.$accessor.viewed.setItems(response.data.items)
           console.log('[WebSocket] Viewed synced')
         })
-        .catch((e) => {
-          console.error('[WebSocket] Viewed sync failed', e)
+        .catch((error) => {
+          console.error('[WebSocket] Viewed sync failed', error)
         })
     }
     if (this.$accessor.settings.isAutoSyncMutes) {
@@ -277,8 +277,8 @@ export class WebSocketAPI {
           this.$accessor.itemMute.setAllMutes(mutes.data)
           console.log('[WebSocket] ItemMute synced')
         })
-        .catch((e) => {
-          console.error('[WebSocket] ItemMute sync failed', e)
+        .catch((error) => {
+          console.error('[WebSocket] ItemMute sync failed', error)
         })
     }
   }
@@ -311,21 +311,24 @@ export class WebSocketAPI {
     }
 
     switch (data.type) {
-      case 'shareAddItemMute':
+      case 'shareAddItemMute': {
         this.itemMute.onAddItemMute(
           this.$accessor,
           data as ShareAddItemMuteResponse
         )
         break
-      case 'shareRemoveItemMute':
+      }
+      case 'shareRemoveItemMute': {
         this.itemMute.onRemoveItemMute(
           this.$accessor,
           data as ShareRemoveItemMuteResponse
         )
         break
-      case 'shareAddViewed':
+      }
+      case 'shareAddViewed': {
         this.viewed.onAddViewed(this.$accessor, data as ShareAddViewedResponse)
         break
+      }
     }
   }
 }
@@ -364,7 +367,7 @@ declare module '@nuxt/types' {
   }
 }
 
-let api: WebSocketAPI | null = null
+let api: WebSocketAPI
 const websocketPlugin: Plugin = (context, inject) => {
   api = new WebSocketAPI(context)
   inject('api', api)

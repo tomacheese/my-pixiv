@@ -65,9 +65,9 @@ export default Vue.extend({
   name: 'IllustPopupActions',
   props: {
     item: {
-      type: Object as () => PixivItem,
+      type: Object as () => PixivItem | undefined,
       required: false,
-      default: null,
+      default: undefined,
     },
     fullscreen: {
       type: Boolean,
@@ -75,9 +75,9 @@ export default Vue.extend({
       default: false,
     },
     tweetStatus: {
-      type: String as () => TweetStatus,
+      type: String as () => TweetStatus | undefined,
       required: false,
-      default: null,
+      default: undefined,
     },
     isLiked: {
       type: Boolean,
@@ -106,16 +106,21 @@ export default Vue.extend({
   },
   mounted() {
     switch (this.$accessor.settings.actionPosition) {
-      case 'LEFT':
+      case 'LEFT': {
         this.actionPosition = false
         break
-      case 'RIGHT':
+      }
+      case 'RIGHT': {
         this.actionPosition = true
         break
+      }
     }
   },
   methods: {
-    openPage(item: PixivItem) {
+    openPage(item?: PixivItem) {
+      if (!item) {
+        return
+      }
       this.isLoadingOpenPage = true
       openPixivIllust(this.$accessor, item.id).then(() => {
         this.$emit('close-popup')
@@ -124,11 +129,13 @@ export default Vue.extend({
     },
     getTweetFoundColor(): string {
       switch (this.tweetStatus) {
-        case 'EXACT_TWEET_FOUND':
+        case 'EXACT_TWEET_FOUND': {
           return '#1da1f2'
-        case 'TWEET_FOUND':
+        }
+        case 'TWEET_FOUND': {
           return 'teal'
-        case 'ACCOUNT_FOUND':
+        }
+        case 'ACCOUNT_FOUND': {
           if (this.isShadowBanned) {
             return 'orange'
           }
@@ -136,14 +143,17 @@ export default Vue.extend({
             return 'grey'
           }
           return 'red'
-        case 'FAILED':
+        }
+        case 'FAILED': {
           return 'error'
-        default:
+        }
+        default: {
           return 'gray'
+        }
       }
     },
     addHeart() {
-      if (this.item == null) {
+      if (!this.item) {
         return
       }
 

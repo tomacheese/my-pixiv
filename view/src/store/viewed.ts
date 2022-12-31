@@ -3,14 +3,14 @@ import { ViewedItem } from 'my-pixiv-types'
 import { getAPI } from '@/plugins/websocket'
 
 interface Viewed {
-  illusts: number[] | null
-  novels: number[] | null
+  illusts?: number[]
+  novels?: number[]
   items: ViewedItem[]
 }
 
 export const state = (): Viewed => ({
-  illusts: null,
-  novels: null,
+  illusts: undefined,
+  novels: undefined,
   items: [],
 })
 
@@ -43,7 +43,7 @@ export const mutations = mutationTree(state, {
   },
   migration: (state) => {
     // v2からv3へのマイグレーション
-    if (state.illusts !== null) {
+    if (state.illusts) {
       console.log('migration illusts')
       state.items = state.items.filter((item) => item.type !== 'illust')
       state.items.push(
@@ -55,13 +55,13 @@ export const mutations = mutationTree(state, {
           } as ViewedItem
         })
       )
-      state.illusts = null
+      state.illusts = undefined
       console.log(
         'illusts migration done. items:',
         state.items.filter((item) => item.type === 'illust').length
       )
     }
-    if (state.novels !== null) {
+    if (state.novels) {
       console.log('migrating novels')
       state.items = state.items.filter((item) => item.type !== 'novel')
       state.items.push(
@@ -73,7 +73,7 @@ export const mutations = mutationTree(state, {
           } as ViewedItem
         })
       )
-      state.novels = null
+      state.novels = undefined
       console.log(
         'novels migration done. items:',
         state.items.filter((item) => item.type === 'novel').length
@@ -90,20 +90,20 @@ export const actions = actionTree(
   {
     addIllust: (
       { commit, state },
-      param: {
+      parameter: {
         itemId: number
         isSync: boolean
       }
     ) => {
-      const itemId = param.itemId
+      const itemId = parameter.itemId
       if (
         state.items.some((item) => item.type === 'illust' && item.id === itemId)
       ) {
         return
       }
-      if (param.isSync) {
+      if (parameter.isSync) {
         const api = getAPI()
-        if (param.isSync && api !== null) {
+        if (parameter.isSync) {
           api.viewed.add({
             type: 'illust',
             id: itemId,
@@ -122,20 +122,20 @@ export const actions = actionTree(
     },
     addNovel: (
       { commit, state },
-      param: {
+      parameter: {
         itemId: number
         isSync: boolean
       }
     ) => {
-      const itemId = param.itemId
+      const itemId = parameter.itemId
       if (
         state.items.some((item) => item.type === 'novel' && item.id === itemId)
       ) {
         return
       }
-      if (param.isSync) {
+      if (parameter.isSync) {
         const api = getAPI()
-        if (param.isSync && api !== null) {
+        if (parameter.isSync) {
           api.viewed.add({
             type: 'novel',
             id: itemId,

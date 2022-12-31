@@ -1,4 +1,4 @@
-import fs from 'fs'
+import fs from 'node:fs'
 import { ItemMute, MuteTargetType } from 'my-pixiv-types'
 import { PATH } from './utils'
 
@@ -9,10 +9,12 @@ type ItemMuteJsonSchema = ItemMute[]
  */
 export class ItemMuteApi {
   private mutes: ItemMute[]
-  private static cache: {
-    mutes: ItemMute[]
-    timestamp: number
-  } | null = null
+  private static cache:
+    | {
+        mutes: ItemMute[]
+        timestamp: number
+      }
+    | undefined = undefined
 
   private constructor(mutes: ItemMute[]) {
     this.mutes = mutes

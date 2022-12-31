@@ -47,11 +47,11 @@ export default Vue.extend({
 
   data(): {
     started: boolean
-    items: HTMLCollection | null
+    items?: HTMLCollection
   } {
     return {
       started: false,
-      items: null,
+      items: undefined,
     }
   },
 
@@ -63,7 +63,7 @@ export default Vue.extend({
     update() {
       console.log('[DEBUG] update()')
       this.started = false
-      this.items = null
+      this.items = undefined
       this.waitUntilReady()
     },
 
@@ -137,26 +137,26 @@ export default Vue.extend({
       wSpace: number
     } {
       console.log(
-        '[DEBUG] setup::this.$el.getBoundingClientRect().width: ',
+        '[DEBUG] setup::this.$el.getBoundingClientRect().width:',
         this.$el.getBoundingClientRect().width
       )
       const width = this.$el.getBoundingClientRect().width
-      let numCols = Math.floor(width / this.colWidth()) || 1
+      let numberCols = Math.floor(width / this.colWidth()) || 1
       const cols = []
 
-      if (this.maxCols && numCols > this.maxCols) {
-        numCols = this.maxCols
+      if (this.maxCols && numberCols > this.maxCols) {
+        numberCols = this.maxCols
       }
 
-      for (let i = 0; i < numCols; i++) {
-        cols[i] = {
+      for (let index = 0; index < numberCols; index++) {
+        cols[index] = {
           height: 0,
           top: 0,
-          index: i,
+          index,
         }
       }
 
-      const wSpace = width - numCols * this.colWidth() + this.gap
+      const wSpace = width - numberCols * this.colWidth() + this.gap
 
       return {
         cols,
@@ -164,10 +164,10 @@ export default Vue.extend({
       }
     },
 
-    nextCol(cols: Column[], i: number) {
+    nextCol(cols: Column[], index: number) {
       if (this.useMin) return this.getMin(cols)
 
-      return cols[i % cols.length]
+      return cols[index % cols.length]
     },
 
     positionItems() {
@@ -179,9 +179,9 @@ export default Vue.extend({
         return
       }
 
-      for (let i = 0; i < this.items.length; i++) {
-        const item = this.items[i] as HTMLElement
-        const min = this.nextCol(cols, i)
+      for (let index = 0; index < this.items.length; index++) {
+        const item = this.items[index] as HTMLElement
+        const min = this.nextCol(cols, index)
         const left = min.index * this.colWidth() + wSpace
 
         item.style.left = left + 'px'

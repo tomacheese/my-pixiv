@@ -92,24 +92,28 @@ export default Vue.extend({
   methods: {
     getViewType(key: ItemType): IViewType | undefined {
       switch (key) {
-        case 'ILLUST':
+        case 'ILLUST': {
           return ViewTypeMap.find(
             (v) => v.key === this.$accessor.settings.viewType
           )
-        case 'NOVEL':
+        }
+        case 'NOVEL': {
           return ViewTypeMap.find(
             (v) => v.key === this.$accessor.settings.novelViewType
           )
+        }
       }
     },
     changeViewType(key: ItemType, viewType: IViewType) {
       switch (key) {
-        case 'ILLUST':
+        case 'ILLUST': {
           this.$accessor.settings.setViewType(viewType.key)
           break
-        case 'NOVEL':
+        }
+        case 'NOVEL': {
           this.$accessor.settings.setNovelViewType(viewType.key)
           break
+        }
       }
     },
   },

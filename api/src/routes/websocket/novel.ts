@@ -12,8 +12,8 @@ import {
   PixivNovelItem,
   PixivNovelSeriesItem,
 } from 'my-pixiv-types'
-import fs from 'fs'
-import { dirname, join } from 'path'
+import fs from 'node:fs'
+import { dirname, join } from 'node:path'
 import { PATH } from '@/utils/utils'
 import { RecommendedNovelOptions } from '@/pixiv/options'
 
@@ -61,7 +61,7 @@ export class GetNovel extends BaseWSRouter<GetNovelRequest, GetNovelResponse> {
     const cachePath = this.getCachePath()
     if (fs.existsSync(cachePath)) {
       const cache: CacheGetNovel = JSON.parse(
-        fs.readFileSync(cachePath, 'utf-8')
+        fs.readFileSync(cachePath, 'utf8')
       )
       if (cache.timestamp + 3600 * 1000 > Date.now()) {
         this.send(cache.data)
@@ -92,7 +92,8 @@ export class GetNovel extends BaseWSRouter<GetNovelRequest, GetNovelResponse> {
 
   isVaildNovelId(rawIllustId: any) {
     return (
-      !Number.isNaN(parseInt(rawIllustId, 10)) || parseInt(rawIllustId, 10) < 0
+      !Number.isNaN(Number.parseInt(rawIllustId, 10)) ||
+      Number.parseInt(rawIllustId, 10) < 0
     )
   }
 }
@@ -114,7 +115,7 @@ export class SearchNovel extends BaseWSRouter<
       this.data.word.length > 0 &&
       !!this.data.search_item_count &&
       !Number.isNaN(
-        parseInt(this.data.search_item_count as unknown as string, 10)
+        Number.parseInt(this.data.search_item_count as unknown as string, 10)
       ) &&
       this.data.search_item_count > 0
     )
@@ -127,7 +128,7 @@ export class SearchNovel extends BaseWSRouter<
     const cachePath = this.getCachePath()
     if (fs.existsSync(cachePath)) {
       const cache: CacheSearchNovel = JSON.parse(
-        fs.readFileSync(cachePath, 'utf-8')
+        fs.readFileSync(cachePath, 'utf8')
       )
       if (cache.timestamp + 3600 * 1000 > Date.now()) {
         this.send({
@@ -195,10 +196,10 @@ export class RecommendedNovel extends BaseWSRouter<
     if (this.data.next_url) {
       const query = Pixiv.parseQueryString(this.data.next_url)
       const maxBookmarkIdForRecommend = query.max_bookmark_id_for_recommend
-        ? parseInt(query.max_bookmark_id_for_recommend as string, 10)
+        ? Number.parseInt(query.max_bookmark_id_for_recommend as string, 10)
         : undefined
       const alreadyRecommended = (query.already_recommended as string[]).map(
-        (id) => parseInt(id, 10)
+        (id) => Number.parseInt(id, 10)
       )
       options = {
         ...options,
@@ -241,7 +242,7 @@ export class GetNovelSeries extends BaseWSRouter<
     const cachePath = this.getCachePath()
     if (fs.existsSync(cachePath)) {
       const cache: CacheGetNovelSeries = JSON.parse(
-        fs.readFileSync(cachePath, 'utf-8')
+        fs.readFileSync(cachePath, 'utf8')
       )
       if (cache.timestamp + 3600 * 1000 > Date.now()) {
         this.send(cache.data)
@@ -272,7 +273,8 @@ export class GetNovelSeries extends BaseWSRouter<
 
   isVaildNovelSeriesId(rawIllustId: any) {
     return (
-      !Number.isNaN(parseInt(rawIllustId, 10)) || parseInt(rawIllustId, 10) < 0
+      !Number.isNaN(Number.parseInt(rawIllustId, 10)) ||
+      Number.parseInt(rawIllustId, 10) < 0
     )
   }
 }

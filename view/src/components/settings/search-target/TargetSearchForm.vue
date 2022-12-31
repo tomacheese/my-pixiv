@@ -15,9 +15,7 @@
     />
     <v-text-field v-model="minLikeCount" label="最低すき！数" type="number" />
     <v-text-field v-model="searchItemCount" label="検索件数" type="number" />
-    <v-btn v-if="item === null" color="success" block @click="add()"
-      >追加</v-btn
-    >
+    <v-btn v-if="!item" color="success" block @click="add()">追加</v-btn>
     <v-btn v-else color="success" block @click="update()">更新</v-btn>
   </v-form>
 </template>
@@ -38,9 +36,9 @@ export default Vue.extend({
   name: 'AddTargetSearchSetting',
   props: {
     item: {
-      type: Object as () => Target,
+      type: Object as () => Target | undefined,
       required: false,
-      default: null,
+      default: undefined,
     },
   },
   data(): {
@@ -90,9 +88,9 @@ export default Vue.extend({
         targetType: this.targetType.map((t) => targetTypeMap[t]),
         tag: this.tag.split(/[ ,]/),
         ignores:
-          this.ignores.trim().length !== 0 ? this.ignores.split(/[ ,]/) : [],
-        minLikeCount: parseInt(this.minLikeCount),
-        searchItemCount: parseInt(this.searchItemCount),
+          this.ignores.trim().length > 0 ? this.ignores.split(/[ ,]/) : [],
+        minLikeCount: Number.parseInt(this.minLikeCount),
+        searchItemCount: Number.parseInt(this.searchItemCount),
       })
     },
     update(): void {
@@ -100,9 +98,9 @@ export default Vue.extend({
         targetType: this.targetType.map((t) => targetTypeMap[t]),
         tag: this.tag.split(/[ ,]/),
         ignores:
-          this.ignores.trim().length !== 0 ? this.ignores.split(/[ ,]/) : [],
-        minLikeCount: parseInt(this.minLikeCount),
-        searchItemCount: parseInt(this.searchItemCount),
+          this.ignores.trim().length > 0 ? this.ignores.split(/[ ,]/) : [],
+        minLikeCount: Number.parseInt(this.minLikeCount),
+        searchItemCount: Number.parseInt(this.searchItemCount),
       })
     },
   },

@@ -6,6 +6,7 @@ extends:
   - '@nuxtjs/eslint-config-typescript'
   - plugin:nuxt/recommended
   - prettier
+  - plugin:unicorn/recommended
 plugins:
   - unused-imports
 rules:
@@ -23,3 +24,5 @@ rules:
         'argsIgnorePattern': '^_',
       },
     ]
+  'unicorn/filename-case': off
+  'unicorn/prevent-abbreviations': off

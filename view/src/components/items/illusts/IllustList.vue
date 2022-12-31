@@ -67,7 +67,7 @@ export default Vue.extend({
     },
   },
   data(): {
-    fetcher: Fetcher | null
+    fetcher?: Fetcher
     items: PixivItem[] | PixivItemWithSearchTag[]
     vieweds: number[] | undefined
     selectType: ViewType
@@ -79,13 +79,13 @@ export default Vue.extend({
     }
     overlay: {
       isIllustOpened: boolean
-      target: PixivItem | null
+      target: PixivItem | undefined
       isFullscreen: boolean
     }
     loading: boolean
   } {
     return {
-      fetcher: null,
+      fetcher: undefined,
       items: [],
       vieweds: [],
       selectType: 'PAGINATION',
@@ -97,7 +97,7 @@ export default Vue.extend({
       },
       overlay: {
         isIllustOpened: false,
-        target: null,
+        target: undefined,
         isFullscreen: false,
       },
       loading: false,
@@ -107,8 +107,8 @@ export default Vue.extend({
     targetType() {
       this.fetch()
     },
-    'overlay.isIllustOpened'(val) {
-      if (!val && window.location.hash === '#illust-popup') {
+    'overlay.isIllustOpened'(value) {
+      if (!value && window.location.hash === '#illust-popup') {
         history.back()
       }
     },
@@ -117,13 +117,12 @@ export default Vue.extend({
     this.selectType = this.$accessor.settings.viewType
 
     // 既読情報は検索結果画面のみで使用
-    if (!this.recommended && !this.later) {
-      this.vieweds = this.$accessor.viewed.items
-        .filter((item) => item.type === 'illust')
-        .map((item) => item.id)
-    } else {
-      this.vieweds = undefined
-    }
+    this.vieweds =
+      !this.recommended && !this.later
+        ? this.$accessor.viewed.items
+            .filter((item) => item.type === 'illust')
+            .map((item) => item.id)
+        : undefined
 
     await this.fetch()
 
@@ -169,6 +168,7 @@ export default Vue.extend({
           targets.map(async (target) => {
             const items = await this.fetcher
               ?.getFetchItemPromise(target)
+              // eslint-disable-next-line unicorn/no-null
               .catch(() => null)
             if (!items) {
               this.count.failed++
@@ -217,7 +217,7 @@ export default Vue.extend({
     },
     close() {
       this.overlay.isIllustOpened = false
-      this.overlay.target = null
+      this.overlay.target = undefined
     },
     onItemViewing(item: PixivItem) {
       if (this.loading) {

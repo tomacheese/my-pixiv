@@ -2,9 +2,7 @@
   <div>
     <v-progress-linear v-if="isLoadingTweet" indeterminate></v-progress-linear>
     <v-card :loading="loading">
-      <v-card-title v-if="error != null" class="text-h5">{{
-        error
-      }}</v-card-title>
+      <v-card-title v-if="error" class="text-h5">{{ error }}</v-card-title>
       <v-card-title>
         <v-chip
           v-for="screenName of screenNames"
@@ -23,7 +21,10 @@
       </v-card-title>
       <v-card-text>
         <v-row>
-          <v-col v-if="tweets.length === 0 && !isLoadingTweet" cols="12">
+          <v-col
+            v-if="tweets && tweets.length === 0 && !isLoadingTweet"
+            cols="12"
+          >
             <v-card>
               <v-card-text class="text-h5 text-center my-5"
                 >No tweets found</v-card-text
@@ -108,10 +109,10 @@ import { openTwitterTweet, openTwitterUser } from '@/utils/twitter'
 import { WebSocketAPIError } from '@/plugins/websocket'
 import { PixivItem } from '@/types/pixiv-item'
 
-export interface TweetPopupProp {
+export interface TweetPopupProperty {
   screen_names: string[]
   tweets: SearchTweetResult[]
-  error: string | null
+  error?: string
 }
 
 export interface TweetPopupData {
@@ -129,7 +130,7 @@ export function isShadowBanned(
       result.user.screen_name.toLocaleLowerCase() ===
       screenName.toLocaleLowerCase()
   )
-  if (item == null) {
+  if (!item) {
     return false
   }
   return (
@@ -155,14 +156,14 @@ export function isCheckingShadowBan(
 export default Vue.extend({
   props: {
     item: {
-      type: Object as () => PixivItem,
+      type: Object as () => PixivItem | undefined,
       required: false,
-      default: null,
+      default: undefined,
     },
     tweets: {
-      type: Array as () => SearchTweetResult[],
+      type: Array as () => SearchTweetResult[] | undefined,
       required: false,
-      default: null,
+      default: undefined,
     },
     screenNames: {
       type: Array as () => string[],
@@ -170,9 +171,9 @@ export default Vue.extend({
       default: () => [],
     },
     error: {
-      type: String,
+      type: String as () => string | undefined,
       required: false,
-      default: null,
+      default: undefined,
     },
     shadowBans: {
       type: Array as () => ShadowBanResult[],
@@ -208,7 +209,7 @@ export default Vue.extend({
   },
   methods: {
     fetchTweetsLike() {
-      if (this.tweets == null) {
+      if (!this.tweets) {
         return
       }
       const tweetIds = this.tweets.map((tweet) => tweet.tweet.id)
@@ -222,19 +223,21 @@ export default Vue.extend({
       )
       this.$api.twitter
         .getTweetsLike('main', notCheckedTweetIds)
-        .then((res) => {
-          this.liked.main = res.data.tweets
+        .then((response) => {
+          this.liked.main = response.data.tweets
             .filter((tweet) => tweet.liked)
             .map((tweet) => tweet.id)
         })
-      this.$api.twitter.getTweetsLike('sub', notCheckedTweetIds).then((res) => {
-        this.liked.sub = res.data.tweets
-          .filter((tweet) => tweet.liked)
-          .map((tweet) => tweet.id)
-      })
+      this.$api.twitter
+        .getTweetsLike('sub', notCheckedTweetIds)
+        .then((response) => {
+          this.liked.sub = response.data.tweets
+            .filter((tweet) => tweet.liked)
+            .map((tweet) => tweet.id)
+        })
     },
     sortedTweets(): SearchTweetResult[] {
-      if (this.tweets == null) {
+      if (!this.tweets) {
         return []
       }
       const tweets = [...this.tweets]
@@ -312,26 +315,22 @@ export default Vue.extend({
         : this.$api.twitter.removeLike(account, tweet.tweet.id)
       promise
         .then(() => {
-          if (isAdd) {
-            this.liked[account] = [...this.liked[account], tweet.tweet.id]
-          } else {
-            this.liked[account] = this.liked[account]?.filter(
-              (id) => id !== tweet.tweet.id
-            )
-          }
+          this.liked[account] = isAdd
+            ? [...this.liked[account], tweet.tweet.id]
+            : this.liked[account]?.filter((id) => id !== tweet.tweet.id)
           this.likeLoading = false
         })
-        .catch((err) => {
-          if (err instanceof WebSocketAPIError) {
+        .catch((error) => {
+          if (error instanceof WebSocketAPIError) {
             this.$nuxt.$emit('snackbar', {
-              message: `Likeに失敗: ${err.data.error.message}`,
+              message: `Likeに失敗: ${error.data.error.message}`,
               color: 'error',
             })
             return
           }
           this.$nuxt.$emit('snackbar', {
-            message: `Likeに失敗: ${err.message}\n${
-              err.response?.data.detail || ''
+            message: `Likeに失敗: ${error.message}\n${
+              error.response?.data.detail || ''
             }`,
             color: 'error',
           })

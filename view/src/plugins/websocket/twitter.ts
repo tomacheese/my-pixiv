@@ -32,16 +32,16 @@ export class TwitterAPI {
    */
   public searchByIllust(
     illustId: number,
-    callbackFunc: (response: SearchTweetResponse) => void,
-    errorFunc: (error: Error) => void
+    callbackFunction: (response: SearchTweetResponse) => void,
+    errorFunction: (error: Error) => void
   ): void {
     this.utils.requestMultiResponse<SearchTweetRequest, SearchTweetResponse>(
       'searchTweet',
       {
         illust_id: illustId,
       },
-      callbackFunc,
-      errorFunc
+      callbackFunction,
+      errorFunction
     )
   }
 

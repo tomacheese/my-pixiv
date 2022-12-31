@@ -67,20 +67,20 @@ export default Vue.extend({
     }, 1000)
   },
   methods: {
-    onAutoSyncViewedsChange(val: boolean) {
+    onAutoSyncViewedsChange(value: boolean) {
       if (
         !confirm(
           `リアルタイム既読更新を${
-            val ? '有効' : '無効'
+            value ? '有効' : '無効'
           }にしますか？\n「はい」をクリックすると、ページが再読み込みされます。`
         )
       ) {
         this.$nextTick(() => {
-          this.isAutoSyncVieweds = !val
+          this.isAutoSyncVieweds = !value
         })
         return
       }
-      this.$accessor.settings.setAutoSyncVieweds(val)
+      this.$accessor.settings.setAutoSyncVieweds(value)
       this.$nextTick(() => {
         location.reload()
       })
@@ -88,7 +88,7 @@ export default Vue.extend({
     copyToClipboard(text: string) {
       const textarea = document.createElement('textarea')
       textarea.value = text
-      document.body.appendChild(textarea)
+      document.body.append(textarea)
       textarea.select()
       document.execCommand('copy')
       textarea.remove()
@@ -133,7 +133,7 @@ export default Vue.extend({
         setTimeout(() => {
           location.reload()
         }, 3000)
-      } catch (e) {
+      } catch {
         this.$nuxt.$emit('snackbar', {
           message: `既読情報のインポートに失敗しました`,
           color: 'error',
@@ -146,18 +146,18 @@ export default Vue.extend({
       }
       const input = document.createElement('input')
       input.type = 'file'
-      input.onchange = () => {
+      input.addEventListener('change', () => {
         if (!input.files || !input.files[0]) {
           return
         }
         const file = input.files[0]
         const reader = new FileReader()
-        reader.onload = () => {
+        reader.addEventListener('load', () => {
           this.viewedsText = reader.result as string
           this.importVieweds()
-        }
+        })
         reader.readAsText(file)
-      }
+      })
       input.click()
     },
   },

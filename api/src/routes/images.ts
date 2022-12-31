@@ -1,6 +1,6 @@
 import { FastifyReply, FastifyRequest } from 'fastify'
 import { BaseRouter } from '@/base-router'
-import fs from 'fs'
+import fs from 'node:fs'
 import { Pixiv } from '@/pixiv/pixiv'
 
 /**
@@ -41,7 +41,7 @@ export class ImagesRouter extends BaseRouter {
   }
 
   public getExtension(url: string): string {
-    const extension = url.split('.').pop() || null
+    const extension: string | undefined = url.split('.').pop()
     if (!extension) {
       throw new Error('Failed to get extension')
     }

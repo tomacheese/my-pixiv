@@ -56,14 +56,18 @@ export default Vue.extend({
   methods: {
     getTypeName(type: string): string {
       switch (type) {
-        case 'ILLUST':
+        case 'ILLUST': {
           return 'イラスト'
-        case 'MANGA':
+        }
+        case 'MANGA': {
           return 'マンガ'
-        case 'NOVEL':
+        }
+        case 'NOVEL': {
           return '小説'
-        default:
+        }
+        default: {
           return ''
+        }
       }
     },
     remove(): void {

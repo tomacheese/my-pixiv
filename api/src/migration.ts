@@ -1,4 +1,4 @@
-import fs from 'fs'
+import fs from 'node:fs'
 import { ViewedItem } from 'my-pixiv-types'
 import { PATH } from './utils/utils'
 

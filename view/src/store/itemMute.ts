@@ -39,17 +39,17 @@ export const actions = actionTree(
   {
     addMute: (
       { commit, state },
-      param: {
+      parameter: {
         item: { type: MuteTargetType; id: number }
         isSync: boolean
       }
     ) => {
-      const item = param.item
+      const item = parameter.item
       if (state.items.some((m) => m.id === item.id && m.type === item.type)) {
         return
       }
       const api = getAPI()
-      if (param.isSync && api !== null) {
+      if (parameter.isSync) {
         api.itemMute.add(item)
       }
       commit('setItems', [
@@ -62,17 +62,17 @@ export const actions = actionTree(
     },
     removeMute: (
       { commit, state },
-      param: {
+      parameter: {
         item: { type: MuteTargetType; id: number }
         isSync: boolean
       }
     ) => {
-      const item = param.item
+      const item = parameter.item
       if (!state.items.some((m) => m.id === item.id && m.type === item.type)) {
         return
       }
       const api = getAPI()
-      if (param.isSync && api !== null) {
+      if (parameter.isSync) {
         api.itemMute.remove(item)
       }
       const items = state.items.filter(

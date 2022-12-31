@@ -57,7 +57,10 @@ export class AddItemMute extends BaseWSRouter<
   }
 
   isVaildId(rawId: any) {
-    return !Number.isNaN(parseInt(rawId, 10)) || parseInt(rawId, 10) < 0
+    return (
+      !Number.isNaN(Number.parseInt(rawId, 10)) ||
+      Number.parseInt(rawId, 10) < 0
+    )
   }
 
   share() {
@@ -91,7 +94,10 @@ export class RemoveItemMute extends BaseWSRouter<
   }
 
   isVaildId(rawId: any) {
-    return !Number.isNaN(parseInt(rawId, 10)) || parseInt(rawId, 10) < 0
+    return (
+      !Number.isNaN(Number.parseInt(rawId, 10)) ||
+      Number.parseInt(rawId, 10) < 0
+    )
   }
 
   share() {

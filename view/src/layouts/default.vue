@@ -83,9 +83,9 @@ export default Vue.extend({
     },
   },
   watch: {
-    selected(val) {
+    selected(value) {
       this.$nuxt.$router.push({
-        name: this.types[val].value,
+        name: this.types[value].value,
       })
     },
     '$route.path': {

@@ -59,6 +59,7 @@ export default Vue.extend({
     vieweds: {
       type: Array as () => number[] | undefined,
       required: false,
+      // eslint-disable-next-line unicorn/no-useless-undefined
       default: () => undefined,
     },
     loading: {

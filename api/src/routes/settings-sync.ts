@@ -87,9 +87,9 @@ export class SettingsSyncWebSocketRouter extends BaseRouter {
       }
 
       ws.send(JSON.stringify({ action: 'synced', data: sendCount }))
-    } catch (e) {
-      console.error(e)
-      ws.close(1002, (e as Error).message)
+    } catch (error) {
+      console.error(error)
+      ws.close(1002, (error as Error).message)
     }
   }
 

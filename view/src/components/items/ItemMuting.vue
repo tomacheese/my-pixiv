@@ -66,7 +66,7 @@
     </v-dialog>
 
     <v-snackbar
-      v-if="snackbarType !== null"
+      v-if="snackbarType"
       v-model="isSnackbar"
       :color="snackbarMap[snackbarType].color"
     >
@@ -114,15 +114,15 @@ export default Vue.extend({
     isOpen: boolean
     isLoading: boolean
     isSnackbar: boolean
-    snackbarType: SnackBarType | null
+    snackbarType?: SnackBarType
     snackbarMap: { [key in SnackBarType]: SnackBarView }
-    pressTimer: NodeJS.Timeout | null
+    pressTimer?: NodeJS.Timeout
   } {
     return {
       isOpen: false,
       isLoading: false,
       isSnackbar: false,
-      snackbarType: null,
+      snackbarType: undefined,
       snackbarMap: {
         ADDED_ITEM: {
           icon: 'mdi-check',
@@ -150,7 +150,7 @@ export default Vue.extend({
           color: 'error',
         },
       },
-      pressTimer: null,
+      pressTimer: undefined,
     }
   },
   computed: {
@@ -207,15 +207,18 @@ export default Vue.extend({
 
       switch (type) {
         case 'ILLUST':
-        case 'NOVEL':
+        case 'NOVEL': {
           this.snackbarType = 'ADDED_ITEM'
           break
-        case 'USER':
+        }
+        case 'USER': {
           this.snackbarType = 'ADDED_AUTHOR'
           break
-        case 'NOVEL_SERIES':
+        }
+        case 'NOVEL_SERIES': {
           this.snackbarType = 'ADDED_SERIES'
           break
+        }
       }
       this.isSnackbar = true
     },

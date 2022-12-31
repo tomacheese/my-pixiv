@@ -11,8 +11,8 @@ import {
   SearchMangaRequest,
   SearchMangaResponse,
 } from 'my-pixiv-types'
-import fs from 'fs'
-import { dirname, join } from 'path'
+import fs from 'node:fs'
+import { dirname, join } from 'node:path'
 import { PATH } from '@/utils/utils'
 import { RecommendedIllustOptions } from '@/pixiv/options'
 
@@ -52,7 +52,7 @@ export class GetManga extends BaseWSRouter<GetMangaRequest, GetMangaResponse> {
     const cachePath = this.getCachePath()
     if (fs.existsSync(cachePath)) {
       const cache: CacheGetManga = JSON.parse(
-        fs.readFileSync(cachePath, 'utf-8')
+        fs.readFileSync(cachePath, 'utf8')
       )
       if (cache.timestamp + 3600 * 1000 > Date.now()) {
         this.send({
@@ -87,7 +87,8 @@ export class GetManga extends BaseWSRouter<GetMangaRequest, GetMangaResponse> {
 
   isVaildIllustId(rawIllustId: any) {
     return (
-      !Number.isNaN(parseInt(rawIllustId, 10)) || parseInt(rawIllustId, 10) < 0
+      !Number.isNaN(Number.parseInt(rawIllustId, 10)) ||
+      Number.parseInt(rawIllustId, 10) < 0
     )
   }
 }
@@ -109,7 +110,7 @@ export class SearchManga extends BaseWSRouter<
       this.data.word.length > 0 &&
       !!this.data.search_item_count &&
       !Number.isNaN(
-        parseInt(this.data.search_item_count as unknown as string, 10)
+        Number.parseInt(this.data.search_item_count as unknown as string, 10)
       ) &&
       this.data.search_item_count > 0
     )
@@ -122,7 +123,7 @@ export class SearchManga extends BaseWSRouter<
     const cachePath = this.getCachePath()
     if (fs.existsSync(cachePath)) {
       const cache: CacheSearchManga = JSON.parse(
-        fs.readFileSync(cachePath, 'utf-8')
+        fs.readFileSync(cachePath, 'utf8')
       )
       if (cache.timestamp + 3600 * 1000 > Date.now()) {
         this.send({
@@ -193,10 +194,13 @@ export class RecommendedManga extends BaseWSRouter<
       const query = Pixiv.parseQueryString(this.data.next_url)
       const minBookmarkIdForRecentIllust =
         query.min_bookmark_id_for_recent_illust
-          ? parseInt(query.min_bookmark_id_for_recent_illust as string, 10)
+          ? Number.parseInt(
+              query.min_bookmark_id_for_recent_illust as string,
+              10
+            )
           : undefined
       const maxBookmarkIdForRecommend = query.max_bookmark_id_for_recommend
-        ? parseInt(query.max_bookmark_id_for_recommend as string, 10)
+        ? Number.parseInt(query.max_bookmark_id_for_recommend as string, 10)
         : undefined
 
       options = {
@@ -238,7 +242,8 @@ export class AddMangaLike extends BaseWSRouter<
 
   isVaildIllustId(rawIllustId: any) {
     return (
-      !Number.isNaN(parseInt(rawIllustId, 10)) || parseInt(rawIllustId, 10) < 0
+      !Number.isNaN(Number.parseInt(rawIllustId, 10)) ||
+      Number.parseInt(rawIllustId, 10) < 0
     )
   }
 }
