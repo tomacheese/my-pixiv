@@ -75,7 +75,7 @@ export async function loadTwitterApi(
     accountName === 'NO_ACCOUNT'
       ? undefined
       : config.get('accounts')[accountName]
-  if (account === undefined) {
+  if (account === undefined && accountName !== 'NO_ACCOUNT') {
     throw new Error(`Account not found: ${accountName}`)
   }
   const twitterApi = new TwitterApi({
