@@ -27,10 +27,10 @@ export default Vue.extend({
     },
   },
   data(): {
-    pressTimer: NodeJS.Timeout | null
+    pressTimer?: NodeJS.Timeout
   } {
     return {
-      pressTimer: null,
+      pressTimer: undefined,
     }
   },
   methods: {
@@ -42,7 +42,7 @@ export default Vue.extend({
     endPress(): void {
       if (!this.pressTimer) return
       clearTimeout(this.pressTimer)
-      this.pressTimer = null
+      this.pressTimer = undefined
     },
   },
 })

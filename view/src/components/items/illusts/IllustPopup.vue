@@ -90,9 +90,9 @@ export default Vue.extend({
   },
   props: {
     item: {
-      type: Object as () => PixivIllustItem,
+      type: Object as () => PixivIllustItem | undefined,
       required: false,
-      default: null,
+      default: undefined,
     },
     fullscreen: {
       type: Boolean,
@@ -108,8 +108,8 @@ export default Vue.extend({
     isTweetOpened: boolean
     tweetStatus: TweetStatus
     screenNames: string[]
-    tweets: SearchTweetResult[] | null
-    error: string | null
+    tweets: SearchTweetResult[] | undefined
+    error: string | undefined
     shadowBans: ShadowBanResult[]
   } {
     return {
@@ -121,7 +121,7 @@ export default Vue.extend({
       tweetStatus: 'LOADING',
       screenNames: [],
       tweets: [],
-      error: null,
+      error: undefined,
       shadowBans: [],
     }
   },
@@ -147,7 +147,9 @@ export default Vue.extend({
 
         // イラストポップアップアクセス中は #illust-popup をつける
         if (window.location.hash !== '#illust-popup') {
+          // eslint-disable-next-line unicorn/no-null
           history.pushState(null, '', location.href)
+          // eslint-disable-next-line unicorn/no-null
           history.replaceState(null, '', '#illust-popup')
         }
       },
@@ -167,7 +169,9 @@ export default Vue.extend({
 
     // イラストポップアップアクセス中は #illust-popup をつける
     if (window.location.hash !== '#illust-popup') {
+      // eslint-disable-next-line unicorn/no-null
       history.pushState(null, '', location.href)
+      // eslint-disable-next-line unicorn/no-null
       history.replaceState(null, '', '#illust-popup')
     }
 
@@ -191,16 +195,16 @@ export default Vue.extend({
         item.meta_pages[this.page - 1].image_urls.large
       )
     },
-    clickImage(e: MouseEvent) {
+    clickImage(event: MouseEvent) {
       const { naturalWidth } = this.$refs.image as HTMLImageElement
-      if (this.item == null) {
+      if (!this.item) {
         return
       }
       if (this.item.meta_pages.length === 0) {
         // 画像数が1個（meta_pagesは0）ならクリックしても何もおきない
         return
       }
-      const isRight = e.offsetX > naturalWidth / 2
+      const isRight = event.offsetX > naturalWidth / 2
       if (isRight && this.page < this.item.meta_pages.length) {
         this.page++
       } else if (!isRight && this.page > 1) {
@@ -215,18 +219,18 @@ export default Vue.extend({
       this.fetchTweets()
     },
     fetchTweets() {
-      if (this.item == null) {
+      if (!this.item) {
         return
       }
       this.isLoadingTweet = true
       this.tweetStatus = 'LOADING'
-      this.tweets = null
+      this.tweets = undefined
       if (this.$api.getReadyState() !== WebSocket.OPEN) {
         this.$api.reconnect()
       }
       this.screenNames = []
       this.tweets = []
-      this.error = null
+      this.error = undefined
       this.$api.twitter.searchByIllust(
         this.item.id,
         this.searchCallback.bind(this),
@@ -242,36 +246,50 @@ export default Vue.extend({
     searchCallback(response: SearchTweetResponse) {
       const data = response.data
 
-      if (data.responseType === 'screen_names') {
-        this.screenNames = data.screen_names
-        this.checkShadowBan()
+      switch (data.responseType) {
+        case 'screen_names': {
+          this.screenNames = data.screen_names
+          this.checkShadowBan()
 
-        if (this.screenNames.length > 0) {
-          this.tweetStatus = 'ACCOUNT_FOUND'
-        }
-      } else if (data.responseType === 'tweet') {
-        if (this.tweets === null) {
-          this.tweets = []
-        }
-        if (this.tweets.some((t) => t.tweet.id === data.tweet.tweet.id)) {
-          // 重複ツイートは無視する
-          return
-        }
-        this.tweets.push(data.tweet)
+          if (this.screenNames.length > 0) {
+            this.tweetStatus = 'ACCOUNT_FOUND'
+          }
 
-        if (this.tweets.some((t) => t.similarity >= 0.95)) {
-          // 95%以上の類似度を持つツイートがあれば、合致ツイートとして扱う
-          this.tweetStatus = 'EXACT_TWEET_FOUND'
-          return
+          break
         }
-        if (this.tweets.length > 0) {
-          this.tweetStatus = 'TWEET_FOUND'
+        case 'tweet': {
+          if (!this.tweets) {
+            this.tweets = []
+          }
+          if (this.tweets.some((t) => t.tweet.id === data.tweet.tweet.id)) {
+            // 重複ツイートは無視する
+            return
+          }
+          this.tweets.push(data.tweet)
+
+          if (this.tweets.some((t) => t.similarity >= 0.95)) {
+            // 95%以上の類似度を持つツイートがあれば、合致ツイートとして扱う
+            this.tweetStatus = 'EXACT_TWEET_FOUND'
+            return
+          }
+          if (this.tweets.length > 0) {
+            this.tweetStatus = 'TWEET_FOUND'
+          }
+
+          break
         }
-      } else if (data.responseType === 'error') {
-        this.tweetStatus = 'FAILED'
-        this.error = data.message
-      } else if (data.responseType === 'finish') {
-        this.isLoadingTweet = false
+        case 'error': {
+          this.tweetStatus = 'FAILED'
+          this.error = data.message
+
+          break
+        }
+        case 'finish': {
+          this.isLoadingTweet = false
+
+          break
+        }
+        // No default
       }
     },
     checkShadowBan() {

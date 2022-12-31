@@ -23,7 +23,7 @@ export class Fetcher {
   private $accessor: Context['$accessor']
   private readonly targetType: TargetType
   private readonly globalFilter: Filter[]
-  private recommendedNextUrl: string | null = null
+  private recommendedNextUrl: string | undefined = undefined
 
   /**
    * コンストラクタ
@@ -54,7 +54,7 @@ export class Fetcher {
    */
   public sortItems(items: PixivItemWithSearchTag[]): PixivItemWithSearchTag[] {
     return items
-      .filter((item) => item)
+      .filter(Boolean)
       .filter((item, index, self) => {
         return self.map((item) => item.id).indexOf(item.id) === index
       })
@@ -79,8 +79,9 @@ export class Fetcher {
       .recommended(
         more && this.recommendedNextUrl ? this.recommendedNextUrl : undefined
       )
-      .catch((e) => {
-        console.error(e)
+      .catch((error) => {
+        console.error(error)
+        // eslint-disable-next-line unicorn/no-null
         return null
       })
     if (response === null) {
@@ -95,7 +96,7 @@ export class Fetcher {
     this.recommendedNextUrl = response.data.next_url
 
     return data
-      .filter((item) => !this.isFilterItem(null, item))
+      .filter((item) => !this.isFilterItem(undefined, item))
       .filter((item) => !this.isMutedItem(item))
   }
 
@@ -108,7 +109,7 @@ export class Fetcher {
     const items = this.$accessor.settings.later
 
     return items
-      .filter((item) => !this.isFilterItem(null, item))
+      .filter((item) => !this.isFilterItem(undefined, item))
       .filter((item) => !this.isMutedItem(item))
       .filter((item) =>
         this.targetType === 'ILLUST'
@@ -123,7 +124,7 @@ export class Fetcher {
    * @returns さらに読み込むアイテムがあるか
    */
   public isLoadMoreAvailable() {
-    return this.recommendedNextUrl !== null
+    return !!this.recommendedNextUrl
   }
 
   /**
@@ -166,7 +167,7 @@ export class Fetcher {
             )
           }
         )
-        .catch((e) => reject(e))
+        .catch((error) => reject(error))
     })
   }
 
@@ -178,12 +179,15 @@ export class Fetcher {
    */
   private getApiMethod(targetType: TargetType) {
     switch (targetType) {
-      case 'ILLUST':
+      case 'ILLUST': {
         return this.$api.illust
-      case 'MANGA':
+      }
+      case 'MANGA': {
         return this.$api.manga
-      case 'NOVEL':
+      }
+      case 'NOVEL': {
         return this.$api.novel
+      }
     }
   }
 
@@ -251,21 +255,23 @@ export class Fetcher {
    * @param item アイテム
    * @returns フィルター対象であれば true
    */
-  private isFilterItem(target: Target | null, item: PixivItem) {
+  private isFilterItem(target: Target | undefined, item: PixivItem) {
     // グローバルフィルター
     for (const filter of this.globalFilter) {
       switch (filter.type) {
-        case 'TITLE':
+        case 'TITLE': {
           if (item.title.includes(filter.value)) {
             return true
           }
           break
-        case 'CAPTION':
+        }
+        case 'CAPTION': {
           if (item.caption.includes(filter.value)) {
             return true
           }
           break
-        case 'TAG':
+        }
+        case 'TAG': {
           if (
             item.tags.some(
               (tag) =>
@@ -277,19 +283,20 @@ export class Fetcher {
             return true
           }
           break
+        }
       }
     }
     // 個別ターゲットフィルター
     // 除外文字列が、タイトル・作者名・タグに含まれていたらフィルタリング対象
-    return target !== null
-      ? target.ignores.some((ignore) => {
+    return target === undefined
+      ? false
+      : target.ignores.some((ignore) => {
           return (
             item.title.includes(ignore) ||
             item.user.name.includes(ignore) ||
             item.tags.some((tag) => tag.name.includes(ignore))
           )
         })
-      : false
   }
 
   /**
@@ -301,20 +308,25 @@ export class Fetcher {
   public isMutedItem(item: PixivItem): boolean {
     return this.$accessor.itemMute.items.some((mutedItem) => {
       switch (mutedItem.type) {
-        case 'ILLUST':
+        case 'ILLUST': {
           return isPixivIllustItem(item) && item.id === mutedItem.id
-        case 'NOVEL':
+        }
+        case 'NOVEL': {
           return isPixivNovelItem(item) && item.id === mutedItem.id
-        case 'USER':
+        }
+        case 'USER': {
           return item.user.id === mutedItem.id
-        case 'NOVEL_SERIES':
+        }
+        case 'NOVEL_SERIES': {
           return (
             isPixivNovelItem(item) &&
             isSeriesItem(item.series) &&
             item.series.id === mutedItem.id
           )
-        default:
+        }
+        default: {
           return false
+        }
       }
     })
   }

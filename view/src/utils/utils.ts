@@ -23,11 +23,11 @@ export function openUrlScheme(
       resolve()
     }, timeout)
     window.location.href = schemeUrl
-    window.onblur = function () {
+    window.addEventListener('blur', function () {
       change = true
-    }
-    window.onfocus = function () {
+    })
+    window.addEventListener('focus', function () {
       change = false
-    }
+    })
   })
 }

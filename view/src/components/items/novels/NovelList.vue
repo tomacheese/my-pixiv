@@ -51,7 +51,7 @@ export default Vue.extend({
     },
   },
   data(): {
-    fetcher: Fetcher | null
+    fetcher?: Fetcher
     items: PixivItem[] | PixivItemWithSearchTag[]
     vieweds: number[] | undefined
     selectType: ViewType
@@ -64,7 +64,7 @@ export default Vue.extend({
     loading: boolean
   } {
     return {
-      fetcher: null,
+      fetcher: undefined,
       items: [],
       vieweds: [],
       selectType: 'PAGINATION',
@@ -86,13 +86,9 @@ export default Vue.extend({
     this.selectType = this.$accessor.settings.novelViewType
 
     // 既読情報は検索結果画面のみで使用
-    if (!this.recommended && !this.later) {
-      this.vieweds = this.$accessor.viewed.items
+    this.vieweds = !this.recommended && !this.later ? this.$accessor.viewed.items
         .filter((item) => item.type === 'novel')
-        .map((item) => item.id)
-    } else {
-      this.vieweds = undefined
-    }
+        .map((item) => item.id) : undefined;
 
     await this.fetch()
 
@@ -136,6 +132,7 @@ export default Vue.extend({
           targets.map(async (target) => {
             const items = await this.fetcher
               ?.getFetchItemPromise(target)
+              // eslint-disable-next-line unicorn/no-null
               .catch(() => null)
             if (!items) {
               this.count.failed++

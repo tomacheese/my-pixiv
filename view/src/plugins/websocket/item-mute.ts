@@ -63,15 +63,15 @@ export class ItemMuteAPI {
    * アイテムミュート追加シェアイベント(shareAddItemMute)を受信したときの処理
    *
    * @param $accessor Vuexアクセサー
-   * @param res アイテムミュート追加シェアレスポンス
+   * @param response アイテムミュート追加シェアレスポンス
    */
   public onAddItemMute(
     $accessor: Context['$accessor'],
-    res: ShareAddItemMuteResponse
+    response: ShareAddItemMuteResponse
   ): void {
     if (!$accessor.settings.isAutoSyncMutes) return
     $accessor.itemMute.addMute({
-      item: res.data,
+      item: response.data,
       isSync: false,
     })
   }
@@ -80,15 +80,15 @@ export class ItemMuteAPI {
    * アイテムミュート削除シェアイベント(shareRemoveItemMute)を受信したときの処理
    *
    * @param $accessor Vuexアクセサー
-   * @param res アイテムミュート削除シェアレスポンス
+   * @param response アイテムミュート削除シェアレスポンス
    */
   public onRemoveItemMute(
     $accessor: Context['$accessor'],
-    res: ShareRemoveItemMuteResponse
+    response: ShareRemoveItemMuteResponse
   ): void {
     if (!$accessor.settings.isAutoSyncMutes) return
     $accessor.itemMute.removeMute({
-      item: res.data,
+      item: response.data,
       isSync: false,
     })
   }

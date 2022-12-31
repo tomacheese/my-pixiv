@@ -74,8 +74,8 @@ export default Vue.extend({
     fetchAppLatestVersion() {
       axios
         .get('https://api.github.com/repos/tomacheese/my-pixiv/releases/latest')
-        .then((res) => {
-          this.appLatestVersion = res.data.tag_name
+        .then((response) => {
+          this.appLatestVersion = response.data.tag_name
         })
     },
     reload() {

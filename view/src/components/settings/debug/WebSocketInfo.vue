@@ -28,18 +28,22 @@ export default Vue.extend({
   methods: {
     loadStatus() {
       switch (this.$api.getReadyState()) {
-        case WebSocket.OPEN:
+        case WebSocket.OPEN: {
           this.readyState = 'OPEN'
           break
-        case WebSocket.CONNECTING:
+        }
+        case WebSocket.CONNECTING: {
           this.readyState = 'CONNECTING'
           break
-        case WebSocket.CLOSING:
+        }
+        case WebSocket.CLOSING: {
           this.readyState = 'CLOSING'
           break
-        case WebSocket.CLOSED:
+        }
+        case WebSocket.CLOSED: {
           this.readyState = 'CLOSED'
           break
+        }
       }
 
       this.url = this.$api.getWS().url

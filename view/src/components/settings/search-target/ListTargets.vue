@@ -53,12 +53,12 @@ export default Vue.extend({
   },
   data(): {
     isEditing: boolean
-    editingItem: Target | null
+    editingItem?: Target
     editingIndex: number
   } {
     return {
       isEditing: false,
-      editingItem: null,
+      editingItem: undefined,
       editingIndex: -1,
     }
   },
@@ -68,9 +68,9 @@ export default Vue.extend({
     },
   },
   methods: {
-    onEdit(item: Target, i: number) {
+    onEdit(item: Target, index: number) {
       this.editingItem = item
-      this.editingIndex = i
+      this.editingIndex = index
       this.isEditing = true
     },
     onUpdated(target: Target): void {

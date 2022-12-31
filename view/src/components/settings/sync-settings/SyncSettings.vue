@@ -38,12 +38,12 @@
 import Vue from 'vue'
 export default Vue.extend({
   data(): {
-    client: WebSocket | null
+    client?: WebSocket
     isDisabled: boolean
     isConnected: boolean
   } {
     return {
-      client: null,
+      client: undefined,
       isDisabled: false,
       isConnected: false,
     }
@@ -63,17 +63,17 @@ export default Vue.extend({
           ? `${location.host}/`
           : this.$config.baseURL.replace(/https?:\/\//, '')
       const password =
-        this.$accessor.auth.password !== ''
-          ? this.$accessor.auth.password
-          : undefined
+        this.$accessor.auth.password === ''
+          ? undefined
+          : this.$accessor.auth.password
       this.client = new WebSocket(
         `${protocol}://${domain}api/settings-sync`,
         password
       )
-      this.client.onopen = () => {
+      this.client.addEventListener('open', () => {
         this.isConnected = true
-      }
-      this.client.onclose = (event) => {
+      })
+      this.client.addEventListener('close', (event) => {
         this.isConnected = false
         if (event.code === 1002) {
           this.$nuxt.$emit('snackbar', {
@@ -82,12 +82,12 @@ export default Vue.extend({
             color: 'error',
           })
         }
-      }
-      this.client.onerror = () => {
+      })
+      this.client.addEventListener('error', () => {
         this.isConnected = false
-      }
-      this.client.onmessage = (e) => {
-        const data = JSON.parse(e.data.toString())
+      })
+      this.client.addEventListener('message', (event) => {
+        const data = JSON.parse(event.data.toString())
         if (data.action === undefined) {
           return // actionがない場合は無視
         }
@@ -104,7 +104,7 @@ export default Vue.extend({
             location.reload()
           }, 3000)
         })
-      }
+      })
     },
     startSync() {
       const protocol = location.protocol === 'https:' ? 'wss' : 'ws'
@@ -114,22 +114,22 @@ export default Vue.extend({
           : this.$config.baseURL.replace(/https?:\/\//, '')
       this.isDisabled = true
       const password =
-        this.$accessor.auth.password !== ''
-          ? this.$accessor.auth.password
-          : undefined
+        this.$accessor.auth.password === ''
+          ? undefined
+          : this.$accessor.auth.password
       this.client = new WebSocket(
         `${protocol}://${domain}api/settings-sync`,
         password
       )
-      this.client.onopen = () => {
+      this.client.addEventListener('open', () => {
         this.client?.send(
           JSON.stringify({
             action: 'sync',
             data: this.$accessor.settings.settings,
           })
         )
-      }
-      this.client.onclose = (event) => {
+      })
+      this.client.addEventListener('close', (event) => {
         this.isDisabled = false
         if (event.code === 1002) {
           this.$nuxt.$emit('snackbar', {
@@ -138,12 +138,12 @@ export default Vue.extend({
             color: 'error',
           })
         }
-      }
-      this.client.onerror = () => {
+      })
+      this.client.addEventListener('error', () => {
         this.isDisabled = false
-      }
-      this.client.onmessage = (e) => {
-        const data = JSON.parse(e.data.toString())
+      })
+      this.client.addEventListener('message', (event) => {
+        const data = JSON.parse(event.data.toString())
         if (data.action === undefined) {
           return // actionがない場合は無視
         }
@@ -155,7 +155,7 @@ export default Vue.extend({
           color: 'success',
         })
         this.client?.close(1000)
-      }
+      })
     },
   },
 })

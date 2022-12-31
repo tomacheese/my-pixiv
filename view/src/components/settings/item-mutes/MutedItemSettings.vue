@@ -114,7 +114,7 @@ const targetsMap: {
 }
 
 type MuteItemWithDetails = MuteItem & {
-  details?: PixivItem | PixivUserItem | NovelSeriesDetail | null
+  details?: PixivItem | PixivUserItem | NovelSeriesDetail
 }
 
 export default Vue.extend({
@@ -162,7 +162,7 @@ export default Vue.extend({
     fetch() {
       this.pageCount = Math.ceil(this.$accessor.itemMute.items.length / 10)
       for (const item of this.$accessor.itemMute.items) {
-        if (this.items.find((i) => i.id === item.id && i.type === item.type)) {
+        if (this.items.some((index) => index.id === item.id && index.type === item.type)) {
           continue
         }
         if (this.$api.getReadyState() !== WebSocket.OPEN) {
@@ -172,15 +172,15 @@ export default Vue.extend({
         apiMethod(item.id)
           .then(
             (
-              res:
+              response:
                 | GetIllustResponse
                 | GetNovelResponse
                 | GetUserResponse
                 | GetNovelSeriesResponse
             ) => {
-              const details = isPixivNovelSeriesItem(res.data)
-                ? res.data.novel_series_detail
-                : res.data
+              const details = isPixivNovelSeriesItem(response.data)
+                ? response.data.novel_series_detail
+                : response.data
 
               this.items.push({
                 id: item.id,
@@ -189,13 +189,13 @@ export default Vue.extend({
               })
             }
           )
-          .catch((err) => {
+          .catch((error) => {
             this.items.push({
               id: item.id,
               type: item.type,
-              details: null,
+              details: undefined,
             })
-            console.error(err)
+            console.error(error)
           })
       }
     },
@@ -215,7 +215,7 @@ export default Vue.extend({
       if (
         this.items.some(
           (item) =>
-            item.id === parseInt(this.id) && item.type === this.targetType.key
+            item.id === Number.parseInt(this.id) && item.type === this.targetType.key
         )
       ) {
         this.$nuxt.$emit('snackbar', {
@@ -227,7 +227,7 @@ export default Vue.extend({
       this.$accessor.itemMute.addMute({
         item: {
           type: this.targetType.key as MuteTargetType,
-          id: parseInt(this.id),
+          id: Number.parseInt(this.id),
         },
         isSync: this.$accessor.settings.isAutoSyncMutes,
       })
@@ -248,25 +248,29 @@ export default Vue.extend({
     },
     open(item: MuteItemWithDetails) {
       switch (item.type) {
-        case 'ILLUST':
+        case 'ILLUST': {
           window.open(`https://www.pixiv.net/artworks/${item.id}`, '_blank')
           break
-        case 'NOVEL':
+        }
+        case 'NOVEL': {
           window.open(
             `https://www.pixiv.net/novel/show.php?id=${item.id}`,
             '_blank'
           )
           break
-        case 'USER':
+        }
+        case 'USER': {
           window.open(`https://www.pixiv.net/users/${item.id}`, '_blank')
           break
-        case 'NOVEL_SERIES':
+        }
+        case 'NOVEL_SERIES': {
           window.open(`https://www.pixiv.net/novel/series/${item.id}`, '_blank')
           break
+        }
       }
     },
     getTitleOrName(item: MuteItemWithDetails) {
-      if (item.details === null) {
+      if (!item.details) {
         return '読み込み失敗'
       }
       if (isPixivItem(item.details)) {
@@ -281,7 +285,7 @@ export default Vue.extend({
       return 'NULL'
     },
     getUserName(item: MuteItemWithDetails) {
-      if (item.details === null) {
+      if (!item.details) {
         return '読み込み失敗'
       }
       if (isPixivItem(item.details)) {
@@ -300,14 +304,18 @@ export default Vue.extend({
     },
     getApiMethod(type: MuteTargetType) {
       switch (type) {
-        case 'ILLUST':
+        case 'ILLUST': {
           return this.$api.illust.get.bind(this.$api.illust)
-        case 'NOVEL':
+        }
+        case 'NOVEL': {
           return this.$api.novel.get.bind(this.$api.novel)
-        case 'USER':
+        }
+        case 'USER': {
           return this.$api.user.get.bind(this.$api.user)
-        case 'NOVEL_SERIES':
+        }
+        case 'NOVEL_SERIES': {
           return this.$api.novel.getSeries.bind(this.$api.novel)
+        }
       }
     },
     getTypeName(type: MuteTargetType): string {
@@ -315,14 +323,18 @@ export default Vue.extend({
     },
     getTypeIcon(type: MuteTargetType): string {
       switch (type) {
-        case 'ILLUST':
+        case 'ILLUST': {
           return 'mdi-image'
-        case 'NOVEL':
+        }
+        case 'NOVEL': {
           return 'mdi-book-open-page-variant'
-        case 'USER':
+        }
+        case 'USER': {
           return 'mdi-account'
-        case 'NOVEL_SERIES':
+        }
+        case 'NOVEL_SERIES': {
           return 'mdi-format-list-text'
+        }
       }
     },
     checkUrl() {
@@ -353,20 +365,20 @@ export default Vue.extend({
         this.id = userUrlMatch[1]
       }
     },
-    onAutoSyncMutesChange(val: boolean) {
+    onAutoSyncMutesChange(value: boolean) {
       if (
         !confirm(
           `リアルタイムミュート更新を${
-            val ? '有効' : '無効'
+            value ? '有効' : '無効'
           }にしますか？\n「はい」をクリックすると、ページが再読み込みされます。`
         )
       ) {
         this.$nextTick(() => {
-          this.isAutoSyncMutes = !val
+          this.isAutoSyncMutes = !value
         })
         return
       }
-      this.$accessor.settings.setAutoSyncMutes(val)
+      this.$accessor.settings.setAutoSyncMutes(value)
       this.$nextTick(() => {
         location.reload()
       })

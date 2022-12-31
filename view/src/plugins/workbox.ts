@@ -5,6 +5,7 @@ interface WorkboxStatus {
 }
 
 const workboxStatus: WorkboxStatus = {
+  // eslint-disable-next-line unicorn/no-null
   isUpdate: null,
 }
 

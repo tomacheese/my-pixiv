@@ -1,12 +1,12 @@
-import fs from 'fs'
-import { execSync } from 'child_process'
-import { networkInterfaces } from 'os'
+import fs from 'node:fs'
+import { execSync } from 'node:child_process'
+import { networkInterfaces } from 'node:os'
 import { NuxtConfig } from '@nuxt/types'
 
 function getIpAddress() {
   const nets = networkInterfaces()
   const net = nets.en0?.find((v) => v.family === 'IPv4')
-  return net ? net.address : null
+  return net ? net.address : undefined
 }
 
 const hostname = getIpAddress() || 'localhost'
@@ -41,6 +41,7 @@ const config: NuxtConfig = {
       lang: 'ja',
     },
     meta: [
+      // eslint-disable-next-line unicorn/text-encoding-identifier-case
       { charset: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
       { hid: 'description', name: 'description', content: '' },

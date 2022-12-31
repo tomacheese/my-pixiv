@@ -30,32 +30,36 @@ export default Vue.extend({
       this.status = state
 
       switch (state) {
-        case WebSocket.CONNECTING:
+        case WebSocket.CONNECTING: {
           this.snackbar = true
           this.message =
             '接続しています…。(' + this.$api.lastCloseEvent?.code + ')'
           this.color = 'info'
           this.timeout = 0
           break
-        case WebSocket.OPEN:
+        }
+        case WebSocket.OPEN: {
           this.snackbar = true
           this.message = '接続しました。'
           this.color = 'success'
           this.timeout = 3000
           break
-        case WebSocket.CLOSING:
+        }
+        case WebSocket.CLOSING: {
           this.snackbar = true
           this.message = '切断しています…。'
           this.color = 'warning'
           this.timeout = 0
           break
-        case WebSocket.CLOSED:
+        }
+        case WebSocket.CLOSED: {
           this.snackbar = true
           this.message =
             '切断しました。(' + this.$api.lastCloseEvent?.code + ')'
           this.color = 'error'
           this.timeout = 0
           break
+        }
       }
     }, 1000)
   },

@@ -42,18 +42,19 @@ export default Vue.extend({
       const input = document.createElement('input')
       input.type = 'file'
       input.accept = '.json'
-      input.onchange = () => {
+      input.addEventListener('change', () => {
         const file = input.files?.item(0)
         if (file) {
           const reader = new FileReader()
-          reader.onload = () => {
+          reader.addEventListener('load', () => {
             const text = reader.result as string
             this.import(text)
-          }
+          })
           reader.readAsText(file)
         }
-      }
-      document.body.onfocus = () => {
+      })
+      document.body.addEventListener('focus', () => {
+        // eslint-disable-next-line unicorn/prefer-add-event-listener, unicorn/no-null
         document.body.onfocus = null
         setTimeout(() => {
           console.log(input.files?.length)
@@ -62,7 +63,7 @@ export default Vue.extend({
           }
           this.isLoading = false
         }, 500)
-      }
+      })
       input.click()
     },
     importFromClipboard() {
@@ -70,11 +71,11 @@ export default Vue.extend({
 
       if (!navigator.clipboard) {
         const textarea = document.createElement('textarea')
-        document.body.appendChild(textarea)
+        document.body.append(textarea)
         textarea.focus()
         document.execCommand('paste')
         const text = textarea.value
-        document.body.removeChild(textarea)
+        textarea.remove()
         if (text.length === 0) {
           this.isImportFailed = true
           this.isLoading = false
@@ -103,7 +104,7 @@ export default Vue.extend({
         setTimeout(() => {
           location.reload()
         }, 3000)
-      } catch (e) {
+      } catch {
         this.isImportFailed = true
         this.isLoading = false
       }
