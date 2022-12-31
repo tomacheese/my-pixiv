@@ -1,8 +1,8 @@
 import { BaseWSRouter } from '@/base-ws-router'
 import { PATH } from '@/utils/utils'
 import { GetUserRequest, GetUserResponse, PixivUserItem } from 'my-pixiv-types'
-import { dirname, join } from 'path'
-import fs from 'fs'
+import { dirname, join } from 'node:path'
+import fs from 'node:fs'
 import { loadPixiv } from '@/pixiv/pixiv'
 
 /**
@@ -32,9 +32,7 @@ export class GetUser extends BaseWSRouter<GetUserRequest, GetUserResponse> {
     // キャッシュの存在確認、1時間以内ならキャッシュを返す
     const cachePath = this.getCachePath()
     if (fs.existsSync(cachePath)) {
-      const cache: CacheGetUser = JSON.parse(
-        fs.readFileSync(cachePath, 'utf-8')
-      )
+      const cache: CacheGetUser = JSON.parse(fs.readFileSync(cachePath, 'utf8'))
       if (cache.timestamp + 3600 * 1000 > Date.now()) {
         this.send(cache.data)
         return
@@ -69,6 +67,9 @@ export class GetUser extends BaseWSRouter<GetUserRequest, GetUserResponse> {
   }
 
   isVaildUserId(rawUserId: any) {
-    return !Number.isNaN(parseInt(rawUserId, 10)) || parseInt(rawUserId, 10) < 0
+    return (
+      !Number.isNaN(Number.parseInt(rawUserId, 10)) ||
+      Number.parseInt(rawUserId, 10) < 0
+    )
   }
 }

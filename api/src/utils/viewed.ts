@@ -1,4 +1,4 @@
-import fs from 'fs'
+import fs from 'node:fs'
 import { ViewedItem, ViewedItemType } from 'my-pixiv-types'
 import { PATH } from './utils'
 
@@ -9,10 +9,12 @@ type ViewedItemJsonSchema = ViewedItem[]
  */
 export class ViewedApi {
   private vieweds: ViewedItem[]
-  private static cache: {
-    vieweds: ViewedItem[]
-    timestamp: number
-  } | null = null
+  private static cache:
+    | {
+        vieweds: ViewedItem[]
+        timestamp: number
+      }
+    | undefined = undefined
 
   private constructor(vieweds: ViewedItem[]) {
     this.vieweds = vieweds

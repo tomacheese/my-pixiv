@@ -1,7 +1,7 @@
-import crypto from 'crypto'
+import crypto from 'node:crypto'
 import axios, { AxiosInstance, AxiosResponse } from 'axios'
 import { PATH } from '@/utils/utils'
-import fs from 'fs'
+import fs from 'node:fs'
 import qs from 'qs'
 import {
   GetIllustDetailApiResponse,
@@ -25,7 +25,7 @@ import {
   GetNovelSeriesOptions,
   GetUserDetailOptions,
 } from './options'
-import { dirname, join } from 'path'
+import { dirname, join } from 'node:path'
 
 interface RequestOptions {
   method: 'GET' | 'POST'
@@ -142,24 +142,24 @@ export class Pixiv {
     url: string
   ): Promise<string> {
     // 画像は変更されないことを前提に恒久的にキャッシュする
-    const extension = url.split('.').pop() || null
+    const extension: string | undefined = url.split('.').pop()
 
     // オリジナルサイズの場合は img-original が含まれる
     // それ以外の場合は 600x600 のようなサイズが含まれる
-    let size
+    let size: string | undefined
     if (url.includes('img-original')) {
       size = 'original'
     } else {
       const sizeRegex = /\d+x\d+/
       const match = url.match(sizeRegex)
-      size = match ? match[0] : null
+      size = match ? match[0] : undefined
     }
     if (!extension || !size) {
       throw new Error('Invalid input url')
     }
     const pageRegex = /p\d+/
     const match = url.match(pageRegex)
-    const page = match ? match[0] : null
+    const page: string | undefined = match ? match[0] : undefined
     const filename = [
       size,
       page ? `-${page}` : '',
@@ -409,7 +409,7 @@ export class Pixiv {
    */
   public static parseQueryString(url: string) {
     let query = url
-    if (url.indexOf('?') !== -1) {
+    if (url.includes('?')) {
       query = url.split('?')[1]
     }
 
@@ -452,10 +452,10 @@ export class Pixiv {
  * Pixivインスタンスのキャッシュ
  */
 const cache: {
-  pixiv: Pixiv | null
+  pixiv: Pixiv | undefined
   timestamp: number
 } = {
-  pixiv: null,
+  pixiv: undefined,
   timestamp: 0,
 }
 
@@ -470,7 +470,7 @@ export async function loadPixiv() {
     return cache.pixiv
   }
 
-  const data = fs.readFileSync(PATH.TOKEN_FILE, 'utf-8')
+  const data = fs.readFileSync(PATH.TOKEN_FILE, 'utf8')
   const json = JSON.parse(data)
   const pixiv = await Pixiv.of(json.refresh_token)
 

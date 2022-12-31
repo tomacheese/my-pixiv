@@ -28,10 +28,10 @@ export function buildApp(): FastifyInstance {
     new SettingsSyncWebSocketRouter(app, config),
   ]
 
-  routers.forEach((router) => {
+  for (const router of routers) {
     console.log(`Initializing route: ${router.constructor.name}`)
     router.init()
-  })
+  }
 
   return app
 }

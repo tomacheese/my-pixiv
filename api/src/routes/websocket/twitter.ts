@@ -19,11 +19,11 @@ import {
   SearchTweetObject,
   StatusesUserTimelineResponse,
 } from 'my-pixiv-types'
-import fs from 'fs'
+import fs from 'node:fs'
 import { loadTwitterApi, PATH } from '@/utils/utils'
 import axios from 'axios'
 import jimp from 'jimp'
-import { dirname, join } from 'path'
+import { dirname, join } from 'node:path'
 
 /**
  * イラストからツイートを検索 WebSocket API
@@ -82,14 +82,14 @@ export class SearchTweet extends BaseWSRouter<
     const postedAtRaw = illustDetail.data.illust.create_date
     const postedAt = new Date(postedAtRaw)
 
-    screenNames.forEach((screenName) => {
-      this.getTweets(screenName, postedAt, path).catch((e) => {
+    for (const screenName of screenNames) {
+      this.getTweets(screenName, postedAt, path).catch((error) => {
         this.send({
           responseType: 'error',
-          message: e.message,
+          message: error.message,
         })
       })
-    })
+    }
   }
 
   private async getTweets(
@@ -154,7 +154,7 @@ export class SearchTweet extends BaseWSRouter<
     const postedAtAfter3daySnowflake =
       this.dateToSnowflake(postedAtAfter3day).toString()
 
-    const twitterApi = await loadTwitterApi(this.config, null)
+    const twitterApi = await loadTwitterApi(this.config)
     const response = await twitterApi.v1.get<StatusesUserTimelineResponse>(
       'statuses/user_timeline.json',
       {
@@ -182,10 +182,13 @@ export class SearchTweet extends BaseWSRouter<
   private dateToSnowflake(date: Date) {
     // https://pronama.jp/2015/02/18/generate-twitter-status-id/
     // timestamp を求め 22bit 上位へシフトする
-    return (BigInt(date.getTime() - 1288834974657) << BigInt(22)).toString()
+    return (BigInt(date.getTime() - 1_288_834_974_657) << BigInt(22)).toString()
   }
 
-  private async analysisTweet(tweet: SearchTweetObject, imagePath: string) {
+  private async analysisTweet(
+    tweet: SearchTweetObject,
+    imagePath: string
+  ): Promise<void> {
     const tweetImagePath = await this.downloadImage(
       tweet.media_url,
       tweet.id,
@@ -214,12 +217,16 @@ export class SearchTweet extends BaseWSRouter<
    * @param imageNum 画像番号
    * @returns 画像のパス
    */
-  private async downloadImage(url: string, tweetId: string, imageNum: number) {
+  private async downloadImage(
+    url: string,
+    tweetId: string,
+    imageNum: number
+  ): Promise<string | undefined> {
     const res = await axios.get(url, {
       responseType: 'arraybuffer',
     })
     if (res.status !== 200) {
-      return null
+      return
     }
     const buffer = Buffer.from(res.data, 'binary')
     const path = join(PATH.TWEET_CACHE_DIR, `${tweetId}-${imageNum}.png`)
@@ -277,7 +284,7 @@ export class SearchTweet extends BaseWSRouter<
       `since:${postedAtBefore3day.toISOString().slice(0, 10)}`,
     ].join(' ')
 
-    const twitterApi = await loadTwitterApi(this.config, null)
+    const twitterApi = await loadTwitterApi(this.config)
     // 3日間の間に100件以上ツイートしている場合は漏れてしまうので、今後検討
     const tweets = await twitterApi.v1.get<SearchTweetsResponse>(
       'search/tweets.json',
@@ -367,8 +374,10 @@ export class SearchTweet extends BaseWSRouter<
     const regexScreenName = /@(\w+)/g
 
     const caption = illust.caption
-    screenNames.push(...this.getRegexMatches(regexUrl, caption))
-    screenNames.push(...this.getRegexMatches(regexScreenName, caption))
+    screenNames.push(
+      ...this.getRegexMatches(regexUrl, caption),
+      ...this.getRegexMatches(regexScreenName, caption)
+    )
 
     // プロフィールから探す
     const userDetail = await pixiv.getUserDetail({
@@ -403,7 +412,8 @@ export class SearchTweet extends BaseWSRouter<
 
   isVaildIllustId(rawIllustId: any) {
     return (
-      !Number.isNaN(parseInt(rawIllustId, 10)) || parseInt(rawIllustId, 10) < 0
+      !Number.isNaN(Number.parseInt(rawIllustId, 10)) ||
+      Number.parseInt(rawIllustId, 10) < 0
     )
   }
 }
