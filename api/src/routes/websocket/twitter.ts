@@ -168,8 +168,11 @@ export class SearchTweet extends BaseWSRouter<
       }
     )
 
-    return this.filterMediaDuplication(
-      response.flatMap((tweet) => this.getMedia(tweet))
+    return this.sortTweetsByPostedAt(
+      this.filterMediaDuplication(
+        response.flatMap((tweet) => this.getMedia(tweet))
+      ),
+      postedAt
     )
   }
 
@@ -295,8 +298,11 @@ export class SearchTweet extends BaseWSRouter<
       }
     )
 
-    return this.filterMediaDuplication(
-      tweets.statuses.flatMap((tweet) => this.getMedia(tweet))
+    return this.sortTweetsByPostedAt(
+      this.filterMediaDuplication(
+        tweets.statuses.flatMap((tweet) => this.getMedia(tweet))
+      ),
+      postedAt
     )
   }
 
@@ -337,6 +343,7 @@ export class SearchTweet extends BaseWSRouter<
           screen_name: tweet.user.screen_name,
           profile_image_url: tweet.user.profile_image_url_https,
         },
+        created_at: tweet.created_at,
       })
     }
 
@@ -357,6 +364,22 @@ export class SearchTweet extends BaseWSRouter<
         result &&
         self.filter((r) => r && r.media_url === result.media_url).length === 1
     )
+  }
+
+  // 投稿日時に近いほど優先度が高くなるようにソートする
+  private sortTweetsByPostedAt(
+    tweets: SearchTweetObject[],
+    postedAt: Date
+  ): SearchTweetObject[] {
+    return tweets.sort((a, b) => {
+      const aDiff = Math.abs(
+        new Date(a.created_at).getTime() - postedAt.getTime()
+      )
+      const bDiff = Math.abs(
+        new Date(b.created_at).getTime() - postedAt.getTime()
+      )
+      return aDiff - bDiff
+    })
   }
 
   /**
