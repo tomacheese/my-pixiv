@@ -162,7 +162,11 @@ export default Vue.extend({
     fetch() {
       this.pageCount = Math.ceil(this.$accessor.itemMute.items.length / 10)
       for (const item of this.$accessor.itemMute.items) {
-        if (this.items.some((index) => index.id === item.id && index.type === item.type)) {
+        if (
+          this.items.some(
+            (index) => index.id === item.id && index.type === item.type
+          )
+        ) {
           continue
         }
         if (this.$api.getReadyState() !== WebSocket.OPEN) {
@@ -215,7 +219,8 @@ export default Vue.extend({
       if (
         this.items.some(
           (item) =>
-            item.id === Number.parseInt(this.id) && item.type === this.targetType.key
+            item.id === Number.parseInt(this.id) &&
+            item.type === this.targetType.key
         )
       ) {
         this.$nuxt.$emit('snackbar', {

@@ -86,9 +86,12 @@ export default Vue.extend({
     this.selectType = this.$accessor.settings.novelViewType
 
     // 既読情報は検索結果画面のみで使用
-    this.vieweds = !this.recommended && !this.later ? this.$accessor.viewed.items
-        .filter((item) => item.type === 'novel')
-        .map((item) => item.id) : undefined;
+    this.vieweds =
+      !this.recommended && !this.later
+        ? this.$accessor.viewed.items
+            .filter((item) => item.type === 'novel')
+            .map((item) => item.id)
+        : undefined
 
     await this.fetch()
 

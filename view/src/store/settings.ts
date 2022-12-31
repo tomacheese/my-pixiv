@@ -233,10 +233,15 @@ export const actions = actionTree(
     addTarget({ state, commit }, target: Target) {
       commit('setTargets', [...state.targets, target])
     },
-    updateTarget({ state, commit }, parameters: { index: number; target: Target }) {
+    updateTarget(
+      { state, commit },
+      parameters: { index: number; target: Target }
+    ) {
       commit(
         'setTargets',
-        state.targets.map((t, index) => (index === parameters.index ? parameters.target : t))
+        state.targets.map((t, index) =>
+          index === parameters.index ? parameters.target : t
+        )
       )
     },
     removeTarget({ state, commit }, target: Target) {

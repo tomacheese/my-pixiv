@@ -2,9 +2,7 @@
   <div>
     <v-progress-linear v-if="isLoadingTweet" indeterminate></v-progress-linear>
     <v-card :loading="loading">
-      <v-card-title v-if="error" class="text-h5">{{
-        error
-      }}</v-card-title>
+      <v-card-title v-if="error" class="text-h5">{{ error }}</v-card-title>
       <v-card-title>
         <v-chip
           v-for="screenName of screenNames"

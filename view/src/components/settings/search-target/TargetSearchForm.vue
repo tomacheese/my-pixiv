@@ -15,9 +15,7 @@
     />
     <v-text-field v-model="minLikeCount" label="最低すき！数" type="number" />
     <v-text-field v-model="searchItemCount" label="検索件数" type="number" />
-    <v-btn v-if="!item" color="success" block @click="add()"
-      >追加</v-btn
-    >
+    <v-btn v-if="!item" color="success" block @click="add()">追加</v-btn>
     <v-btn v-else color="success" block @click="update()">更新</v-btn>
   </v-form>
 </template>

@@ -94,10 +94,10 @@ export default Vue.extend({
       const tag = this.item.tags
       return filterNull([
         tag.some((t) => t.name === 'R-18')
-          // eslint-disable-next-line unicorn/no-null
-          ? { name: 'R-18', translated_name: null }
-          // eslint-disable-next-line unicorn/no-null
-          : null,
+          ? // eslint-disable-next-line unicorn/no-null
+            { name: 'R-18', translated_name: null }
+          : // eslint-disable-next-line unicorn/no-null
+            null,
         ...tag.filter((t) => t.name !== 'R-18'),
       ])
     },

@@ -37,10 +37,10 @@ export class WSUtils {
    * @param data リクエストデータ
    * @returns レスポンス
    */
-  public request<Request_ extends WebSocketRequest, Res extends WebSocketResponse>(
-    type: Request_['type'],
-    data: Request_['data']
-  ): Promise<Res> {
+  public request<
+    Request_ extends WebSocketRequest,
+    Res extends WebSocketResponse
+  >(type: Request_['type'], data: Request_['data']): Promise<Res> {
     if (!this.ws) {
       throw new Error('WebSocket is not initialized')
     }
