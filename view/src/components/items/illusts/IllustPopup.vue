@@ -254,7 +254,6 @@ export default Vue.extend({
           if (this.screenNames.length > 0) {
             this.tweetStatus = 'ACCOUNT_FOUND'
           }
-
           break
         }
         case 'tweet': {
@@ -275,18 +274,16 @@ export default Vue.extend({
           if (this.tweets.length > 0) {
             this.tweetStatus = 'TWEET_FOUND'
           }
-
           break
         }
         case 'error': {
           this.tweetStatus = 'FAILED'
           this.error = data.message
-
+          this.isLoadingTweet = false
           break
         }
         case 'finish': {
           this.isLoadingTweet = false
-
           break
         }
         // No default
