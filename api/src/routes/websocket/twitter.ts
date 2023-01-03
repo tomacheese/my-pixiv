@@ -104,13 +104,9 @@ export class SearchTweet extends BaseWSRouter<
           return this.analysisTweet(tweet, imagePath)
         })
       )
-      this.send({
-        responseType: 'finish',
-      })
-      return
     }
 
-    // 検索APIでヒットしなかった場合、ユーザーのツイートから画像を探す
+    // ユーザーのツイートから画像を探す
     const tweetsByUserTimeline = await this.huntingUserTweets(
       screenName,
       postedAt
@@ -121,6 +117,9 @@ export class SearchTweet extends BaseWSRouter<
           return this.analysisTweet(tweet, imagePath)
         })
       )
+    }
+
+    if (tweetsBySearch.length > 0 || tweetsByUserTimeline.length > 0) {
       this.send({
         responseType: 'finish',
       })
