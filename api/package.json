@@ -41,7 +41,7 @@
     "eslint-plugin-unicorn": "45.0.2",
     "eslint-plugin-unused-imports": "2.0.0",
     "my-pixiv-types": "*",
-    "prettier": "2.8.1",
+    "prettier": "2.8.2",
     "qs": "6.11.0",
     "ts-node": "10.9.1",
     "ts-node-dev": "2.0.0",
