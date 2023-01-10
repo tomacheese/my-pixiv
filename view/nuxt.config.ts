@@ -98,7 +98,7 @@ const config: NuxtConfig = {
     },
   },
 
-  css: ['@/assets/scroll.css'],
+  css: ['@mdi/font/css/materialdesignicons.css', '@/assets/scroll.css'],
 
   plugins: [
     { src: 'plugins/settings.ts', ssr: false },
@@ -136,6 +136,9 @@ const config: NuxtConfig = {
     customVariables: [],
     theme: {
       dark: false,
+    },
+    defaultAssets: {
+      icons: false,
     },
   },
 
