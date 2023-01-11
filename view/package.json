@@ -19,7 +19,7 @@
     "core-js": "3.27.1",
     "nuxt": "2.15.8",
     "ts-loader": "8.4.0",
-    "vue": "2.7.14",
+    "vue": "3.2.45",
     "vue-server-renderer": "2.7.14",
     "vue-template-compiler": "2.7.14",
     "vuetify": "2.6.14",
