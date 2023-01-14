@@ -147,7 +147,7 @@ jobs:
             type=raw,value=latest${{ steps.tag.outputs.suffix }}
 
       - name: Build and push Docker image
-        uses: docker/build-push-action@v3.2.0
+        uses: docker/build-push-action@v3.3.0
         with:
           context: .
           file: ${{ fromJson(matrix.target).file }}
