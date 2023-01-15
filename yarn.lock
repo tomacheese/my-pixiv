@@ -11781,10 +11781,10 @@ tty-browserify@0.0.0:
   resolved "https://registry.yarnpkg.com/tty-browserify/-/tty-browserify-0.0.0.tgz#a157ba402da24e9bf957f9aa69d524eed42901a6"
   integrity sha512-JVa5ijo+j/sOoHGjw0sxw734b1LhBkQ3bvUGNdxnVXDCX81Yx7TFgnZygxrIIWn23hbfTaMYLwRmAxFyDuFmIw==
 
-twitter-api-v2@1.13.0:
-  version "1.13.0"
-  resolved "https://registry.yarnpkg.com/twitter-api-v2/-/twitter-api-v2-1.13.0.tgz#55147d1376c97dfcb6a796b78c9899be01fcfa05"
-  integrity sha512-vtR4lwHbaG5Ep91wj9N+ZOYpJMIj+J6N2ESmyYtoBIZC+T2lQjrHAkwLRqKgEt01N+Ro/zHxpQp++QpWeCfn2A==
+twitter-api-v2@1.14.0:
+  version "1.14.0"
+  resolved "https://registry.yarnpkg.com/twitter-api-v2/-/twitter-api-v2-1.14.0.tgz#2aa186087aae58083dcbbafef8727b42cb703483"
+  integrity sha512-kBc0X6hTl0qWYTSNH9Gp87S6d9wIM2qOxHg7jlWH054HnMPC8XMcttsrKyPwP8SVha28dt5DPQvlqhPxsWRC+Q==
 
 type-check@^0.4.0, type-check@~0.4.0:
   version "0.4.0"
