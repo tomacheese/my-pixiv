@@ -16,7 +16,7 @@
   },
   "dependencies": {
     "ctix": "1.8.1",
-    "rimraf": "4.0.7"
+    "rimraf": "4.1.0"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "5.48.2",
