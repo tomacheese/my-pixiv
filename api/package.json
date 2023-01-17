@@ -30,7 +30,7 @@
     "@types/ws": "8.5.4",
     "@typescript-eslint/eslint-plugin": "5.48.2",
     "@typescript-eslint/parser": "5.48.2",
-    "axios": "1.2.2",
+    "axios": "1.2.3",
     "eslint": "8.32.0",
     "eslint-config-prettier": "8.6.0",
     "eslint-config-standard": "17.0.0",
