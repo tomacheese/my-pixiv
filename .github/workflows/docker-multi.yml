@@ -157,6 +157,7 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha,scope=${{ fromJson(matrix.target).packageName }}-${{ steps.platform.outputs.shortPlatform }}
           cache-to: type=gha,mode=max,scope=${{ fromJson(matrix.target).packageName }}-${{ steps.platform.outputs.shortPlatform }}
+          provenance: false
 
       - name: Update deployment status (success)
         uses: chrnorm/deployment-status@v2.0.1
