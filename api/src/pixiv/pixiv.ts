@@ -474,6 +474,21 @@ export async function loadPixiv() {
   const json = JSON.parse(data)
   const pixiv = await Pixiv.of(json.refresh_token)
 
+  if (json.refresh_token !== pixiv.refreshToken) {
+    fs.writeFileSync(
+      PATH.TOKEN_FILE,
+      JSON.stringify(
+        {
+          refresh_token: pixiv.refreshToken,
+          datetime: new Date().toISOString(),
+        },
+        // eslint-disable-next-line unicorn/no-null
+        null,
+        2
+      )
+    )
+  }
+
   cache.pixiv = pixiv
   cache.timestamp = Date.now()
 
