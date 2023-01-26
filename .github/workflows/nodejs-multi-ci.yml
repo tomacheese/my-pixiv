@@ -32,7 +32,7 @@ jobs:
         with:
           node-version-file: ${{ matrix.directory }}/.node-version
           cache: yarn
-          cache-dependency-path: ${{ matrix.directory }}/yarn.lock
+          # cache-dependency-path: ${{ matrix.directory }}/yarn.lock
 
       - name: 📃 Check package.json definition
         id: package-json
