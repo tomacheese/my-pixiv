@@ -19,7 +19,6 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
-        node: [16]
         directory: [view, api]
 
     steps:
@@ -31,7 +30,8 @@ jobs:
       - name: 🏗 Setup node env
         uses: actions/setup-node@v3
         with:
-          node-version: ${{ matrix.node }}
+          node-version-file: .node-version
+          cache: yarn
 
       - name: 📃 Check package.json definition
         id: package-json
@@ -55,22 +55,9 @@ jobs:
           echo "package=$package" >> $GITHUB_OUTPUT
           echo "lint=$lint" >> $GITHUB_OUTPUT
 
-      - name: 🛠 Get yarn cache directory path
-        id: yarn-cache-dir-path
-        run: echo "dir=$(yarn cache dir)" >> $GITHUB_OUTPUT
-
-      - name: 📦 Cache node_modules
-        uses: actions/cache@v3
-        id: yarn-cache
-        with:
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
-
       - name: 👨🏻‍💻 Install dependencies
         working-directory: ${{ matrix.directory }}
-        run: yarn
+        run: yarn install --frozen-lockfile
 
       - name: 👀 Run linter
         if: steps.package-json.outputs.lint == 'true'
