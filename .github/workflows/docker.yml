@@ -96,7 +96,7 @@ jobs:
 
   # Dockerイメージをビルドする
   build:
-    name: Docker build (${{ matrix.target.file }}, ${{ matrix.platform }})
+    name: Docker build (${{ matrix.target.packageName }}, ${{ matrix.platform }})
     runs-on: ubuntu-latest
     needs: calc-version
 
@@ -106,7 +106,7 @@ jobs:
         # ビルドするプラットフォーム
         platform: ${{ fromJSON(needs.calc-version.outputs.platform-matrix) }}
         # ビルドするDockerfile
-        target: ${{ fromJSON(needs.calc-version.outputs.platform-matrix) }}
+        target: ${{ fromJSON(needs.calc-version.outputs.targets-matrix) }}
 
     steps:
       - name: Remove platform prefix
@@ -208,7 +208,7 @@ jobs:
 
   # 各プラットフォームのlatestからlatestタグにマージしてイメージを作成
   merge-latest:
-    name: Merge latest (${{ matrix.target.file }})
+    name: Merge latest (${{ matrix.target.packageName }})
     runs-on: ubuntu-latest
     if: github.event.pull_request.merged == true
     needs:
@@ -219,7 +219,7 @@ jobs:
       fail-fast: false
       matrix:
         # ビルドするDockerfile
-        target: ${{ fromJSON(needs.calc-version.outputs.platform-matrix) }}
+        target: ${{ fromJSON(needs.calc-version.outputs.targets-matrix) }}
 
     steps:
       - name: Login to ${{ env.REGISTRY }}
