@@ -1,4 +1,4 @@
-# 複数のディレクトリにある Node.js v16 でビルド・テストを実行する
+# 複数のディレクトリにある Node.js でビルド・テストを実行する。バージョンは .node-version に記載されているものを利用する
 
 name: Node CI
 
@@ -13,13 +13,13 @@ on:
       - master
 
 jobs:
-  ci:
-    runs-on: ${{ matrix.os }}
+  node-ci:
+    runs-on: ubuntu-latest
 
     strategy:
       matrix:
-        os: [ubuntu-latest]
         directory: [view, api]
+      fail-fast: false
 
     steps:
       - name: 🛎 Checkout
@@ -27,33 +27,37 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.head.sha }}
 
-      - name: 🏗 Setup node env
+      - name: 🏗 Setup node
         uses: actions/setup-node@v3
         with:
-          node-version-file: .node-version
+          node-version-file: ${{ matrix.directory }}/.node-version
           cache: yarn
+          cache-dependency-path: ${{ matrix.directory }}/yarn.lock
 
       - name: 📃 Check package.json definition
         id: package-json
         working-directory: ${{ matrix.directory }}
         run: |
-          compile=$(cat package.json | jq '.scripts | has("compile")')
-          build=$(cat package.json | jq '.scripts | has("build")')
-          generate=$(cat package.json | jq '.scripts | has("generate")')
-          package=$(cat package.json | jq '.scripts | has("package")')
-          lint=$(cat package.json | jq '.scripts | has("lint")')
+          compile=$(jq '.scripts | has("compile")' package.json)
+          build=$(jq '.scripts | has("build")' package.json)
+          generate=$(jq '.scripts | has("generate")' package.json)
+          package=$(jq '.scripts | has("package")' package.json)
+          lint=$(jq '.scripts | has("lint")' package.json)
+          test=$(jq '.scripts | has("test")' package.json)
 
           echo "compile: $compile"
           echo "build: $build"
           echo "generate: $generate"
           echo "package: $package"
           echo "lint: $lint"
+          echo "test: $test"
 
           echo "compile=$compile" >> $GITHUB_OUTPUT
           echo "build=$build" >> $GITHUB_OUTPUT
           echo "generate=$generate" >> $GITHUB_OUTPUT
           echo "package=$package" >> $GITHUB_OUTPUT
           echo "lint=$lint" >> $GITHUB_OUTPUT
+          echo "test=$test" >> $GITHUB_OUTPUT
 
       - name: 👨🏻‍💻 Install dependencies
         working-directory: ${{ matrix.directory }}
@@ -81,6 +85,11 @@ jobs:
           yarn build
           yarn generate
 
+      - name: 🧪 Run tests
+        if: steps.package-json.outputs.test == 'true'
+        working-directory: ${{ matrix.directory }}
+        run: yarn test
+
       - name: Check exists dist directory
         id: check-dist
         working-directory: ${{ matrix.directory }}
@@ -93,3 +102,13 @@ jobs:
         with:
           name: ${{ matrix.directory }}-dist
           path: ${{ matrix.directory }}/dist
+
+  finished-node-ci:
+    name: Check finished Node CI
+    runs-on: ubuntu-latest
+    needs:
+      - node-ci
+
+    steps:
+      - name: Check finished Node CI
+        run: echo ok
