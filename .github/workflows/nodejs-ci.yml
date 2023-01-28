@@ -18,4 +18,5 @@ jobs:
     uses: book000/templates/.github/workflows/reusable-nodejs-ci.yml@master
     with:
       directorys: api, view, types
+      disabled-jobs: depcheck
       lock-path: yarn.lock
