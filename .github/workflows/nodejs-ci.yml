@@ -1,0 +1,22 @@
+# Node.js でビルド・テストを実行する。バージョンは .node-version に記載されているものを利用する
+
+name: Node CI
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+    branches:
+      - main
+      - master
+
+jobs:
+  node-ci:
+    name: Node CI
+    uses: book000/templates/.github/workflows/reusable-nodejs-ci.yml@master
+    with:
+      directorys: api, view, types
+      disabled-jobs: depcheck
+      lock-path: yarn.lock
