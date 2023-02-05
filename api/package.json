@@ -49,7 +49,7 @@
     "@fastify/websocket": "7.1.2",
     "@vercel/ncc": "0.36.1",
     "fastify": "4.12.0",
-    "jimp": "0.21.0",
+    "jimp": "0.21.3",
     "twitter-api-v2": "1.14.1",
     "typescript": "4.9.5",
     "ws": "8.12.0"
