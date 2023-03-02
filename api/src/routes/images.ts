@@ -1,6 +1,5 @@
 import { FastifyReply, FastifyRequest } from 'fastify'
 import { BaseRouter } from '@/base-router'
-import fs from 'node:fs'
 import { Pixiv } from '@/pixiv/pixiv'
 
 /**
@@ -28,16 +27,16 @@ export class ImagesRouter extends BaseRouter {
       reply.code(400).send({ message: 'Bad request' })
     }
 
-    const path = await Pixiv.downloadImage(type, id, url)
     const extension = this.getExtension(url)
 
-    if (!fs.existsSync(path)) {
-      await reply.code(404).send({ message: 'Not found' })
-      return
+    const response = await Pixiv.getAxiosImageStream(url)
+    if (response.status !== 200 && response.status !== 404) {
+      await reply.code(response.status).send({ message: response.data })
+      throw new Error(`Failed to download image: ${url} (${response.status})`)
     }
 
     // ファイルを返す
-    await reply.type(`image/${extension}`).send(fs.createReadStream(path))
+    await reply.type(`image/${extension}`).send(response.data)
   }
 
   public getExtension(url: string): string {
