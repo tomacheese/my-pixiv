@@ -1,7 +1,7 @@
 import crypto from 'node:crypto'
 import axios, { AxiosInstance, AxiosResponse } from 'axios'
 import { PATH } from '@/utils/utils'
-import fs from 'node:fs'
+import fs, { ReadStream } from 'node:fs'
 import qs from 'qs'
 import {
   GetIllustDetailApiResponse,
@@ -172,32 +172,33 @@ export class Pixiv {
 
     // なければダウンロード
     if (!fs.existsSync(path)) {
+      const response = await this.getAxiosImageStream(url)
+      if (response.status !== 200 && response.status !== 404) {
+        throw new Error(`Failed to download image: ${url} (${response.status})`)
+      }
       await new Promise<void>((resolve, reject) => {
-        axios
-          .get(url, {
-            headers: {
-              'User-Agent':
-                'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.149 Safari/537.36',
-              Referer: 'https://www.pixiv.net/',
-            },
-            responseType: 'stream',
-          })
-          .then((response) => {
-            response.data.pipe(fs.createWriteStream(path))
-            response.data.on('end', () => {
-              resolve()
-            })
-          })
-          .catch((error) => {
-            if (error.response.status === 404) {
-              resolve()
-            }
-            reject(error)
-          })
+        response.data.pipe(fs.createWriteStream(path))
+        response.data.on('end', () => {
+          resolve()
+        })
+        response.data.on('error', (error: Error) => {
+          reject(error)
+        })
       })
     }
 
     return path
+  }
+
+  public static async getAxiosImageStream(url: string) {
+    return axios.get<ReadStream>(url, {
+      headers: {
+        'User-Agent':
+          'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.149 Safari/537.36',
+        Referer: 'https://www.pixiv.net/',
+      },
+      responseType: 'stream',
+    })
   }
 
   /**
