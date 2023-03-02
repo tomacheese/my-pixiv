@@ -95,6 +95,9 @@
         </v-row>
       </v-card-text>
     </v-card>
+    <v-snackbar v-model="isAutoLiked" timeout="3000" color="success">
+      完全一致するツイートの自動いいねを行いました。3秒後に自動的に閉じます。
+    </v-snackbar>
   </div>
 </template>
 
@@ -118,6 +121,7 @@ export interface TweetPopupProperty {
 export interface TweetPopupData {
   loading: boolean
   likeLoading: boolean
+  isAutoLiked: boolean
   liked: { [key in TwitterAccountType]: string[] }
 }
 
@@ -185,11 +189,17 @@ export default Vue.extend({
       required: false,
       default: false,
     },
+    isPixivLiked: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
   },
   data(): TweetPopupData {
     return {
       loading: false,
       likeLoading: false,
+      isAutoLiked: false,
       liked: {
         main: [],
         sub: [],
@@ -203,6 +213,21 @@ export default Vue.extend({
           return
         }
         this.fetchTweetsLike()
+      },
+      immediate: true,
+    },
+    isPixivLiked: {
+      handler() {
+        if (!this.isPixivLiked) {
+          return
+        }
+        this.autoFirstLike()
+      },
+      immediate: true,
+    },
+    tweets: {
+      handler() {
+        this.autoFirstLike()
       },
       immediate: true,
     },
@@ -321,6 +346,7 @@ export default Vue.extend({
           this.likeLoading = false
         })
         .catch((error) => {
+          this.likeLoading = false
           if (error instanceof WebSocketAPIError) {
             this.$nuxt.$emit('snackbar', {
               message: `Likeに失敗: ${error.data.error.message}`,
@@ -334,7 +360,6 @@ export default Vue.extend({
             }`,
             color: 'error',
           })
-          this.likeLoading = false
         })
     },
     isCheckingShadowBan(screenName: string) {
@@ -371,6 +396,47 @@ export default Vue.extend({
         this.loading = false
         this.$emit('close-popup')
       })
+    },
+    autoFirstLike() {
+      if (!this.tweets) {
+        return
+      }
+      const exactMatches = this.tweets.filter((tweet) => tweet.similarity === 1)
+      if (exactMatches.length === 0) {
+        return
+      }
+      const firstTweetId = exactMatches[0].tweet.id
+      if (this.liked.sub.includes(firstTweetId)) {
+        return
+      }
+
+      this.likeLoading = true
+      this.$api.twitter
+        .addLike('sub', firstTweetId)
+        .then(() => {
+          this.liked.sub = [...this.liked.sub, firstTweetId]
+          this.isAutoLiked = true
+
+          setTimeout(() => {
+            this.$emit('close-popup')
+          }, 3000)
+        })
+        .catch((error) => {
+          this.likeLoading = false
+          if (error instanceof WebSocketAPIError) {
+            this.$nuxt.$emit('snackbar', {
+              message: `Likeに失敗: ${error.data.error.message}`,
+              color: 'error',
+            })
+            return
+          }
+          this.$nuxt.$emit('snackbar', {
+            message: `Likeに失敗: ${error.message}\n${
+              error.response?.data.detail || ''
+            }`,
+            color: 'error',
+          })
+        })
     },
   },
 })

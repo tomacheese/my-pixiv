@@ -54,6 +54,7 @@ interface Settings {
   isExcludeR18: boolean
   isAutoSyncVieweds: boolean
   isAutoSyncMutes: boolean
+  isAutoTweetLike: boolean
   illustPopupMaxHeight: number
   viewType: ViewType
   novelViewType: ViewType
@@ -75,6 +76,7 @@ export const state = (): Settings => ({
   isExcludeR18: false,
   isAutoSyncVieweds: false,
   isAutoSyncMutes: false,
+  isAutoTweetLike: false,
   illustPopupMaxHeight: 100,
   viewType: 'PAGINATION',
   novelViewType: 'PAGINATION',
@@ -147,6 +149,8 @@ export const mutations = mutationTree(state, {
       state.isAutoSyncVieweds = settings.isAutoSyncVieweds
     if (settings.isAutoSyncMutes !== undefined)
       state.isAutoSyncMutes = settings.isAutoSyncMutes
+    if (settings.isAutoTweetLike !== undefined)
+      state.isAutoTweetLike = settings.isAutoTweetLike
     if (settings.illustPopupMaxHeight !== undefined)
       state.illustPopupMaxHeight = settings.illustPopupMaxHeight
     if (settings.viewType !== undefined) state.viewType = settings.viewType
@@ -185,6 +189,9 @@ export const mutations = mutationTree(state, {
   },
   setAutoSyncMutes(state, isAutoSyncMutes: boolean) {
     state.isAutoSyncMutes = isAutoSyncMutes
+  },
+  setAutoTweetLike(state, isAutoTweetLike: boolean) {
+    state.isAutoTweetLike = isAutoTweetLike
   },
   setIllustPopupMaxHeight(state, illustPopupMaxHeight: number) {
     state.illustPopupMaxHeight = illustPopupMaxHeight
