@@ -66,7 +66,7 @@ export default Vue.extend({
 <style>
 .sticky-recommended-header {
   position: sticky;
-  top: 48px;
+  top: 72px;
   z-index: 5;
 }
 </style>

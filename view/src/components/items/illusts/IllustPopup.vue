@@ -63,6 +63,7 @@
         :error="error"
         :shadow-bans="shadowBans"
         :is-loading-tweet="isLoadingTweet"
+        :is-pixiv-liked="isLiked"
         @close-popup="close()"
       ></TweetPopup>
     </v-dialog>
