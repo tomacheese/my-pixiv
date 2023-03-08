@@ -2344,10 +2344,10 @@
     serve-static "^1.14.1"
     workbox-cdn "^5.1.4"
 
-"@nuxtjs/stylelint-module@4.1.0":
-  version "4.1.0"
-  resolved "https://registry.yarnpkg.com/@nuxtjs/stylelint-module/-/stylelint-module-4.1.0.tgz#2d69dc882a0b2b4391311c405b07d4b39a975ff5"
-  integrity sha512-XeUZobXlSVW5VDbZBDktB3oFkBm+4JhYlyvZqu4tD7F3Qf4IU5aFwlELbK+VLVewbGgKSEg4QaT5nZdWpgXQBw==
+"@nuxtjs/stylelint-module@4.2.0":
+  version "4.2.0"
+  resolved "https://registry.yarnpkg.com/@nuxtjs/stylelint-module/-/stylelint-module-4.2.0.tgz#8f2ea9f7c11e3349f4da0dfb25d8564244f3d1de"
+  integrity sha512-BgZs9zVFjAouuJiTPfwi4deL+ikfykL1AWiEriAlp+nmTjw/dfn7K2G7GQCANkNxnytbL+EQ7njNTTJIpIGvtQ==
   dependencies:
     consola "^2.15.3"
     stylelint-webpack-plugin "^2.3.1"
