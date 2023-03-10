@@ -2411,14 +2411,14 @@
     serve-static "^1.14.1"
     workbox-cdn "^5.1.4"
 
-"@nuxtjs/stylelint-module@5.0.0":
-  version "5.0.0"
-  resolved "https://registry.yarnpkg.com/@nuxtjs/stylelint-module/-/stylelint-module-5.0.0.tgz#a703fc6661966184e93b1a0f014869caeb4271df"
-  integrity sha512-25tuBPfAV6oPUqEQUxIcNZ4DA7tuKaavKEYENg1BGOgf3/VOgf+0T98fmMrLdRK8Kq/EeR03JVWQ0uZ8wFPjKA==
+"@nuxtjs/stylelint-module@5.0.1":
+  version "5.0.1"
+  resolved "https://registry.yarnpkg.com/@nuxtjs/stylelint-module/-/stylelint-module-5.0.1.tgz#72b56fbdc597fbf897347e2e5b5343cbf84edb0e"
+  integrity sha512-oEtbFazgJaEEeTjuLS43HUNRChfexmAj4AX5FoSz03gO+K9371hnT8akU3N9/QU2an+cXQbNj8ATqyy1XasTOw==
   dependencies:
     "@nuxt/kit" "^3.2.3"
     stylelint-webpack-plugin "^4.1.0"
-    vite-plugin-stylelint "^4.2.0"
+    vite-plugin-stylelint "^4.3.0"
 
 "@nuxtjs/vuetify@1.12.3":
   version "1.12.3"
@@ -12560,7 +12560,7 @@ vite-plugin-eslint@^1.8.1:
     "@types/eslint" "^8.4.5"
     rollup "^2.77.2"
 
-vite-plugin-stylelint@^4.2.0:
+vite-plugin-stylelint@^4.3.0:
   version "4.3.0"
   resolved "https://registry.yarnpkg.com/vite-plugin-stylelint/-/vite-plugin-stylelint-4.3.0.tgz#62cfee8aadc277f06b2655e2b4e311ea46812f8d"
   integrity sha512-S8BONq5X8TndOFt+My4lkeHxVZvkDQRL++TV0nvnuYgOU/CvDddPPOT4V6go+ETzWK0NEtXqCGFnpkmm8c8Xcg==
