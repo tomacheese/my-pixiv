@@ -37,7 +37,7 @@
     "@nuxtjs/stylelint-module": "5.0.1",
     "@nuxtjs/vuetify": "1.12.3",
     "@vue/runtime-dom": "3.2.47",
-    "eslint": "8.35.0",
+    "eslint": "8.36.0",
     "eslint-config-prettier": "8.7.0",
     "eslint-plugin-nuxt": "4.0.0",
     "eslint-plugin-unicorn": "^46.0.0",
