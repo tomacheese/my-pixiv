@@ -1,7 +1,7 @@
 import { PixivNovelItem } from '../../pixivNovel'
 
 /**
- * GET /v2/novel/recommended のレスポンス
+ * GET /v1/novel/recommended のレスポンス
  */
 export interface RecommendedNovelApiResponse {
   novels: PixivNovelItem[]

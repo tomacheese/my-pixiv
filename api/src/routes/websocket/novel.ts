@@ -198,9 +198,9 @@ export class RecommendedNovel extends BaseWSRouter<
       const maxBookmarkIdForRecommend = query.max_bookmark_id_for_recommend
         ? Number.parseInt(query.max_bookmark_id_for_recommend as string, 10)
         : undefined
-      const alreadyRecommended = (query.already_recommended as string[]).map(
-        (id) => Number.parseInt(id, 10)
-      )
+      const alreadyRecommended = (query.already_recommended as string)
+        .split(',')
+        .map((id) => Number.parseInt(id, 10))
       options = {
         ...options,
         maxBookmarkIdForRecommend,
