@@ -351,8 +351,11 @@ export class Pixiv {
       filter: options.filter || 'for_ios',
       offset: options.offset || undefined,
       include_ranking_novels: options.includeRankingNovels || undefined,
-      already_recommended: options.alreadyRecommended,
-      max_bookmark_id_for_recommend: options.maxBookmarkIdForRecommend,
+      already_recommended: options.alreadyRecommended
+        ? options.alreadyRecommended.join(',')
+        : undefined,
+      max_bookmark_id_for_recommend:
+        options.maxBookmarkIdForRecommend || undefined,
       include_privacy_policy: options.includePrivacyPolicy || undefined,
     }
 
