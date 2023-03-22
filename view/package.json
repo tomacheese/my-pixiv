@@ -27,7 +27,7 @@
   },
   "devDependencies": {
     "@babel/eslint-parser": "7.21.3",
-    "@commitlint/cli": "17.4.4",
+    "@commitlint/cli": "17.5.0",
     "@commitlint/config-conventional": "17.4.4",
     "@mdi/font": "^7.1.96",
     "@nuxt/types": "2.16.3",
