@@ -240,6 +240,14 @@ export class Fetcher {
    * @returns 変換後の画像URL
    */
   private convertImageUrl(item: PixivItem, url: string) {
+    if (this.$accessor.settings.imageServerUrl) {
+      return [
+        this.$accessor.settings.imageServerUrl,
+        'images',
+        this.targetType.toLocaleLowerCase(),
+        `${item.id}?url=${url}`,
+      ].join('/')
+    }
     return [
       `${this.$config.baseURL}api`,
       'images',

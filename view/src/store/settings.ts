@@ -60,6 +60,7 @@ interface Settings {
   novelViewType: ViewType
   paginationLimit: number
   appCheckTimeout: number
+  imageServerUrl: string
   actionPosition: ActionPosition
   headerSticky: boolean
   getTweetTiming: GetTweetTiming
@@ -82,6 +83,7 @@ export const state = (): Settings => ({
   novelViewType: 'PAGINATION',
   paginationLimit: 10,
   appCheckTimeout: 700,
+  imageServerUrl: '',
   actionPosition: 'RIGHT',
   headerSticky: false,
   getTweetTiming: 'POPUP_OPEN',
@@ -110,6 +112,7 @@ export const getters = getterTree(state, {
   novelViewType: (state) => state.novelViewType,
   paginationLimit: (state) => state.paginationLimit,
   appCheckTimeout: (state) => state.appCheckTimeout,
+  imageServerUrl: (state) => state.imageServerUrl,
   actionPosition: (state) => state.actionPosition,
   headerSticky: (state) => state.headerSticky,
   getTweetTiming: (state) => state.getTweetTiming,
@@ -160,6 +163,8 @@ export const mutations = mutationTree(state, {
       state.paginationLimit = settings.paginationLimit
     if (settings.appCheckTimeout !== undefined)
       state.appCheckTimeout = settings.appCheckTimeout
+    if (settings.imageServerUrl !== undefined)
+      state.imageServerUrl = settings.imageServerUrl
     if (settings.actionPosition !== undefined)
       state.actionPosition = settings.actionPosition
     if (settings.headerSticky !== undefined)
@@ -207,6 +212,9 @@ export const mutations = mutationTree(state, {
   },
   setAppCheckTimeout(state, appCheckTimeout: number) {
     state.appCheckTimeout = appCheckTimeout
+  },
+  setImageServerUrl(state, imageServerUrl: string) {
+    state.imageServerUrl = imageServerUrl
   },
   setActionPosition(state, actionPosition: ActionPosition) {
     state.actionPosition = actionPosition
