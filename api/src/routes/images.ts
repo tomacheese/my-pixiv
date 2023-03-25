@@ -9,6 +9,7 @@ export class ImagesRouter extends BaseRouter {
   init(): void {
     this.fastify.register(
       (route, _opts, done) => {
+        route.head('/:type/:id', this.routeHeadImage.bind(this))
         route.get('/:type/:id', this.routeGetImage.bind(this))
         done()
       },
@@ -16,6 +17,12 @@ export class ImagesRouter extends BaseRouter {
         prefix: '/api/images',
       }
     )
+  }
+
+  routeHeadImage(_request: FastifyRequest, reply: FastifyReply) {
+    // cors
+    this.responseCors(reply)
+    reply.send()
   }
 
   async routeGetImage(request: FastifyRequest, reply: FastifyReply) {
@@ -37,6 +44,16 @@ export class ImagesRouter extends BaseRouter {
 
     // ファイルを返す
     await reply.type(`image/${extension}`).send(response.data)
+  }
+
+  responseCors(reply: FastifyReply) {
+    reply.header('Access-Control-Allow-Origin', '*')
+    reply.header(
+      'Access-Control-Allow-Methods',
+      'GET,HEAD,PUT,PATCH,POST,DELETE'
+    )
+    reply.header('Access-Control-Allow-Headers', 'Content-Type, Authorization')
+    reply.header('Access-Control-Allow-Credentials', 'true')
   }
 
   public getExtension(url: string): string {

@@ -20,13 +20,18 @@ export function buildApp(): FastifyInstance {
   const configPath = PATH.CONFIG_FILE
   const config = new Configuration(configPath)
 
+  const isImageApiOnly = process.env.IMAGE_API_ONLY === 'true'
+  if (isImageApiOnly) {
+    console.log('Image API only mode')
+  }
+
   // routers
   const routers: BaseRouter[] = [
     new RootRouter(app, config),
     new ImagesRouter(app, config),
-    new WebSocketRouter(app, config),
-    new SettingsSyncWebSocketRouter(app, config),
-  ]
+    isImageApiOnly ? undefined : new WebSocketRouter(app, config),
+    isImageApiOnly ? undefined : new SettingsSyncWebSocketRouter(app, config),
+  ].filter((router) => router !== undefined) as BaseRouter[]
 
   for (const router of routers) {
     console.log(`Initializing route: ${router.constructor.name}`)

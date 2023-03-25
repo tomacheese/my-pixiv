@@ -243,6 +243,7 @@ export class Fetcher {
     if (this.$accessor.settings.imageServerUrl) {
       return [
         this.$accessor.settings.imageServerUrl,
+        'api',
         'images',
         this.targetType.toLocaleLowerCase(),
         `${item.id}?url=${url}`,
