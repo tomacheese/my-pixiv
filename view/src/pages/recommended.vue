@@ -59,6 +59,9 @@ export default Vue.extend({
     isHeaderSticky(): boolean {
       return this.$accessor.settings.headerSticky
     },
+    isXsBreakpoint(): boolean {
+      return this.$vuetify.breakpoint.name === 'xs'
+    },
   },
 })
 </script>
@@ -68,5 +71,19 @@ export default Vue.extend({
   position: sticky;
   top: 72px;
   z-index: 5;
+}
+
+/* xs breakpoint: 48px */
+@media screen and (max-width: 599px) {
+  .sticky-recommended-header {
+    top: 48px;
+  }
+}
+
+/* other breakpoint: 72px */
+@media screen and (min-width: 600px) {
+  .sticky-recommended-header {
+    top: 72px;
+  }
 }
 </style>
