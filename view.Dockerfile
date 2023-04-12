@@ -43,7 +43,7 @@ RUN yarn build && \
   yarn generate
 
 # ----- final image ----- #
-FROM nginx:1.23.4-alpine
+FROM nginx:1.24.0-alpine
 
 COPY view/nginx-template.conf /etc/nginx/templates/default.conf.template
 
