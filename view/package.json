@@ -23,7 +23,7 @@
     "vue-server-renderer": "2.7.14",
     "vue-template-compiler": "2.7.14",
     "vuetify": "2.6.15",
-    "webpack": "5.78.0"
+    "webpack": "5.79.0"
   },
   "devDependencies": {
     "@babel/eslint-parser": "7.21.3",
