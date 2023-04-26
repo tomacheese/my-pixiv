@@ -8,7 +8,7 @@
 	"postCreateCommand": "/entrypoint.sh",
 	"runServices": [
 		"crawler",
-		"api",
+		"web",
 		"phpmyadmin"
 	],
 	"customizations": {
@@ -16,7 +16,8 @@
 			"extensions": [
 				"ms-azuretools.vscode-docker",
 				"GitHub.copilot",
-				"Prisma.prisma"
+				"Prisma.prisma",
+				"esbenp.prettier-vscode"
 			]
 		}
 	}

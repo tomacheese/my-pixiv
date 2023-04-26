@@ -35,7 +35,7 @@
       "path": "packages/crawler"
     },
     {
-      "path": "packages/api"
+      "path": "packages/web"
     },
     {
       "path": "packages/types"

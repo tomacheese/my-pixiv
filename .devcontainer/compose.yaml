@@ -8,6 +8,7 @@ services:
     working_dir: /apps/packages/crawler
     environment:
       DATABASE_URL: mysql://my-pixiv:password@db:3306/my-pixiv
+      CONFIG_PATH: /apps/data/config.json
     volumes:
       - ../:/apps/:delegated
     depends_on:
@@ -16,11 +17,11 @@ services:
     tty: true
     init: true
 
-  api:
+  web:
     build:
       context: ..
-      dockerfile: packages/api/dev.Dockerfile
-    working_dir: /apps/packages/api
+      dockerfile: packages/web/dev.Dockerfile
+    working_dir: /apps/packages/web
     environment:
       DATABASE_URL: mysql://my-pixiv:password@db:3306/my-pixiv
     volumes:
@@ -38,19 +39,6 @@ services:
     working_dir: /apps/packages/types
     volumes:
       - ../:/apps/:delegated
-    tty: true
-    init: true
-
-  view:
-    build:
-      context: ..
-      dockerfile: packages/view/dev.Dockerfile
-    working_dir: /apps/packages/view
-    volumes:
-      - ../:/apps/:delegated
-    depends_on:
-      - db
-      - api
     tty: true
     init: true
 
@@ -75,7 +63,7 @@ services:
           "-h",
           "localhost",
           "-uroot",
-          "-ppassword",
+          "-ppassword"
         ]
       timeout: 20s
       interval: 5s
@@ -88,7 +76,7 @@ services:
       - PMA_ARBITRARY=1
       - PMA_HOSTS=db
       - PMA_USER=root
-      - PMA_PASSWORD=root
+      - PMA_PASSWORD=password
     ports:
       - 8080:80
     depends_on:

@@ -26,11 +26,11 @@
       }
     },
     {
-      "name": "Dev: api",
+      "name": "Dev: web",
       "type": "node",
       "request": "launch",
       "runtimeExecutable": "pnpm",
-      "cwd": "${workspaceFolder}/packages/api",
+      "cwd": "${workspaceFolder}/packages/web",
       "runtimeArgs": [
         "dev"
       ]

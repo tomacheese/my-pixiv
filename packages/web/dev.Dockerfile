@@ -12,12 +12,9 @@ RUN apt-get update && \
   rm -rf /var/lib/apt/lists/* && \
   rm /usr/local/bin/yarn
 
-COPY ./.devcontainer/my.cnf /etc/my.cnf
-
 # hadolint ignore=DL3016
 RUN npm install -g pnpm prisma @antfu/ni && \
-  chmod a+w /usr/local/share/npm-global/lib/node_modules/prisma && \
-  git config --system --add safe.directory /apps
+  chmod a+w /usr/local/share/npm-global/lib/node_modules/prisma
 
 COPY ./packages/crawler/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh

@@ -3,7 +3,7 @@
 cd /apps || exit
 pnpm install
 
-cd /tmp || exit
+cd /apps/packages/db || exit
 prisma db push --skip-generate
 
 cd /apps || exit

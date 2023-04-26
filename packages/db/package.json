@@ -6,11 +6,15 @@
   "license": "MIT",
   "scripts": {
     "preinstall": "npx only-allow pnpm && prisma generate",
-    "push": "prisma db push --skip-generate"
+    "db:migrate": "prisma migrate dev",
+    "db:generate": "prisma generate",
+    "db:push": "prisma db push --skip-generate",
+    "db:generate-pu": "prisma-uml prisma/schema.prisma > prisma/schema.pu"
   },
-  "dependencies": {
+  "devDependencies": {
     "@prisma/client": "4.13.0",
-    "prisma": "4.13.0"
+    "prisma": "4.13.0",
+    "prisma-uml": "1.1.18"
   },
   "packageManager": "pnpm@8.3.1"
 }

@@ -3,6 +3,7 @@
 enum IllustType {
   ILLUST
   MANGA
+  UGOIRA
 }
 
 enum AiType {
@@ -55,13 +56,13 @@ entity IllustBookmark {
 entity IllustImage {
   * illustId: Int
   * illust: Illust
-  * width: Int
-  * height: Int
-  * page_id: Int
+  width: Int?
+  height: Int?
+  * pageId: Int
   * squareMediumUrl: String
   * mediumUrl: String
   * largeUrl: String
-  * originalUrl: String
+  originalUrl: String?
   * createdAt: DateTime
   * updatedAt: DateTime
 }
@@ -91,8 +92,8 @@ entity Novel {
 entity NovelImage {
   * novelId: Int
   * novel: Novel
-  * width: Int
-  * height: Int
+  width: Int?
+  height: Int?
   * squareMediumUrl: String
   * mediumUrl: String
   * largeUrl: String
@@ -121,7 +122,6 @@ entity NovelBookmark {
 }
 
 entity Tag {
-  * id: Int
   * name: String
   translatedName: String?
   * illusts: Illust[]

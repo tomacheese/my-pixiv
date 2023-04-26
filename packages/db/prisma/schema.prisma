@@ -21,6 +21,7 @@ datasource db {
 enum IllustType {
   ILLUST
   MANGA
+  UGOIRA
 }
 
 /// AI種別
@@ -39,7 +40,7 @@ model Illust {
   /// 作品種別
   type           IllustType
   /// キャプション
-  caption        String?
+  caption        String?       @db.Text
   /// ユーザID
   userId         Int           @map("user_id")
   user           User          @relation(fields: [userId], references: [id])
@@ -81,7 +82,7 @@ model IllustSeries {
   /// シリーズ名
   name        String
   /// シリーズ説明
-  description String?
+  description String?  @db.Text
   /// 作者ID
   userId      Int      @map("user_id")
   user        User     @relation(fields: [userId], references: [id])
@@ -116,14 +117,14 @@ model IllustBookmark {
 /// イラスト画像URLテーブル
 model IllustImage {
   /// 作品ID
-  illustId        Int      @id @map("id")
+  illustId        Int      @map("illust_id")
   illust          Illust   @relation(fields: [illustId], references: [id])
   /// 横幅
   width           Int?
   /// 縦幅
   height          Int?
   /// ページ番号
-  page_id         Int
+  pageId          Int      @map("page_id")
   /// スクエア画像URL
   squareMediumUrl String   @map("square_medium_url")
   /// 中画像URL
@@ -131,12 +132,13 @@ model IllustImage {
   /// 大画像URL
   largeUrl        String   @map("large_url")
   /// オリジナル画像URL
-  originalUrl     String   @map("original_url")
+  originalUrl     String?  @map("original_url")
   /// 行作成日時
   createdAt       DateTime @default(now()) @map("created_at")
   /// 行更新日時
   updatedAt       DateTime @updatedAt @map("updated_at")
 
+  @@id([illustId, pageId])
   @@index([illustId])
   @@map("illust_images")
 }
@@ -150,7 +152,7 @@ model Novel {
   /// 作品タイトル
   title          String
   /// 説明文
-  caption        String?
+  caption        String?      @db.Text
   /// ページ数
   pageCount      Int          @map("page_count")
   /// 文字数
@@ -220,7 +222,7 @@ model NovelSeries {
   /// シリーズ名
   name        String
   /// シリーズ説明
-  description String?
+  description String?  @db.Text
   /// 作者ID
   userId      Int      @map("user_id")
   user        User     @relation(fields: [userId], references: [id])
