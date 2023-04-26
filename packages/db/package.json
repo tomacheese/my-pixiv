@@ -1,0 +1,16 @@
+{
+  "name": "my-pixiv-db",
+  "version": "4.0.0",
+  "main": "index.ts",
+  "types": "index.ts",
+  "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm && prisma generate",
+    "push": "prisma db push --skip-generate"
+  },
+  "dependencies": {
+    "@prisma/client": "4.13.0",
+    "prisma": "4.13.0"
+  },
+  "packageManager": "pnpm@8.3.1"
+}

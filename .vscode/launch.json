@@ -1,0 +1,39 @@
+{
+  "configurations": [
+    {
+      "name": "Apply Prisma Migrations",
+      "type": "node",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/packages/crawler",
+      "runtimeArgs": [
+        "dev"
+      ],
+      "presentation": {
+        "group": "groupServerStuff"
+      }
+    },
+    {
+      "name": "Dev: crawler",
+      "type": "node",
+      "request": "launch",
+      "runtimeExecutable": "pnpm",
+      "cwd": "${workspaceFolder}/packages/crawler",
+      "runtimeArgs": [
+        "dev"
+      ],
+      "presentation": {
+        "group": "groupServerStuff"
+      }
+    },
+    {
+      "name": "Dev: api",
+      "type": "node",
+      "request": "launch",
+      "runtimeExecutable": "pnpm",
+      "cwd": "${workspaceFolder}/packages/api",
+      "runtimeArgs": [
+        "dev"
+      ]
+    }
+  ]
+}

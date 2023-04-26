@@ -1,0 +1,95 @@
+version: "3"
+
+services:
+  crawler:
+    build:
+      context: ..
+      dockerfile: packages/crawler/dev.Dockerfile
+    working_dir: /apps/packages/crawler
+    environment:
+      DATABASE_URL: mysql://my-pixiv:password@db:3306/my-pixiv
+    volumes:
+      - ../:/apps/:delegated
+    depends_on:
+      db:
+        condition: service_healthy
+    tty: true
+    init: true
+
+  api:
+    build:
+      context: ..
+      dockerfile: packages/api/dev.Dockerfile
+    working_dir: /apps/packages/api
+    environment:
+      DATABASE_URL: mysql://my-pixiv:password@db:3306/my-pixiv
+    volumes:
+      - ../:/apps/:delegated
+    depends_on:
+      - crawler
+    tty: true
+    init: true
+    # port forwardingはlaunch.jsonで行う
+
+  types:
+    build:
+      context: ..
+      dockerfile: packages/types/dev.Dockerfile
+    working_dir: /apps/packages/types
+    volumes:
+      - ../:/apps/:delegated
+    tty: true
+    init: true
+
+  view:
+    build:
+      context: ..
+      dockerfile: packages/view/dev.Dockerfile
+    working_dir: /apps/packages/view
+    volumes:
+      - ../:/apps/:delegated
+    depends_on:
+      - db
+      - api
+    tty: true
+    init: true
+
+  db:
+    build:
+      context: ..
+      dockerfile: packages/db/Dockerfile
+    volumes:
+      - ../mysql-data:/var/lib/mysql
+    environment:
+      MARIADB_ROOT_PASSWORD: password
+      MARIADB_USER: my-pixiv
+      MARIADB_PASSWORD: password
+      MARIADB_DATABASE: my-pixiv
+      TZ: "Asia/Tokyo"
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "mysqladmin",
+          "ping",
+          "-h",
+          "localhost",
+          "-uroot",
+          "-ppassword",
+        ]
+      timeout: 20s
+      interval: 5s
+      retries: 30
+    init: true
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    environment:
+      - PMA_ARBITRARY=1
+      - PMA_HOSTS=db
+      - PMA_USER=root
+      - PMA_PASSWORD=root
+    ports:
+      - 8080:80
+    depends_on:
+      - db

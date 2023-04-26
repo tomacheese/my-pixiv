@@ -1,0 +1,218 @@
+@startuml schema
+
+enum IllustType {
+  ILLUST
+  MANGA
+}
+
+enum AiType {
+  UNUSED
+  SUPPORT
+  USED
+}
+
+entity Illust {
+  * id: Int
+  * title: String
+  * type: IllustType
+  caption: String?
+  * userId: Int
+  * user: User
+  * pageCount: Int
+  * tags: Tag[]
+  seriesId: Int?
+  series: IllustSeries?
+  * aiType: AiType
+  * isDeleted: Boolean
+  * totalBookmarks: Int
+  * totalComments: Int
+  * createdAt: DateTime
+  * updatedAt: DateTime
+  * illustImages: IllustImage[]
+  illustBookmark: IllustBookmark?
+  IllustLater: IllustLater?
+}
+
+entity IllustSeries {
+  * id: Int
+  * name: String
+  description: String?
+  * userId: Int
+  * user: User
+  * createdAt: DateTime
+  * updatedAt: DateTime
+  * illusts: Illust[]
+}
+
+entity IllustBookmark {
+  * illustId: Int
+  * illust: Illust
+  * isPublic: Boolean
+  * createdAt: DateTime
+  * updatedAt: DateTime
+}
+
+entity IllustImage {
+  * illustId: Int
+  * illust: Illust
+  * width: Int
+  * height: Int
+  * page_id: Int
+  * squareMediumUrl: String
+  * mediumUrl: String
+  * largeUrl: String
+  * originalUrl: String
+  * createdAt: DateTime
+  * updatedAt: DateTime
+}
+
+entity Novel {
+  * id: Int
+  * title: String
+  caption: String?
+  * pageCount: Int
+  * textLength: Int
+  * userId: Int
+  * user: User
+  * tags: Tag[]
+  seriesId: Int?
+  series: NovelSeries?
+  * aiType: AiType
+  * isDeleted: Boolean
+  * totalBookmarks: Int
+  * totalComments: Int
+  * createdAt: DateTime
+  * updatedAt: DateTime
+  novelImage: NovelImage?
+  novelBookmark: NovelBookmark?
+  NovelLater: NovelLater?
+}
+
+entity NovelImage {
+  * novelId: Int
+  * novel: Novel
+  * width: Int
+  * height: Int
+  * squareMediumUrl: String
+  * mediumUrl: String
+  * largeUrl: String
+  * originalUrl: String
+  * createdAt: DateTime
+  * updatedAt: DateTime
+}
+
+entity NovelSeries {
+  * id: Int
+  * name: String
+  description: String?
+  * userId: Int
+  * user: User
+  * createdAt: DateTime
+  * updatedAt: DateTime
+  * novels: Novel[]
+}
+
+entity NovelBookmark {
+  * novelId: Int
+  * novel: Novel
+  * isPublic: Boolean
+  * createdAt: DateTime
+  * updatedAt: DateTime
+}
+
+entity Tag {
+  * id: Int
+  * name: String
+  translatedName: String?
+  * illusts: Illust[]
+  * novels: Novel[]
+}
+
+entity User {
+  * id: Int
+  * name: String
+  * account: String
+  twitterId: Int?
+  twitterUser: TwitterUser?
+  * profileImageUrl: String
+  * createdAt: DateTime
+  * updatedAt: DateTime
+  * illusts: Illust[]
+  * illustSeries: IllustSeries[]
+  * novels: Novel[]
+  * novelSeries: NovelSeries[]
+}
+
+entity Tweet {
+  * id: Int
+  * content: String
+  * twitterUserId: Int
+  * twitterUser: TwitterUser
+  * isDeleted: Boolean
+  * createdAt: DateTime
+  * updatedAt: DateTime
+  * TwitterMedia: TwitterMedia[]
+}
+
+entity TwitterUser {
+  * id: Int
+  * name: String
+  * screenName: String
+  * createdAt: DateTime
+  * updatedAt: DateTime
+  * tweets: Tweet[]
+  * pixivUser: User[]
+}
+
+entity TwitterMedia {
+  * id: Int
+  * tweetId: Int
+  * tweet: Tweet
+  * url: String
+  * type: String
+  * width: Int
+  * height: Int
+  * createdAt: DateTime
+  * updatedAt: DateTime
+}
+
+entity IllustLater {
+  * illustId: Int
+  * illust: Illust
+  * createdAt: DateTime
+  * updatedAt: DateTime
+}
+
+entity NovelLater {
+  * novelId: Int
+  * novel: Novel
+  * createdAt: DateTime
+  * updatedAt: DateTime
+}
+
+entity Setting {
+  * key: String
+  value: String?
+  * createdAt: DateTime
+  * updatedAt: DateTime
+}
+
+Illust ||.r.|| IllustType
+Illust ||.l.|| AiType
+Illust }|--o| IllustSeries
+Illust ||--o| IllustBookmark
+Illust ||--|{ IllustImage
+Novel ||.r.|| AiType
+Novel }|--|| User
+Novel ||--o| NovelImage
+Novel }|--o| NovelSeries
+Novel ||--o| NovelBookmark
+Illust }|--|{ Tag
+Illust }|--|| User
+Tweet }|--|| TwitterUser
+User }|--o| TwitterUser
+Tweet ||--|{ TwitterMedia
+Illust ||--o| IllustLater
+Novel ||--o| NovelLater
+
+@enduml

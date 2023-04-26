@@ -1,0 +1,23 @@
+{
+	"name": "my-pixiv",
+	"dockerComposeFile": [
+		"./compose.yaml"
+	],
+	"service": "crawler",
+	"workspaceFolder": "/apps",
+	"postCreateCommand": "/entrypoint.sh",
+	"runServices": [
+		"crawler",
+		"api",
+		"phpmyadmin"
+	],
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"ms-azuretools.vscode-docker",
+				"GitHub.copilot",
+				"Prisma.prisma"
+			]
+		}
+	}
+}

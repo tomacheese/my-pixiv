@@ -1,0 +1,417 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// https://gist.github.com/yano3nora/63c96a24029db90bf723b1b25fe2f882
+// https://zenn.dev/ikekyo/scraps/f6c87fbfd3bf9d
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// ---------- テーブル定義 ---------- //
+
+// --- イラスト関連
+
+/// イラスト種別
+enum IllustType {
+  ILLUST
+  MANGA
+}
+
+/// AI種別
+enum AiType {
+  UNUSED
+  SUPPORT
+  USED
+}
+
+/// イラスト一覧テーブル
+model Illust {
+  /// 作品ID
+  id             Int           @id
+  /// 作品タイトル
+  title          String
+  /// 作品種別
+  type           IllustType
+  /// キャプション
+  caption        String?
+  /// ユーザID
+  userId         Int           @map("user_id")
+  user           User          @relation(fields: [userId], references: [id])
+  /// ページ数
+  pageCount      Int           @map("page_count")
+  /// タグ
+  tags           Tag[]
+  /// シリーズID
+  seriesId       Int?          @map("series_id")
+  series         IllustSeries? @relation(fields: [seriesId], references: [id])
+  /// AI使用フラグ
+  aiType         AiType        @map("ai_type")
+  /// 削除済みか
+  isDeleted      Boolean       @default(false) @map("is_deleted")
+  /// ブックマーク数
+  totalBookmarks Int           @default(0) @map("total_bookmarks")
+  /// コメント数
+  totalComments  Int           @default(0) @map("total_comments")
+  /// 投稿日時
+  createdAt      DateTime      @default(now()) @map("created_at")
+  /// 行更新日時
+  updatedAt      DateTime      @updatedAt @map("updated_at")
+
+  /// イラスト画像URL群
+  illustImages   IllustImage[]
+  /// イラストブックマーク
+  illustBookmark IllustBookmark?
+  /// あとで見る
+  IllustLater    IllustLater?
+
+  @@index([id, userId, seriesId])
+  @@map("illusts")
+}
+
+/// イラストシリーズテーブル
+model IllustSeries {
+  /// シリーズID
+  id          Int      @id
+  /// シリーズ名
+  name        String
+  /// シリーズ説明
+  description String?
+  /// 作者ID
+  userId      Int      @map("user_id")
+  user        User     @relation(fields: [userId], references: [id])
+  /// シリーズ作成日時
+  createdAt   DateTime @default(now()) @map("created_at")
+  /// 行更新日時
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  /// シリーズに含まれるイラスト
+  illusts Illust[]
+
+  @@index([id, userId])
+  @@map("illust_series")
+}
+
+/// イラストブックマークテーブル
+model IllustBookmark {
+  /// 作品ID
+  illustId  Int      @id @map("id")
+  illust    Illust   @relation(fields: [illustId], references: [id])
+  /// 公開か
+  isPublic  Boolean  @default(false) @map("is_public")
+  /// ブックマーク日時
+  createdAt DateTime @default(now()) @map("created_at")
+  /// 行更新日時
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([illustId])
+  @@map("illust_bookmarks")
+}
+
+/// イラスト画像URLテーブル
+model IllustImage {
+  /// 作品ID
+  illustId        Int      @id @map("id")
+  illust          Illust   @relation(fields: [illustId], references: [id])
+  /// 横幅
+  width           Int?
+  /// 縦幅
+  height          Int?
+  /// ページ番号
+  page_id         Int
+  /// スクエア画像URL
+  squareMediumUrl String   @map("square_medium_url")
+  /// 中画像URL
+  mediumUrl       String   @map("medium_url")
+  /// 大画像URL
+  largeUrl        String   @map("large_url")
+  /// オリジナル画像URL
+  originalUrl     String   @map("original_url")
+  /// 行作成日時
+  createdAt       DateTime @default(now()) @map("created_at")
+  /// 行更新日時
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  @@index([illustId])
+  @@map("illust_images")
+}
+
+// --- 小説関連
+
+/// 小説一覧テーブル
+model Novel {
+  /// 作品ID
+  id             Int          @id
+  /// 作品タイトル
+  title          String
+  /// 説明文
+  caption        String?
+  /// ページ数
+  pageCount      Int          @map("page_count")
+  /// 文字数
+  textLength     Int          @map("text_length")
+  /// ユーザID
+  userId         Int          @map("user_id")
+  user           User         @relation(fields: [userId], references: [id])
+  /// タグ
+  tags           Tag[]
+  /// シリーズID
+  seriesId       Int?         @map("series_id")
+  series         NovelSeries? @relation(fields: [seriesId], references: [id])
+  /// AI使用フラグ
+  aiType         AiType       @map("ai_type")
+  /// 削除済みか
+  isDeleted      Boolean      @default(false) @map("is_deleted")
+  /// ブックマーク数
+  totalBookmarks Int          @default(0) @map("total_bookmarks")
+  /// コメント数
+  totalComments  Int          @default(0) @map("total_comments")
+  /// 投稿日時
+  createdAt      DateTime     @default(now()) @map("created_at")
+  /// 行更新日時
+  updatedAt      DateTime     @updatedAt @map("updated_at")
+
+  /// 小説画像URL
+  novelImage    NovelImage?
+  /// 小説ブックマーク
+  novelBookmark NovelBookmark?
+  /// あとで読む
+  NovelLater    NovelLater?
+
+  @@index([id, userId, seriesId])
+  @@map("novels")
+}
+
+/// 小説画像URLテーブル
+model NovelImage {
+  /// 作品ID
+  novelId         Int      @id
+  novel           Novel    @relation(fields: [novelId], references: [id])
+  /// 横幅
+  width           Int?
+  /// 縦幅
+  height          Int?
+  /// スクエア画像URL
+  squareMediumUrl String   @map("square_medium_url")
+  /// 中画像URL
+  mediumUrl       String   @map("medium_url")
+  /// 大画像URL
+  largeUrl        String   @map("large_url")
+  /// オリジナル画像URL
+  originalUrl     String   @map("original_url")
+  /// 行作成日時
+  createdAt       DateTime @default(now()) @map("created_at")
+  /// 行更新日時
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  @@index([novelId])
+  @@map("novel_images")
+}
+
+/// 小説シリーズテーブル
+model NovelSeries {
+  /// シリーズID
+  id          Int      @id
+  /// シリーズ名
+  name        String
+  /// シリーズ説明
+  description String?
+  /// 作者ID
+  userId      Int      @map("user_id")
+  user        User     @relation(fields: [userId], references: [id])
+  /// シリーズ作成日時
+  createdAt   DateTime @default(now()) @map("created_at")
+  /// 行更新日時
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  /// シリーズに含まれる小説
+  novels Novel[]
+
+  @@index([id, userId])
+  @@map("novel_series")
+}
+
+/// 小説ブックマークテーブル
+model NovelBookmark {
+  /// 作品ID
+  novelId   Int
+  novel     Novel    @relation(fields: [novelId], references: [id])
+  /// 公開か
+  isPublic  Boolean  @default(false) @map("is_public")
+  /// ブックマーク日時
+  createdAt DateTime @default(now()) @map("created_at")
+  /// 行更新日時
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@id([novelId])
+  @@index([novelId])
+  @@map("novel_bookmarks")
+}
+
+// --- 総合テーブル関連
+
+/// タグテーブル
+model Tag {
+  /// タグ名
+  name           String  @id
+  /// 翻訳タグ名
+  translatedName String? @map("translated_name")
+
+  /// タグが付けられたイラスト
+  illusts Illust[]
+  /// タグが付けられた小説
+  novels  Novel[]
+
+  @@index([name])
+  @@map("tags")
+}
+
+/// ユーザテーブル
+model User {
+  /// ユーザID
+  id              Int          @id
+  /// ユーザ名
+  name            String
+  /// アカウント名
+  account         String
+  /// Twitter ID
+  twitterId       Int?         @map("twitter_id")
+  twitterUser     TwitterUser? @relation(fields: [twitterId], references: [id])
+  /// プロフィール画像URL
+  profileImageUrl String       @map("profile_image_url")
+  /// アカウント作成日時
+  createdAt       DateTime     @default(now()) @map("created_at")
+  /// 行更新日時
+  updatedAt       DateTime     @updatedAt @map("updated_at")
+
+  /// ユーザが投稿したイラスト
+  illusts      Illust[]
+  /// ユーザが作成したイラストシリーズ
+  illustSeries IllustSeries[]
+  /// ユーザが投稿した小説
+  novels       Novel[]
+  /// ユーザが作成した小説シリーズ
+  novelSeries  NovelSeries[]
+
+  @@index([id, name, account, twitterId])
+  @@map("users")
+}
+
+/// ツイートテーブル
+model Tweet {
+  /// ツイートID
+  id            Int         @id
+  /// 内容
+  content       String
+  /// ツイート作者ID
+  twitterUserId Int         @map("user_id")
+  twitterUser   TwitterUser @relation(fields: [twitterUserId], references: [id])
+  /// 削除済みか
+  isDeleted     Boolean     @default(false) @map("is_deleted")
+  /// ツイート日時
+  createdAt     DateTime    @default(now()) @map("created_at")
+  /// 行更新日時
+  updatedAt     DateTime    @updatedAt @map("updated_at")
+
+  /// ツイートに含まれるメディア
+  TwitterMedia TwitterMedia[]
+
+  @@map("tweets")
+}
+
+/// Twitterユーザテーブル
+model TwitterUser {
+  /// TwitterユーザID
+  id         Int      @id
+  /// 名前
+  name       String
+  /// スクリーン名
+  screenName String   @map("screen_name")
+  /// アカウント作成日時
+  createdAt  DateTime @default(now()) @map("created_at")
+  /// 行更新日時
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  /// ツイート
+  tweets    Tweet[]
+  /// pixiv ユーザ
+  pixivUser User[]
+
+  @@map("twitter_users")
+}
+
+/// Twitter添付ファイルテーブル
+model TwitterMedia {
+  /// メディアID
+  id        Int      @id
+  /// ツイートID
+  tweetId   Int      @map("tweet_id")
+  tweet     Tweet    @relation(fields: [tweetId], references: [id])
+  /// メディアURL
+  url       String
+  /// コンテンツ種別
+  type      String
+  /// 横幅
+  width     Int
+  /// 縦幅
+  height    Int
+  /// 行作成日時
+  createdAt DateTime @default(now()) @map("created_at")
+  /// 行更新日時
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([id, tweetId])
+  @@map("twitter_media")
+}
+
+// --- あとで見るテーブル関連
+
+/// あとで見るイラストテーブル
+model IllustLater {
+  /// 作品ID
+  illustId  Int      @id
+  illust    Illust   @relation(fields: [illustId], references: [id])
+  /// 行作成日時
+  createdAt DateTime @default(now()) @map("created_at")
+  /// 行更新日時
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([illustId])
+  @@map("illust_laters")
+}
+
+/// あとで見る小説テーブル
+model NovelLater {
+  /// 作品ID
+  novelId   Int      @id
+  novel     Novel    @relation(fields: [novelId], references: [id])
+  /// 行作成日時
+  createdAt DateTime @default(now()) @map("created_at")
+  /// 行更新日時
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([novelId])
+  @@map("novel_laters")
+}
+
+// --- その他
+
+/// 設定テーブル
+model Setting {
+  /// 設定名
+  key       String   @id
+  /// 設定値
+  value     String?
+  /// 行作成日時
+  createdAt DateTime @default(now()) @map("created_at")
+  /// 行更新日時
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([key])
+  @@map("settings")
+}

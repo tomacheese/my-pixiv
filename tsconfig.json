@@ -1,0 +1,50 @@
+{
+  "ts-node": {
+    "files": true
+  },
+  "compilerOptions": {
+    "target": "es2020",
+    "module": "commonjs",
+    "moduleResolution": "Node",
+    "lib": [
+      "ESNext",
+      "esnext.AsyncIterable"
+    ],
+    "removeComments": true,
+    "esModuleInterop": true,
+    "allowJs": true,
+    "checkJs": true,
+    "incremental": true,
+    "sourceMap": true,
+    "declaration": true,
+    "declarationMap": true,
+    "strict": true,
+    "noImplicitAny": true,
+    "strictBindCallApply": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "experimentalDecorators": true,
+    "newLine": "LF",
+    "composite": true
+  },
+  "files": [],
+  "references": [
+    {
+      "path": "packages/crawler"
+    },
+    {
+      "path": "packages/api"
+    },
+    {
+      "path": "packages/types"
+    },
+    {
+      "path": "packages/view"
+    },
+    {
+      "path": "packages/db"
+    }
+  ]
+}
