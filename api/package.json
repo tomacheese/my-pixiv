@@ -46,7 +46,7 @@
     "yarn-run-all": "3.1.1"
   },
   "dependencies": {
-    "@fastify/websocket": "7.2.0",
+    "@fastify/websocket": "8.0.0",
     "@vercel/ncc": "0.36.1",
     "fastify": "4.16.3",
     "jimp": "0.22.7",
