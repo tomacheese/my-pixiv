@@ -23,18 +23,20 @@ export class SearchPixiv {
     const word = this.search.include_tags.join(' ')
     const illusts = await this.searchIllusts(word)
     for (const illust of illusts) {
-      await this.databaseManager.upsertIlust(
+      const illustRow = await this.databaseManager.upsertIlust(
         illust,
         await this.getIllustSeriesDetail(illust.series)
       )
+      await this.databaseManager.addIllustSearchResult(this.search, illustRow)
     }
 
     const novels = await this.searchNovels(word)
     for (const novel of novels) {
-      await this.databaseManager.upsertNovel(
+      const novelRow = await this.databaseManager.upsertNovel(
         novel,
         await this.getNovelSeriesDetail(novel.series)
       )
+      await this.databaseManager.addNovelSearchResult(this.search, novelRow)
     }
   }
 

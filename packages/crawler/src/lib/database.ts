@@ -7,7 +7,15 @@ import {
   Series,
   Tag,
 } from '@book000/pixivts'
-import { AiType, IllustType, Prisma, PrismaClient } from 'my-pixiv-db'
+import {
+  AiType,
+  Illust,
+  IllustType,
+  Novel,
+  Prisma,
+  PrismaClient,
+  Search,
+} from 'my-pixiv-db'
 
 export class DatabaseManager {
   private readonly prisma: PrismaClient
@@ -119,6 +127,36 @@ export class DatabaseManager {
         ...data,
       },
       update: data,
+    })
+  }
+
+  public async addIllustSearchResult(search: Search, illust: Illust) {
+    return await this.prisma.search.update({
+      where: {
+        id: search.id,
+      },
+      data: {
+        illusts: {
+          connect: {
+            id: illust.id,
+          },
+        },
+      },
+    })
+  }
+
+  public async addNovelSearchResult(search: Search, novel: Novel) {
+    return await this.prisma.search.update({
+      where: {
+        id: search.id,
+      },
+      data: {
+        novels: {
+          connect: {
+            id: novel.id,
+          },
+        },
+      },
     })
   }
 
