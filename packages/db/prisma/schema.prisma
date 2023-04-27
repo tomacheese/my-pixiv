@@ -9,7 +9,7 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -70,6 +70,8 @@ model Illust {
   illustBookmark IllustBookmark?
   /// あとで見る
   IllustLater    IllustLater?
+  /// この作品が対象となる検索
+  Searches       Searches[]
 
   @@index([id, userId, seriesId])
   @@map("illusts")
@@ -143,6 +145,20 @@ model IllustImage {
   @@map("illust_images")
 }
 
+/// あとで見るイラストテーブル
+model IllustLater {
+  /// 作品ID
+  illustId  Int      @id
+  illust    Illust   @relation(fields: [illustId], references: [id])
+  /// 行作成日時
+  createdAt DateTime @default(now()) @map("created_at")
+  /// 行更新日時
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([illustId])
+  @@map("illust_laters")
+}
+
 // --- 小説関連
 
 /// 小説一覧テーブル
@@ -184,6 +200,8 @@ model Novel {
   novelBookmark NovelBookmark?
   /// あとで読む
   NovelLater    NovelLater?
+  /// この作品が対象となる検索
+  Searches      Searches[]
 
   @@index([id, userId, seriesId])
   @@map("novels")
@@ -253,6 +271,56 @@ model NovelBookmark {
   @@id([novelId])
   @@index([novelId])
   @@map("novel_bookmarks")
+}
+
+/// あとで見る小説テーブル
+model NovelLater {
+  /// 作品ID
+  novelId   Int      @id
+  novel     Novel    @relation(fields: [novelId], references: [id])
+  /// 行作成日時
+  createdAt DateTime @default(now()) @map("created_at")
+  /// 行更新日時
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([novelId])
+  @@map("novel_laters")
+}
+
+// --- 検索関連
+
+/// 検索対象
+enum SearchTarget {
+  ILLUST
+  MANGA
+  NOVEL
+}
+
+/// 検索テーブル
+model Searches {
+  /// 検索ID
+  id           Int          @id
+  /// 含めるタグ
+  include_tags String[]
+  /// 除外するタグ
+  exclude_tags String[]
+  /// 検索対象
+  target       SearchTarget
+  /// 最低すき！数
+  minLikes     Int?         @map("min_likes")
+  /// 検索件数
+  limit        Int
+  /// イラスト検索結果
+  illusts      Illust[]
+  /// 小説検索結果
+  novels       Novel[]
+  /// 行作成日時
+  createdAt    DateTime     @default(now()) @map("created_at")
+  /// 行更新日時
+  updatedAt    DateTime     @updatedAt @map("updated_at")
+
+  @@index([id])
+  @@map("searches")
 }
 
 // --- 総合テーブル関連
@@ -369,36 +437,6 @@ model TwitterMedia {
 
   @@index([id, tweetId])
   @@map("twitter_media")
-}
-
-// --- あとで見るテーブル関連
-
-/// あとで見るイラストテーブル
-model IllustLater {
-  /// 作品ID
-  illustId  Int      @id
-  illust    Illust   @relation(fields: [illustId], references: [id])
-  /// 行作成日時
-  createdAt DateTime @default(now()) @map("created_at")
-  /// 行更新日時
-  updatedAt DateTime @updatedAt @map("updated_at")
-
-  @@index([illustId])
-  @@map("illust_laters")
-}
-
-/// あとで見る小説テーブル
-model NovelLater {
-  /// 作品ID
-  novelId   Int      @id
-  novel     Novel    @relation(fields: [novelId], references: [id])
-  /// 行作成日時
-  createdAt DateTime @default(now()) @map("created_at")
-  /// 行更新日時
-  updatedAt DateTime @updatedAt @map("updated_at")
-
-  @@index([novelId])
-  @@map("novel_laters")
 }
 
 // --- その他

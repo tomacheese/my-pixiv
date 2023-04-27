@@ -12,6 +12,12 @@ enum AiType {
   USED
 }
 
+enum SearchTarget {
+  ILLUST
+  MANGA
+  NOVEL
+}
+
 entity Illust {
   * id: Int
   * title: String
@@ -32,6 +38,7 @@ entity Illust {
   * illustImages: IllustImage[]
   illustBookmark: IllustBookmark?
   IllustLater: IllustLater?
+  * Searches: Searches[]
 }
 
 entity IllustSeries {
@@ -67,6 +74,13 @@ entity IllustImage {
   * updatedAt: DateTime
 }
 
+entity IllustLater {
+  * illustId: Int
+  * illust: Illust
+  * createdAt: DateTime
+  * updatedAt: DateTime
+}
+
 entity Novel {
   * id: Int
   * title: String
@@ -87,6 +101,7 @@ entity Novel {
   novelImage: NovelImage?
   novelBookmark: NovelBookmark?
   NovelLater: NovelLater?
+  * Searches: Searches[]
 }
 
 entity NovelImage {
@@ -117,6 +132,26 @@ entity NovelBookmark {
   * novelId: Int
   * novel: Novel
   * isPublic: Boolean
+  * createdAt: DateTime
+  * updatedAt: DateTime
+}
+
+entity NovelLater {
+  * novelId: Int
+  * novel: Novel
+  * createdAt: DateTime
+  * updatedAt: DateTime
+}
+
+entity Searches {
+  * id: Int
+  * include_tags: String[]
+  * exclude_tags: String[]
+  * target: SearchTarget
+  minLikes: Int?
+  * limit: Int
+  * illusts: Illust[]
+  * novels: Novel[]
   * createdAt: DateTime
   * updatedAt: DateTime
 }
@@ -176,20 +211,6 @@ entity TwitterMedia {
   * updatedAt: DateTime
 }
 
-entity IllustLater {
-  * illustId: Int
-  * illust: Illust
-  * createdAt: DateTime
-  * updatedAt: DateTime
-}
-
-entity NovelLater {
-  * novelId: Int
-  * novel: Novel
-  * createdAt: DateTime
-  * updatedAt: DateTime
-}
-
 entity Setting {
   * key: String
   value: String?
@@ -202,17 +223,19 @@ Illust ||.l.|| AiType
 Illust }|--o| IllustSeries
 Illust ||--o| IllustBookmark
 Illust ||--|{ IllustImage
+Illust ||--o| IllustLater
 Novel ||.r.|| AiType
 Novel }|--|| User
 Novel ||--o| NovelImage
 Novel }|--o| NovelSeries
 Novel ||--o| NovelBookmark
+Novel ||--o| NovelLater
+Illust }|--|{ Searches
 Illust }|--|{ Tag
 Illust }|--|| User
 Tweet }|--|| TwitterUser
 User }|--o| TwitterUser
 Tweet ||--|{ TwitterMedia
-Illust ||--o| IllustLater
-Novel ||--o| NovelLater
+Searches ||--|| SearchTarget
 
 @enduml

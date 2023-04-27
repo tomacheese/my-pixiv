@@ -9,7 +9,7 @@
 	"runServices": [
 		"crawler",
 		"web",
-		"phpmyadmin"
+		"pgweb"
 	],
 	"customizations": {
 		"vscode": {

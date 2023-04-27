@@ -7,7 +7,7 @@ services:
       dockerfile: packages/crawler/dev.Dockerfile
     working_dir: /apps/packages/crawler
     environment:
-      DATABASE_URL: mysql://my-pixiv:password@db:3306/my-pixiv
+      DATABASE_URL: postgresql://my-pixiv:password@db:5432/my-pixiv
       CONFIG_PATH: /apps/data/config.json
     volumes:
       - ../:/apps/:delegated
@@ -23,7 +23,7 @@ services:
       dockerfile: packages/web/dev.Dockerfile
     working_dir: /apps/packages/web
     environment:
-      DATABASE_URL: mysql://my-pixiv:password@db:3306/my-pixiv
+      DATABASE_URL: postgresql://my-pixiv:password@db:5432/my-pixiv
     volumes:
       - ../:/apps/:delegated
     depends_on:
@@ -47,37 +47,21 @@ services:
       context: ..
       dockerfile: packages/db/Dockerfile
     volumes:
-      - ../mysql-data:/var/lib/mysql
+      - ../postgres-data:/var/lib/postgresql
     environment:
-      MARIADB_ROOT_PASSWORD: password
-      MARIADB_USER: my-pixiv
-      MARIADB_PASSWORD: password
-      MARIADB_DATABASE: my-pixiv
+      POSTGRES_USER: my-pixiv
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: my-pixiv
       TZ: "Asia/Tokyo"
-    healthcheck:
-      test:
-        [
-          "CMD",
-          "mysqladmin",
-          "ping",
-          "-h",
-          "localhost",
-          "-uroot",
-          "-ppassword"
-        ]
-      timeout: 20s
-      interval: 5s
-      retries: 30
     init: true
 
-  phpmyadmin:
-    image: phpmyadmin/phpmyadmin
+  pgweb:
+    image: sosedoff/pgweb
     environment:
-      - PMA_ARBITRARY=1
-      - PMA_HOSTS=db
-      - PMA_USER=root
-      - PMA_PASSWORD=password
+      PGWEB_DATABASE_URL: postgresql://root:password@db:5432/my-pixiv?sslmode=disable
+    volumes:
+      - ../pgadmin-data:/var/lib/pgadmin
     ports:
-      - 8080:80
+      - 8080:8081
     depends_on:
       - db

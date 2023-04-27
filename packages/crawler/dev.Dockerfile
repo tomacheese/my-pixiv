@@ -7,12 +7,10 @@ USER root
 
 # hadolint ignore=DL3008
 RUN apt-get update && \
-  apt-get install mariadb-client -y --no-install-recommends && \
+  apt-get install postgresql-client -y --no-install-recommends && \
   apt-get clean -y && \
   rm -rf /var/lib/apt/lists/* && \
   rm /usr/local/bin/yarn
-
-COPY ./.devcontainer/my.cnf /etc/my.cnf
 
 # hadolint ignore=DL3016
 RUN npm install -g pnpm prisma @antfu/ni && \
@@ -23,5 +21,8 @@ COPY ./packages/crawler/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
 USER node
+
+RUN echo "db:5432:my-pixiv:my-pixiv:password" > ~/.pgpass && \
+  chmod 0600 ~/.pgpass
 
 WORKDIR /apps
