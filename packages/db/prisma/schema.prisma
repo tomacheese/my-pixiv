@@ -71,7 +71,7 @@ model Illust {
   /// あとで見る
   IllustLater    IllustLater?
   /// この作品が対象となる検索
-  Searches       Searches[]
+  Searches       Search[]
 
   @@index([id, userId, seriesId])
   @@map("illusts")
@@ -201,7 +201,7 @@ model Novel {
   /// あとで読む
   NovelLater    NovelLater?
   /// この作品が対象となる検索
-  Searches      Searches[]
+  Searches      Search[]
 
   @@index([id, userId, seriesId])
   @@map("novels")
@@ -297,9 +297,9 @@ enum SearchTarget {
 }
 
 /// 検索テーブル
-model Searches {
+model Search {
   /// 検索ID
-  id           Int          @id
+  id           Int          @id @default(autoincrement())
   /// 含めるタグ
   include_tags String[]
   /// 除外するタグ

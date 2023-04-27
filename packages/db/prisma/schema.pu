@@ -38,7 +38,7 @@ entity Illust {
   * illustImages: IllustImage[]
   illustBookmark: IllustBookmark?
   IllustLater: IllustLater?
-  * Searches: Searches[]
+  * Searches: Search[]
 }
 
 entity IllustSeries {
@@ -101,7 +101,7 @@ entity Novel {
   novelImage: NovelImage?
   novelBookmark: NovelBookmark?
   NovelLater: NovelLater?
-  * Searches: Searches[]
+  * Searches: Search[]
 }
 
 entity NovelImage {
@@ -143,7 +143,7 @@ entity NovelLater {
   * updatedAt: DateTime
 }
 
-entity Searches {
+entity Search {
   * id: Int
   * include_tags: String[]
   * exclude_tags: String[]
@@ -224,18 +224,19 @@ Illust }|--o| IllustSeries
 Illust ||--o| IllustBookmark
 Illust ||--|{ IllustImage
 Illust ||--o| IllustLater
+Illust }|--|{ Search
 Novel ||.r.|| AiType
 Novel }|--|| User
 Novel ||--o| NovelImage
 Novel }|--o| NovelSeries
 Novel ||--o| NovelBookmark
 Novel ||--o| NovelLater
-Illust }|--|{ Searches
+Novel }|--|{ Search
 Illust }|--|{ Tag
 Illust }|--|| User
 Tweet }|--|| TwitterUser
 User }|--o| TwitterUser
 Tweet ||--|{ TwitterMedia
-Searches ||--|| SearchTarget
+Search ||--|| SearchTarget
 
 @enduml
