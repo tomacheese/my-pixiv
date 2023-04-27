@@ -1,4 +1,12 @@
-import { PixivIllustItem } from '@book000/pixivts'
+import {
+  IllustSeriesDetail,
+  NovelSeriesDetail,
+  PixivIllustItem,
+  PixivNovelItem,
+  PixivUser,
+  Series,
+  Tag,
+} from '@book000/pixivts'
 import { AiType, IllustType, Prisma, PrismaClient } from 'my-pixiv-db'
 
 export class DatabaseManager {
@@ -8,9 +16,15 @@ export class DatabaseManager {
   }
 
   /**
-   * name
+   * イラスト情報をデータベースに追加、または更新する
+   *
+   * @param illust イラスト情報
+   * @returns データベースに追加、または更新されたイラスト情報
    */
-  public async upsertIlust(illust: PixivIllustItem) {
+  public async upsertIlust(
+    illust: PixivIllustItem,
+    seriesDetail: IllustSeriesDetail | null
+  ) {
     const illustMetaImages = illust.meta_single_page
       ? [
           {
@@ -44,82 +58,169 @@ export class DatabaseManager {
           originalUrl: illustImage.originalUrl,
         },
       }))
-    await this.prisma.illust.upsert({
+
+    const data = {
+      title: illust.title,
+      type: this.convertIllustType(illust.type),
+      caption: illust.caption,
+      pageCount: illust.page_count,
+      tags: {
+        connectOrCreate: this.getTagConnectOrCreate(illust.tags),
+      },
+      user: {
+        connectOrCreate: this.getUserConnectOrCreate(illust.user),
+      },
+      series: this.getUpsertSeries(illust.series, seriesDetail),
+      aiType: this.convertAiType(illust.illust_ai_type),
+      totalBookmarks: illust.total_bookmarks,
+      totalComments: illust.total_comments,
+      illustImages: {
+        connectOrCreate: illustImages,
+      },
+    }
+    return await this.prisma.illust.upsert({
       where: {
         id: illust.id,
       },
       create: {
         id: illust.id,
-        title: illust.title,
-        type: this.convertIllustType(illust.type),
-        caption: illust.caption,
-        pageCount: illust.page_count,
-        aiType: this.convertAiType(illust.illust_ai_type),
-        totalBookmarks: illust.total_bookmarks,
-        totalComments: illust.total_comments,
-        tags: {
-          connectOrCreate: illust.tags.map((tag) => ({
-            where: {
-              name: tag.name,
-            },
-            create: {
-              name: tag.name,
-            },
-          })),
-        },
-        user: {
-          connectOrCreate: {
-            where: {
-              id: illust.user.id,
-            },
-            create: {
-              id: illust.user.id,
-              name: illust.user.name,
-              account: illust.user.account,
-              profileImageUrl: illust.user.profile_image_urls.medium,
-            },
-          },
-        },
-        illustImages: {
-          connectOrCreate: illustImages,
-        },
+        ...data,
       },
-      update: {
-        title: illust.title,
-        type: this.convertIllustType(illust.type),
-        caption: illust.caption,
-        pageCount: illust.page_count,
-        aiType: this.convertAiType(illust.illust_ai_type),
-        totalBookmarks: illust.total_bookmarks,
-        totalComments: illust.total_comments,
-        tags: {
-          connectOrCreate: illust.tags.map((tag) => ({
-            where: {
-              name: tag.name,
-            },
-            create: {
-              name: tag.name,
-            },
-          })),
-        },
-        user: {
-          connectOrCreate: {
-            where: {
-              id: illust.user.id,
-            },
-            create: {
-              id: illust.user.id,
-              name: illust.user.name,
-              account: illust.user.account,
-              profileImageUrl: illust.user.profile_image_urls.medium,
-            },
-          },
-        },
-        illustImages: {
-          connectOrCreate: illustImages,
-        },
-      },
+      update: data,
     })
+  }
+
+  public async upsertNovel(
+    novel: PixivNovelItem,
+    seriesDetail: NovelSeriesDetail | null
+  ) {
+    const data = {
+      title: novel.title,
+      caption: novel.caption,
+      pageCount: novel.page_count,
+      textLength: novel.text_length,
+      tags: {
+        connectOrCreate: this.getTagConnectOrCreate(novel.tags),
+      },
+      user: {
+        connectOrCreate: this.getUserConnectOrCreate(novel.user),
+      },
+      series: this.getUpsertSeries(novel.series, seriesDetail),
+      aiType: this.convertAiType(novel.novel_ai_type),
+      totalBookmarks: novel.total_bookmarks,
+      totalComments: novel.total_comments,
+    }
+    return await this.prisma.novel.upsert({
+      where: {
+        id: novel.id,
+      },
+      create: {
+        id: novel.id,
+        ...data,
+      },
+      update: data,
+    })
+  }
+
+  public async getSearches() {
+    return await this.prisma.search.findMany()
+  }
+
+  public async isVaildDBSeries(type: 'ILLUST' | 'NOVEL', series: Series) {
+    const row = await (type === 'ILLUST'
+      ? this.prisma.illustSeries.findFirst({
+          where: {
+            id: series.id,
+          },
+        })
+      : this.prisma.novelSeries.findFirst({
+          where: {
+            id: series.id,
+          },
+        }))
+    // 7日以上前のデータは無効
+    return row
+      ? Date.now() - row.createdAt.getTime() < 7 * 24 * 60 * 60 * 1000
+      : false
+  }
+
+  private getUpsertSeries(
+    series: Series | unknown[] | null,
+    seriesDetail: IllustSeriesDetail | NovelSeriesDetail | null
+  ) {
+    // series === null: シリーズに属していない (= undefined)
+    // series !== null && seriesDetail === null: 7日以内のため、シリーズの詳細情報が存在しない (= connect)
+    // series !== null && seriesDetail !== null: 7日以上経過したため、シリーズの詳細情報が存在する (= connectOrCreate)
+    if (!series || Array.isArray(series) || Object.keys(series).length === 0) {
+      return
+    }
+    if (seriesDetail === null) {
+      return {
+        connect: {
+          id: series.id,
+        },
+      }
+    }
+    return {
+      connectOrCreate: this.getSeriesConnectOrCreate(seriesDetail),
+    }
+  }
+
+  private getUserConnectOrCreate(
+    user: PixivUser
+  ):
+    | Prisma.UserCreateOrConnectWithoutIllustsInput
+    | Prisma.UserCreateOrConnectWithoutNovelsInput {
+    return {
+      where: {
+        id: user.id,
+      },
+      create: {
+        id: user.id,
+        name: user.name,
+        account: user.account,
+        profileImageUrl: user.profile_image_urls.medium,
+      },
+    }
+  }
+
+  private getSeriesConnectOrCreate(
+    seriesDetail: IllustSeriesDetail | NovelSeriesDetail | null
+  ):
+    | Prisma.IllustSeriesCreateOrConnectWithoutIllustsInput
+    | Prisma.NovelSeriesCreateOrConnectWithoutNovelsInput
+    | undefined {
+    if (!seriesDetail) {
+      return undefined
+    }
+    return {
+      where: {
+        id: seriesDetail.id,
+      },
+      create: {
+        id: seriesDetail.id,
+        name: seriesDetail.title,
+        description: seriesDetail.caption,
+        user: {
+          connectOrCreate: this.getUserConnectOrCreate(seriesDetail.user),
+        },
+      },
+    }
+  }
+
+  private getTagConnectOrCreate(
+    tags: Tag[]
+  ):
+    | Prisma.TagCreateOrConnectWithoutIllustsInput[]
+    | Prisma.TagCreateOrConnectWithoutNovelsInput[] {
+    return tags.map((tag) => ({
+      where: {
+        name: tag.name,
+      },
+      create: {
+        name: tag.name,
+      },
+    }))
   }
 
   private convertAiType(typeNumber: number): AiType {

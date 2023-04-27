@@ -3,6 +3,7 @@ import { PrismaClient } from 'my-pixiv-db'
 import { Configuration } from './config'
 import { Logger } from '@book000/node-utils'
 import { DatabaseManager } from './lib/database'
+import { SearchPixiv } from './search-pixiv'
 
 async function main() {
   const logger = Logger.configure('main')
@@ -22,19 +23,7 @@ async function main() {
   const databaseManager = new DatabaseManager(prisma)
 
   const pixiv = await Pixiv.of(config.get('pixiv').refresh_token)
-  const illustRecommendeds = await pixiv.recommendedIllust({
-    contentType: 'illust',
-  })
-  if (!illustRecommendeds.status) {
-    logger.error('Failed to fetch recommended illusts')
-    return
-  }
-
-  for (const illust of illustRecommendeds.data.illusts) {
-    logger.info(`Fetching illust: ${illust.id}`)
-
-    await databaseManager.upsertIlust(illust)
-  }
+  await SearchPixiv.runAll(databaseManager, pixiv)
 }
 
 ;(async () => {

@@ -41,13 +41,13 @@ model Illust {
   type           IllustType
   /// キャプション
   caption        String?       @db.Text
-  /// ユーザID
-  userId         Int           @map("user_id")
-  user           User          @relation(fields: [userId], references: [id])
   /// ページ数
   pageCount      Int           @map("page_count")
   /// タグ
   tags           Tag[]
+  /// ユーザID
+  userId         Int           @map("user_id")
+  user           User          @relation(fields: [userId], references: [id])
   /// シリーズID
   seriesId       Int?          @map("series_id")
   series         IllustSeries? @relation(fields: [seriesId], references: [id])
@@ -173,11 +173,11 @@ model Novel {
   pageCount      Int          @map("page_count")
   /// 文字数
   textLength     Int          @map("text_length")
+  /// タグ
+  tags           Tag[]
   /// ユーザID
   userId         Int          @map("user_id")
   user           User         @relation(fields: [userId], references: [id])
-  /// タグ
-  tags           Tag[]
   /// シリーズID
   seriesId       Int?         @map("series_id")
   series         NovelSeries? @relation(fields: [seriesId], references: [id])
