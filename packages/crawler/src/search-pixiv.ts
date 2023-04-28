@@ -7,6 +7,7 @@ import {
   Series,
 } from '@book000/pixivts'
 import { Logger } from '@book000/node-utils'
+import { PixivSaver } from './lib/pixiv-saver'
 
 export class SearchPixiv {
   private databaseManager: DatabaseManager
@@ -60,6 +61,7 @@ export class SearchPixiv {
     const response = await this.pixiv.illustSeries({
       illustSeriesId: series.id,
     })
+    PixivSaver.execute(response)
     if (response.status !== 200) {
       throw new Error(
         `Failed to fetch illust series detail: ${response.status}`
@@ -78,6 +80,7 @@ export class SearchPixiv {
     const response = await this.pixiv.novelSeries({
       seriesId: series.id,
     })
+    PixivSaver.execute(response)
     if (response.status !== 200) {
       throw new Error(`Failed to fetch novel series detail: ${response.status}`)
     }
@@ -88,6 +91,7 @@ export class SearchPixiv {
     const response = await this.pixiv.searchIllust({
       word,
     })
+    PixivSaver.execute(response)
     if (response.status !== 200) {
       throw new Error(`Failed to search illusts: ${response.status}`)
     }
@@ -98,6 +102,7 @@ export class SearchPixiv {
     const response = await this.pixiv.searchNovel({
       word,
     })
+    PixivSaver.execute(response)
     if (response.status !== 200) {
       throw new Error(`Failed to search novels: ${response.status}`)
     }
