@@ -175,8 +175,6 @@ model Novel {
   textLength     Int          @map("text_length")
   /// タグ
   tags           Tag[]
-  /// 言語
-  language       String?
   /// ユーザID
   userId         Int          @map("user_id")
   user           User         @relation(fields: [userId], references: [id])
