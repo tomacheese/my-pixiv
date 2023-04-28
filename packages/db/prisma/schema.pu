@@ -103,6 +103,7 @@ entity Novel {
   novelBookmark: NovelBookmark?
   NovelLater: NovelLater?
   * Searches: Search[]
+  * NovelLanguageScore: NovelLanguageScore[]
 }
 
 entity NovelImage {
@@ -142,6 +143,14 @@ entity NovelLater {
   * novel: Novel
   * createdAt: DateTime
   * updatedAt: DateTime
+}
+
+entity NovelLanguageScore {
+  * novelId: Int
+  * novel: Novel
+  * language: String
+  * score: Float
+  * createdAt: DateTime
 }
 
 entity Search {
@@ -232,6 +241,7 @@ Novel ||--o| NovelImage
 Novel }|--o| NovelSeries
 Novel ||--o| NovelBookmark
 Novel ||--o| NovelLater
+Novel ||--|{ NovelLanguageScore
 Novel }|--|{ Search
 Illust }|--|{ Tag
 Illust }|--|| User

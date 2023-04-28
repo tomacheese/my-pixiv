@@ -197,13 +197,15 @@ model Novel {
   updatedAt      DateTime     @updatedAt @map("updated_at")
 
   /// 小説画像URL
-  novelImage    NovelImage?
+  novelImage         NovelImage?
   /// 小説ブックマーク
-  novelBookmark NovelBookmark?
+  novelBookmark      NovelBookmark?
   /// あとで読む
-  NovelLater    NovelLater?
+  NovelLater         NovelLater?
   /// この作品が対象となる検索
-  Searches      Search[]
+  Searches           Search[]
+  /// 小説の言語スコア
+  NovelLanguageScore NovelLanguageScore[]
 
   @@index([id, userId, seriesId])
   @@map("novels")
@@ -287,6 +289,22 @@ model NovelLater {
 
   @@index([novelId])
   @@map("novel_laters")
+}
+
+/// 小説言語テーブル
+model NovelLanguageScore {
+  /// 作品ID
+  novelId   Int      @id
+  novel     Novel    @relation(fields: [novelId], references: [id])
+  /// 言語
+  language  String
+  /// スコア
+  score     Float
+  /// 行作成日時
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([novelId])
+  @@map("novel_language_scores")
 }
 
 // --- 検索関連
