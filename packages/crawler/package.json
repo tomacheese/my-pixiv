@@ -13,7 +13,7 @@
     "packing": "ncc build ./dist/main.js -o output/ -m",
     "compile": "tsc -p .",
     "clean": "rimraf dist output",
-    "lint": "run-z --then lint:prettier lint:eslint lint:tsc",
+    "lint": "run-z lint:prettier,lint:eslint,lint:tsc",
     "lint:prettier": "prettier --check src",
     "lint:eslint": "eslint . --ext ts,tsx",
     "lint:tsc": "tsc",
