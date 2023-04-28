@@ -1,5 +1,5 @@
 import { Search } from 'my-pixiv-db'
-import { DatabaseManager } from './lib/database'
+import { DatabaseManager } from '../lib/database'
 import {
   Pixiv,
   PixivIllustItem,
@@ -7,8 +7,8 @@ import {
   Series,
 } from '@book000/pixivts'
 import { Logger } from '@book000/node-utils'
-import { PixivSaver } from './lib/pixiv-saver'
-import { Franc } from './lib/franc'
+import { PixivSaver } from '../lib/pixiv-saver'
+import { Franc } from '../lib/franc'
 
 export interface LanguageScore {
   language: string

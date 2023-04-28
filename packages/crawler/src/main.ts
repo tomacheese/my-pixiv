@@ -3,7 +3,7 @@ import { PrismaClient } from 'my-pixiv-db'
 import { Configuration } from './config'
 import { Logger } from '@book000/node-utils'
 import { DatabaseManager } from './lib/database'
-import { SearchPixiv } from './search-pixiv'
+import { SearchPixiv } from './features/search-pixiv'
 
 async function main() {
   const logger = Logger.configure('main')

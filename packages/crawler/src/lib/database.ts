@@ -1,4 +1,4 @@
-import { LanguageScore } from '@/search-pixiv'
+import { LanguageScore } from '@/features/search-pixiv'
 import {
   IllustSeriesDetail,
   NovelSeriesDetail,
