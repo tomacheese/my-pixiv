@@ -294,7 +294,7 @@ model NovelLater {
 /// 小説言語テーブル
 model NovelLanguageScore {
   /// 作品ID
-  novelId   Int      @id
+  novelId   Int
   novel     Novel    @relation(fields: [novelId], references: [id])
   /// 言語
   language  String
@@ -303,6 +303,7 @@ model NovelLanguageScore {
   /// 行作成日時
   createdAt DateTime @default(now()) @map("created_at")
 
+  @@id([novelId, language])
   @@index([novelId])
   @@map("novel_language_scores")
 }
