@@ -10,11 +10,11 @@ importers:
         specifier: 1.3.0
         version: 1.3.0
       '@book000/pixivts':
-        specifier: 0.4.1
-        version: 0.4.1
+        specifier: 0.7.0
+        version: 0.7.0
       '@types/node':
-        specifier: 18.16.1
-        version: 18.16.1
+        specifier: 18.16.2
+        version: 18.16.2
       '@typescript-eslint/eslint-plugin':
         specifier: 5.59.1
         version: 5.59.1(@typescript-eslint/parser@5.59.1)(eslint@8.39.0)(typescript@5.0.4)
@@ -62,10 +62,10 @@ importers:
         version: 1.11.0
       ts-node:
         specifier: 10.9.1
-        version: 10.9.1(@types/node@18.16.1)(typescript@5.0.4)
+        version: 10.9.1(@types/node@18.16.2)(typescript@5.0.4)
       ts-node-dev:
         specifier: 2.0.0
-        version: 2.0.0(@types/node@18.16.1)(typescript@5.0.4)
+        version: 2.0.0(@types/node@18.16.2)(typescript@5.0.4)
       typescript:
         specifier: 5.0.4
         version: 5.0.4
@@ -122,8 +122,8 @@ packages:
       - debug
     dev: true
 
-  /@book000/pixivts@0.4.1:
-    resolution: {integrity: sha512-QOZ3XEYAehiJMAFB/kbwQMLxXTMTJMvY+oZ+EqcLKxdABwtgYrs49/LzP7ktlzmBDVQ1y6jZ+wP8fu6Vm7jYmw==}
+  /@book000/pixivts@0.7.0:
+    resolution: {integrity: sha512-tIDTzv+u5qHX7AYrOU4OXJg1vpVUo4jvgSOx2stK1gceMm3/i0awXDEwqDkOOV/2MJDgk0ZvziXX4AEv5Wn4Cg==}
     dependencies:
       axios: 1.3.6
       qs: 6.11.1
@@ -444,7 +444,7 @@ packages:
   /@types/cross-spawn@6.0.2:
     resolution: {integrity: sha512-KuwNhp3eza+Rhu8IFI5HUXRP0LIhqH5cAjubUvGXXthh4YYBuP2ntwEX+Cz8GJoZUHlKo247wPWOfA9LYEq4cw==}
     dependencies:
-      '@types/node': 18.16.1
+      '@types/node': 18.16.2
     dev: true
 
   /@types/debug@4.1.7:
@@ -469,8 +469,8 @@ packages:
     resolution: {integrity: sha512-iiUgKzV9AuaEkZqkOLDIvlQiL6ltuZd9tGcW3gwpnX8JbuiuhFlEGmmFXEXkN50Cvq7Os88IY2v0dkDqXYWVgA==}
     dev: true
 
-  /@types/node@18.16.1:
-    resolution: {integrity: sha512-DZxSZWXxFfOlx7k7Rv4LAyiMroaxa3Ly/7OOzZO8cBNho0YzAi4qlbrx8W27JGqG57IgR/6J7r+nOJWw6kcvZA==}
+  /@types/node@18.16.2:
+    resolution: {integrity: sha512-GQW/JL/5Fz/0I8RpeBG9lKp0+aNcXEaVL71c0D2Q0QHDTFvlYKT7an0onCUXj85anv7b4/WesqdfchLc0jtsCg==}
     dev: true
 
   /@types/normalize-package-data@2.4.1:
@@ -3619,7 +3619,7 @@ packages:
     resolution: {integrity: sha512-XrHUvV5HpdLmIj4uVMxHggLbFSZYIn7HEWsqePZcI50pco+MPqJ50wMGY794X7AOOhxOBAjbkqfAbEe/QMp2Lw==}
     dev: true
 
-  /ts-node-dev@2.0.0(@types/node@18.16.1)(typescript@5.0.4):
+  /ts-node-dev@2.0.0(@types/node@18.16.2)(typescript@5.0.4):
     resolution: {integrity: sha512-ywMrhCfH6M75yftYvrvNarLEY+SUXtUvU8/0Z6llrHQVBx12GiFk5sStF8UdfE/yfzk9IAq7O5EEbTQsxlBI8w==}
     engines: {node: '>=0.8.0'}
     hasBin: true
@@ -3638,7 +3638,7 @@ packages:
       rimraf: 2.7.1
       source-map-support: 0.5.21
       tree-kill: 1.2.2
-      ts-node: 10.9.1(@types/node@18.16.1)(typescript@5.0.4)
+      ts-node: 10.9.1(@types/node@18.16.2)(typescript@5.0.4)
       tsconfig: 7.0.0
       typescript: 5.0.4
     transitivePeerDependencies:
@@ -3647,7 +3647,7 @@ packages:
       - '@types/node'
     dev: true
 
-  /ts-node@10.9.1(@types/node@18.16.1)(typescript@5.0.4):
+  /ts-node@10.9.1(@types/node@18.16.2)(typescript@5.0.4):
     resolution: {integrity: sha512-NtVysVPkxxrwFGUUxGYhfux8k78pQB3JqYBXlLRZgdGUqTO5wU/UyHop5p70iEbGhB7q5KmiZiU0Y3KlJrScEw==}
     hasBin: true
     peerDependencies:
@@ -3666,7 +3666,7 @@ packages:
       '@tsconfig/node12': 1.0.11
       '@tsconfig/node14': 1.0.3
       '@tsconfig/node16': 1.0.3
-      '@types/node': 18.16.1
+      '@types/node': 18.16.2
       acorn: 8.8.2
       acorn-walk: 8.2.0
       arg: 4.1.3

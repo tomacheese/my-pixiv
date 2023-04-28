@@ -48,6 +48,8 @@ services:
       dockerfile: packages/db/Dockerfile
     volumes:
       - ../postgres-data:/var/lib/postgresql
+    ports:
+      - 5432:5432
     environment:
       POSTGRES_USER: my-pixiv
       POSTGRES_PASSWORD: password

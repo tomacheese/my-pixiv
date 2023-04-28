@@ -24,6 +24,8 @@ async function main() {
 
   const pixiv = await Pixiv.of(config.get('pixiv').refresh_token)
   await SearchPixiv.runAll(databaseManager, pixiv)
+
+  await prisma.$disconnect()
 }
 
 ;(async () => {

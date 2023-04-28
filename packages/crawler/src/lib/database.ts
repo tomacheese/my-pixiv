@@ -1,3 +1,4 @@
+import { LanguageScore } from '@/search-pixiv'
 import {
   IllustSeriesDetail,
   NovelSeriesDetail,
@@ -100,7 +101,8 @@ export class DatabaseManager {
 
   public async upsertNovel(
     novel: PixivNovelItem,
-    seriesDetail: NovelSeriesDetail | null
+    seriesDetail: NovelSeriesDetail | null,
+    languageScores: LanguageScore[]
   ) {
     const data = {
       title: novel.title,
@@ -109,6 +111,12 @@ export class DatabaseManager {
       textLength: novel.text_length,
       tags: {
         connectOrCreate: this.getTagConnectOrCreate(novel.tags),
+      },
+      languageScores: {
+        connectOrCreate: this.getNovelLanguageScoresConnectOrCreate(
+          novel,
+          languageScores
+        ),
       },
       user: {
         connectOrCreate: this.getUserConnectOrCreate(novel.user),
@@ -257,6 +265,24 @@ export class DatabaseManager {
       },
       create: {
         name: tag.name,
+      },
+    }))
+  }
+
+  private getNovelLanguageScoresConnectOrCreate(
+    novel: PixivNovelItem,
+    languageScores: LanguageScore[]
+  ): Prisma.NovelLanguageScoreCreateOrConnectWithoutNovelInput[] {
+    return languageScores.map((languageScore) => ({
+      where: {
+        novelId_language: {
+          novelId: novel.id,
+          language: languageScore.language,
+        },
+      },
+      create: {
+        language: languageScore.language,
+        score: languageScore.score,
       },
     }))
   }
