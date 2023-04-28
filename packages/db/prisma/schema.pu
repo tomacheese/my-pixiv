@@ -23,10 +23,10 @@ entity Illust {
   * title: String
   * type: IllustType
   caption: String?
-  * userId: Int
-  * user: User
   * pageCount: Int
   * tags: Tag[]
+  * userId: Int
+  * user: User
   seriesId: Int?
   series: IllustSeries?
   * aiType: AiType
@@ -87,9 +87,10 @@ entity Novel {
   caption: String?
   * pageCount: Int
   * textLength: Int
+  * tags: Tag[]
+  language: String?
   * userId: Int
   * user: User
-  * tags: Tag[]
   seriesId: Int?
   series: NovelSeries?
   * aiType: AiType
