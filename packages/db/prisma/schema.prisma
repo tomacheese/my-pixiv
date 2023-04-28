@@ -197,15 +197,15 @@ model Novel {
   updatedAt      DateTime     @updatedAt @map("updated_at")
 
   /// 小説画像URL
-  novelImage         NovelImage?
+  novelImage     NovelImage?
   /// 小説ブックマーク
-  novelBookmark      NovelBookmark?
+  novelBookmark  NovelBookmark?
   /// あとで読む
-  NovelLater         NovelLater?
+  novelLater     NovelLater?
   /// この作品が対象となる検索
-  Searches           Search[]
+  searches       Search[]
   /// 小説の言語スコア
-  NovelLanguageScore NovelLanguageScore[]
+  languageScores NovelLanguageScore[]
 
   @@index([id, userId, seriesId])
   @@map("novels")
@@ -409,7 +409,7 @@ model Tweet {
   updatedAt     DateTime    @updatedAt @map("updated_at")
 
   /// ツイートに含まれるメディア
-  TwitterMedia TwitterMedia[]
+  twitterMedia TwitterMedia[]
 
   @@map("tweets")
 }

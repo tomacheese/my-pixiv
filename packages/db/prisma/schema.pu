@@ -101,9 +101,9 @@ entity Novel {
   * updatedAt: DateTime
   novelImage: NovelImage?
   novelBookmark: NovelBookmark?
-  NovelLater: NovelLater?
-  * Searches: Search[]
-  * NovelLanguageScore: NovelLanguageScore[]
+  novelLater: NovelLater?
+  * searches: Search[]
+  * languageScores: NovelLanguageScore[]
 }
 
 entity NovelImage {
@@ -196,7 +196,7 @@ entity Tweet {
   * isDeleted: Boolean
   * createdAt: DateTime
   * updatedAt: DateTime
-  * TwitterMedia: TwitterMedia[]
+  * twitterMedia: TwitterMedia[]
 }
 
 entity TwitterUser {
