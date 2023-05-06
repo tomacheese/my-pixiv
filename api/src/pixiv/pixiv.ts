@@ -498,3 +498,53 @@ export async function loadPixiv() {
 
   return pixiv
 }
+
+/**
+ * Pixivインスタンスのキャッシュ
+ */
+const searchCache: {
+  pixiv: Pixiv | undefined
+  timestamp: number
+} = {
+  pixiv: undefined,
+  timestamp: 0,
+}
+
+/**
+ * 検索用Pixivインスタンスを取得する。インスタンスは10分間キャッシュされる。
+ *
+ * @returns Pixivインスタンス
+ */
+export async function loadSearchPixiv() {
+  // 10分以内に呼ばれたらキャッシュを返す
+  if (
+    searchCache.pixiv &&
+    searchCache.timestamp + 10 * 60 * 1000 > Date.now()
+  ) {
+    return searchCache.pixiv
+  }
+
+  const data = fs.readFileSync(PATH.SEARCH_TOKEN_FILE, 'utf8')
+  const json = JSON.parse(data)
+  const pixiv = await Pixiv.of(json.refresh_token)
+
+  if (json.refresh_token !== pixiv.refreshToken) {
+    fs.writeFileSync(
+      PATH.TOKEN_FILE,
+      JSON.stringify(
+        {
+          refresh_token: pixiv.refreshToken,
+          datetime: new Date().toISOString(),
+        },
+        // eslint-disable-next-line unicorn/no-null
+        null,
+        2
+      )
+    )
+  }
+
+  searchCache.pixiv = pixiv
+  searchCache.timestamp = Date.now()
+
+  return pixiv
+}
