@@ -3,7 +3,7 @@ import { PATH } from '@/utils/utils'
 import { GetUserRequest, GetUserResponse, PixivUserItem } from 'my-pixiv-types'
 import { dirname, join } from 'node:path'
 import fs from 'node:fs'
-import { loadPixiv } from '@/pixiv/pixiv'
+import { loadSearchPixiv } from '@/pixiv/pixiv'
 
 /**
  * ユーザーキャッシュモデル
@@ -25,7 +25,7 @@ export class GetUser extends BaseWSRouter<GetUserRequest, GetUserResponse> {
   }
 
   async execute() {
-    const pixiv = await loadPixiv()
+    const pixiv = await loadSearchPixiv()
 
     const userId = this.data.user_id
 

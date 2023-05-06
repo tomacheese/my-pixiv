@@ -1,5 +1,5 @@
 import { BaseWSRouter } from '@/base-ws-router'
-import { loadPixiv, Pixiv } from '@/pixiv/pixiv'
+import { loadPixiv, loadSearchPixiv, Pixiv } from '@/pixiv/pixiv'
 import {
   AddMangaLikeRequest,
   AddMangaLikeResponse,
@@ -44,7 +44,7 @@ export class GetManga extends BaseWSRouter<GetMangaRequest, GetMangaResponse> {
   }
 
   async execute() {
-    const pixiv = await loadPixiv()
+    const pixiv = await loadSearchPixiv()
 
     const mangaId = this.data.manga_id
 
@@ -117,7 +117,7 @@ export class SearchManga extends BaseWSRouter<
   }
 
   async execute() {
-    const pixiv = await loadPixiv()
+    const pixiv = await loadSearchPixiv()
 
     // キャッシュの存在確認、1時間以内ならキャッシュを返す
     const cachePath = this.getCachePath()
