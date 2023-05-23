@@ -142,9 +142,7 @@ export default Vue.extend({
 
         this.tweetStatus = 'LOADING'
         this.isLoadingImage = true
-        setTimeout(() => {
-          this.fetchTweets()
-        }, 1000)
+        this.fetchTweets()
 
         // イラストポップアップアクセス中は #illust-popup をつける
         if (window.location.hash !== '#illust-popup') {
@@ -223,6 +221,7 @@ export default Vue.extend({
       if (!this.item) {
         return
       }
+      const illustId = this.item.id
       this.isLoadingTweet = true
       this.tweetStatus = 'LOADING'
       this.tweets = undefined
@@ -233,7 +232,7 @@ export default Vue.extend({
       this.tweets = []
       this.error = undefined
       this.$api.twitter.searchByIllust(
-        this.item.id,
+        illustId,
         this.searchCallback.bind(this),
         (error) => {
           this.tweetStatus = 'FAILED'
@@ -246,6 +245,9 @@ export default Vue.extend({
     },
     searchCallback(response: SearchTweetResponse) {
       const data = response.data
+      if (!this.item || data.illustId !== this.item.id) {
+        return
+      }
 
       switch (data.responseType) {
         case 'screen_names': {

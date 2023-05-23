@@ -69,12 +69,14 @@ export class SearchTweet extends BaseWSRouter<
     // スクリーンネームは判明したので返す
     if (screenNames.length === 0) {
       this.send({
+        illustId: this.data.illust_id,
         responseType: 'error',
         message: 'screen name not found',
       })
       return
     }
     this.send({
+      illustId: this.data.illust_id,
       responseType: 'screen_names',
       screen_names: screenNames,
     })
@@ -85,6 +87,7 @@ export class SearchTweet extends BaseWSRouter<
     for (const screenName of screenNames) {
       this.getTweets(screenName, postedAt, path).catch((error) => {
         this.send({
+          illustId: this.data.illust_id,
           responseType: 'error',
           message: error.message,
         })
@@ -121,12 +124,14 @@ export class SearchTweet extends BaseWSRouter<
 
     if (tweetsBySearch.length > 0 || tweetsByUserTimeline.length > 0) {
       this.send({
+        illustId: this.data.illust_id,
         responseType: 'finish',
       })
       return
     }
 
     this.send({
+      illustId: this.data.illust_id,
       responseType: 'error',
       message: `@${screenName} tweet not found`,
     })
@@ -202,6 +207,7 @@ export class SearchTweet extends BaseWSRouter<
 
     const similarity = await this.calculateSimilarity(imagePath, tweetImagePath)
     this.send({
+      illustId: this.data.illust_id,
       responseType: 'tweet',
       tweet: {
         tweet,
