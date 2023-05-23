@@ -82,6 +82,11 @@ export interface SearchTweetResult {
 
 interface SearchTweetResponseScreenNameData {
   /**
+   * イラスト ID
+   */
+  illustId: number
+
+  /**
    * レスポンスタイプ
    */
   responseType: 'screen_names'
@@ -93,6 +98,11 @@ interface SearchTweetResponseScreenNameData {
 }
 
 interface SearchTweetResponseTweetData {
+  /**
+   * イラスト ID
+   */
+  illustId: number
+
   /**
    * レスポンスタイプ
    */
@@ -106,6 +116,11 @@ interface SearchTweetResponseTweetData {
 
 interface SearchTweetResponseError {
   /**
+   * イラスト ID
+   */
+  illustId: number
+
+  /**
    * レスポンスタイプ
    */
   responseType: 'error'
@@ -117,6 +132,11 @@ interface SearchTweetResponseError {
 }
 
 interface SearchTweetResponseFinish {
+  /**
+   * イラスト ID
+   */
+  illustId: number
+
   /**
    * レスポンスタイプ
    */
