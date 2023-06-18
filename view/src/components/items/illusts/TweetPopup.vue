@@ -409,6 +409,9 @@ export default Vue.extend({
       if (this.liked.sub.includes(firstTweetId)) {
         return
       }
+      if (this.likeLoading) {
+        return
+      }
 
       this.likeLoading = true
       this.$api.twitter
