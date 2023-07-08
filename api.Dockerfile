@@ -1,4 +1,4 @@
-FROM node:19-alpine as builder
+FROM node:20-alpine as builder
 
 # ----- common start ----- #
 
@@ -39,7 +39,7 @@ RUN yarn compile && \
   yarn package
 
 # ----- final image ----- #
-FROM node:19-alpine
+FROM node:20-alpine
 
 COPY --from=builder /build/api/output /app
 
