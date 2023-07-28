@@ -41,7 +41,7 @@
     "eslint-config-prettier": "8.9.0",
     "eslint-plugin-nuxt": "4.0.0",
     "eslint-plugin-unicorn": "^46.0.0",
-    "eslint-plugin-unused-imports": "2.0.0",
+    "eslint-plugin-unused-imports": "3.0.0",
     "eslint-plugin-vue": "9.15.1",
     "husky": "8.0.3",
     "lint-staged": "13.2.3",
