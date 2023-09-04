@@ -26,7 +26,7 @@
     "webpack": "5.88.2"
   },
   "devDependencies": {
-    "@babel/eslint-parser": "7.22.9",
+    "@babel/eslint-parser": "7.22.15",
     "@commitlint/cli": "17.6.7",
     "@commitlint/config-conventional": "17.6.7",
     "@mdi/font": "^7.1.96",
