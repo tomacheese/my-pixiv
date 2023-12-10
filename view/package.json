@@ -40,7 +40,7 @@
     "eslint": "8.39.0",
     "eslint-config-prettier": "9.1.0",
     "eslint-plugin-nuxt": "4.0.0",
-    "eslint-plugin-unicorn": "^46.0.0",
+    "eslint-plugin-unicorn": "^49.0.0",
     "eslint-plugin-unused-imports": "3.0.0",
     "eslint-plugin-vue": "9.19.2",
     "husky": "8.0.3",
