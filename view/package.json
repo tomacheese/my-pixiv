@@ -16,7 +16,7 @@
   "dependencies": {
     "@nuxt/typescript-build": "2.1.0",
     "@nuxtjs/axios": "5.13.6",
-    "core-js": "3.32.0",
+    "core-js": "3.34.0",
     "nuxt": "2.17.2",
     "ts-loader": "8.4.0",
     "vue": "2.7.15",
