@@ -24,7 +24,7 @@
     "fix:prettier": "prettier --write src"
   },
   "devDependencies": {
-    "@types/node": "20.10.4",
+    "@types/node": "20.10.5",
     "@types/qs": "6.9.10",
     "@types/ws": "8.5.10",
     "@typescript-eslint/eslint-plugin": "5.62.0",
