@@ -48,7 +48,7 @@
   "dependencies": {
     "@fastify/websocket": "8.3.1",
     "@vercel/ncc": "0.38.1",
-    "fastify": "4.24.3",
+    "fastify": "4.25.2",
     "jimp": "0.22.10",
     "twitter-api-v2": "1.15.2",
     "typescript": "5.3.3",
