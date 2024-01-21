@@ -50,7 +50,7 @@
     "@vercel/ncc": "0.38.1",
     "fastify": "4.24.3",
     "jimp": "0.22.10",
-    "twitter-api-v2": "1.15.2",
+    "twitter-api-v2": "1.16.0",
     "typescript": "5.3.3",
     "ws": "8.15.1"
   }
