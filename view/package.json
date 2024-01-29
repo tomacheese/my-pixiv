@@ -43,7 +43,7 @@
     "eslint-plugin-unicorn": "46.0.1",
     "eslint-plugin-unused-imports": "3.0.0",
     "eslint-plugin-vue": "9.20.1",
-    "husky": "9.0.5",
+    "husky": "9.0.6",
     "lint-staged": "15.2.0",
     "my-pixiv-types": "*",
     "nuxt-typed-vuex": "0.3.1",
