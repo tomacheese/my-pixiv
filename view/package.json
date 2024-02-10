@@ -34,7 +34,7 @@
     "@nuxtjs/eslint-config-typescript": "12.1.0",
     "@nuxtjs/eslint-module": "4.1.0",
     "@nuxtjs/pwa": "3.3.5",
-    "@nuxtjs/stylelint-module": "5.1.0",
+    "@nuxtjs/stylelint-module": "5.2.0",
     "@nuxtjs/vuetify": "1.12.3",
     "@vue/runtime-dom": "3.4.15",
     "eslint": "8.56.0",
