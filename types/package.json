@@ -15,7 +15,7 @@
     "fix:prettier": "prettier --write src"
   },
   "dependencies": {
-    "ctix": "2.4.0"
+    "ctix": "2.4.1"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "5.62.0",
