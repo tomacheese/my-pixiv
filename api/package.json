@@ -51,7 +51,7 @@
     "fastify": "4.26.2",
     "jimp": "0.22.12",
     "twitter-api-v2": "1.16.1",
-    "typescript": "5.4.2",
+    "typescript": "5.4.3",
     "ws": "8.16.0"
   }
 }
